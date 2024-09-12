@@ -1,0 +1,220 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .background-light850_dark200 {
+    @apply bg-light-850 dark:bg-dark-200 !important;
+  }
+
+  .background-light700_dark400 {
+    @apply bg-light-700 dark:bg-dark-400 !important;
+  }
+
+  .background-light900_dark400 {
+    @apply bg-light-900 dark:bg-dark-400;
+  }
+
+  .background-light800_dark200 {
+    @apply bg-light-800 dark:bg-dark-200;
+  }
+
+  .background-light800_dark500 {
+    @apply bg-light-800 dark:bg-dark-500 dark: bg-opacity-50;
+  }
+
+  .background-light500_dark200 {
+    @apply bg-light-500 dark:bg-dark-200 dark:bg-opacity-50;
+  }
+
+  .background-light900_dark200 {
+    @apply bg-light-900 dark:bg-dark-200 !important;
+  }
+
+  .background-light500_dark500 {
+    @apply bg-light-500 dark:bg-dark-500;
+  }
+
+  .background-light800_dark400 {
+    @apply bg-light-800 dark:bg-dark-400;
+    opacity: 0.5;
+  }
+
+  .background-light700_dark200 {
+    @apply bg-light700 dark:bg-dark-200;
+  }
+
+  .background-light500_dark300 {
+    @apply bg-light-500 dark:bg-dark-300;
+    opacity: 0.5;
+  }
+
+  .background-dark500_light900 {
+    @apply bg-dark-500 dark:bg-light-900;
+  }
+
+  .background-light500_dark400 {
+    @apply bg-light-500 dark:bg-dark-400;
+  }
+
+  .background-light700_dark500 {
+    @apply bg-light-700 dark:bg-dark-500;
+  }
+
+  .background-light600_dark400 {
+    @apply bg-light-600 dark:bg-dark-400;
+  }
+
+  .text-dark100_light900 {
+    @apply text-dark-100 dark:text-light-900;
+  }
+
+  .text-dark600_light600 {
+    @apply text-dark-600 dark:text-light-600;
+  }
+
+  .border-light500_dark500 {
+    @apply border-light-500 dark:border-dark-500;
+  }
+
+  .border-light500_dark400 {
+    @apply border-light-500 dark:border-dark-400;
+  }
+
+  .border-light600_dark500 {
+    @apply border-light-600 dark:border-dark-500;
+  }
+
+  .border-light500_dark200 {
+    @apply border-light500 dark:border-dark-200 dark:border-opacity-50;
+    border-width: 0.5px;
+  }
+
+  .h1-bold {
+    @apply text-[36px] font-bold leading-[42px] tracking-tighter;
+  }
+
+  .h2-bold {
+    @apply text-[24px] font-bold leading-[31.2px];
+  }
+
+  .h2-semibold {
+    @apply text-[24px] font-semibold leading-[31.2px];
+  }
+
+  .h2-medium {
+    @apply text-[24px] font-medium leading-[31.2px];
+  }
+
+  .h3-medium {
+    @apply text-[20px] font-medium leading-[26px];
+  }
+
+  .h3-semibold {
+    @apply text-[20px] font-semibold leading-[24.8px];
+  }
+
+  .base-medium {
+    @apply text-[18px] font-medium leading-[25.2px];
+  }
+
+  .base-semibold {
+    @apply text-[18px] font-semibold leading-[25.2px];
+  }
+
+  .base-bold {
+    @apply text-[18px] font-bold leading-[140%];
+  }
+
+  .paragraph-regular {
+    @apply text-[16px] font-normal leading-[22.4px];
+  }
+
+  .paragraph-medium {
+    @apply text-[16px] font-medium leading-[22.4px];
+  }
+
+  .paragraph-semibold {
+    @apply text-[16px] font-semibold leading-[20.8px];
+  }
+
+  .paragraph-15-regular {
+    @apply text-[15px] font-normal leading-[22.4px];
+  }
+
+  .paragraph-15-medium {
+    @apply text-[15px] font-medium leading-[22.4px];
+  }
+
+  .paragraph-15-semibold {
+    @apply text-[15px] font-semibold leading-[20.8px];
+  }
+
+  .body-regular {
+    @apply text-[14px] font-normal leading-[19.6px];
+  }
+
+  .body-medium {
+    @apply text-[14px] font-medium leading-[18.2px];
+  }
+
+  .body-semibold {
+    @apply text-[14px] font-semibold leading-[18.2px];
+  }
+
+  .small-regular {
+    @apply text-[12px] font-normal leading-[15.6px];
+  }
+
+  .small-medium {
+    @apply text-[12px] font-medium leading-[15.6px];
+  }
+
+  .small-semibold {
+    @apply text-[12px] font-semibold leading-[15.6px];
+  }
+
+  .small-11-regular {
+    @apply text-[11px] font-normal leading-[15.6px];
+  }
+
+  .small-11-medium {
+    @apply text-[11px] font-medium leading-[15.6px];
+  }
+
+  .small-11-semibold {
+    @apply text-[11px] font-semibold leading-[15.6px];
+  }
+
+  .subtle-medium {
+    @apply text-[10px] font-medium leading-[13px] !important;
+  }
+
+  .subtle-regular {
+    @apply text-[10px] font-normal leading-[13px];
+  }
+
+  .placeholder {
+    @apply placeholder:text-light-500 dark:placeholder:text-dark-100;
+  }
+
+  .shadow-light100_dark100 {
+    @apply shadow-light-100 dark:shadow-dark-100;
+  }
+
+  .shadow-light100_darknone {
+    @apply shadow-light-100 dark:shadow-none;
+  }
+
+  .primary-gradient {
+    background: linear-gradient(129deg, #f57206 0%, #f57206 100%);
+  }
+
+  .dark-gradient {
+    background: linear-gradient(
+      232deg,
+      rgba(23, 28, 35, 0.41) 0%,
+      rgba(19, 22, 28, 0.7) 100%
+    );
+  }
+}
