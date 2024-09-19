@@ -6,8 +6,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <main className="background-light850_dark200 flex flex-row ">
       <LeftSidebar />
       <div className="bg-transparent flex flex-row">
-        <section className="w-[836px]">
-          <div className="ms-auto">{children}</div>
+        <section className="">
+          <div className="ms-auto h-screen">{children}</div>
         </section>
         RightSidebar
       </div>

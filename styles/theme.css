@@ -138,6 +138,10 @@
     @apply text-[16px] font-semibold leading-[20.8px];
   }
 
+  .paragraph-light {
+    @apply text-[16px] font-light leading-[20.8px];
+  }
+
   .paragraph-15-regular {
     @apply text-[15px] font-normal leading-[22.4px];
   }
@@ -174,8 +178,20 @@
     @apply text-[12px] font-semibold leading-[15.6px];
   }
 
+  .small-custom {
+    @apply text-[12px] leading-[15.6px];
+    font-weight: 350;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .small-custom-2 {
+    @apply text-[12px] leading-[15.6px];
+  }
+
   .small-11-regular {
-    @apply text-[11px] font-normal leading-[15.6px];
+    @apply text-[11px] leading-[15.6px];
   }
 
   .small-11-medium {

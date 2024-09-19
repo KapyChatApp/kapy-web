@@ -24,7 +24,7 @@ const Leftsidebar = () => {
               width={32}
               height={32}
             />
-            <p className="h2-bold">KAPY ChatApp</p>
+            <p className="h2-bold max-sm:hidden">KAPY ChatApp</p>
           </Link>
         </div>
         <div className="flex flex-col mt-[32px]">
