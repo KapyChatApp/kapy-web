@@ -1,12 +1,12 @@
 import React from "react";
 import GlobalSearch from "../search/globalSearch";
-import MessageBox from "../shared/messAttibute/MessageBox";
+import MessageBox from "../shared/groupAttribute/MessageBox";
 
 const LeftMessage = () => {
   const box = [
     {
       id: "1",
-      username: "Junnie",
+      username: "Group ATSH",
       ava: "/assets/ava/ava1.jpg",
       content:
         "Hello I am Hello I am Hello I am Hello I am a girl in your life",
@@ -18,7 +18,7 @@ const LeftMessage = () => {
     },
     {
       id: "2",
-      username: "MasterD",
+      username: "Team good boy",
       ava: "/assets/ava/ava2.jpg",
       content: "Hello",
       sender: "MasterD",
@@ -29,10 +29,10 @@ const LeftMessage = () => {
     },
     {
       id: "3",
-      username: "Annie",
+      username: "Team dev",
       ava: "/assets/ava/ava1.jpg",
       content: "Hello",
-      sender: "Annie",
+      sender: "Junnie",
       pin: false,
       time: "4 min",
       isOnline: false,
@@ -43,7 +43,7 @@ const LeftMessage = () => {
   return (
     <div className="flex flex-col w-full h-screen py-[16px] px-[8px]">
       <div className="text-dark100_light900">
-        <p className="h2-medium">Message</p>
+        <p className="h2-medium">Groups</p>
       </div>
 
       <GlobalSearch />
@@ -66,6 +66,8 @@ const LeftMessage = () => {
             ))
           : null}
       </div>
+
+      <div></div>
     </div>
   );
 };

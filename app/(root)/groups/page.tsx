@@ -1,11 +1,10 @@
 "use client";
-import LeftMessage from "@/components/message/LeftMessage";
-import RightMessage from "@/components/message/RightMessage";
+import LeftMessage from "@/components/groups/LeftMessage";
+import RightMessage from "@/components/groups/RightMessage";
 import RightSidebar from "@/components/shared/sidebar/RightSidebar";
 import { useState } from "react";
 
-const message = () => {
-  // State để nhận thay đổi từ ToggleButton
+const page = () => {
   const [isToggled, setIsToggled] = useState(false);
 
   // Callback để cập nhật state khi ToggleButton được nhấn
@@ -36,4 +35,5 @@ const message = () => {
     </section>
   );
 };
-export default message;
+
+export default page;
