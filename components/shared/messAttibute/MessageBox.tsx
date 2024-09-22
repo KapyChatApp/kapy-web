@@ -49,18 +49,22 @@ const MessageBox = ({
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[8px] flex-grow overflow-hidden min-w-0">
-              <p className="paragraph-regular">{`${username}`}</p>
+              <p className="paragraph-regular text-dark100_light900">{`${username}`}</p>
               <div className="flex items-center w-full min-w-0">
                 {isSeen ? (
-                  <p className="small-custom-2 justify-start">{`${sender}`}:</p>
+                  <p className="small-custom-2 justify-start text-dark100_light900">
+                    {`${sender}`}:
+                  </p>
                 ) : (
-                  <p className="small-bold-custom-2">{`${sender}`}:</p>
+                  <p className="small-bold-custom-2 text-dark100_light900">
+                    {`${sender}`}:
+                  </p>
                 )}
-                <div className="flex min-w-0">
+                <div className="flex min-w-0 ">
                   {isSeen ? (
-                    <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap">{`${content}`}</p>
+                    <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
-                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap">{`${content}`}</p>
+                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   )}
                 </div>
               </div>

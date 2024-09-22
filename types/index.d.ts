@@ -48,3 +48,11 @@ export interface Link {
   createAt: Date;
   createBy: string;
 }
+
+export interface MememberGroup {
+  id: string;
+  username: string;
+  ava: string;
+  addedBy: string;
+  isOnline: boolean;
+}

@@ -1,4 +1,12 @@
-import { Photo, SidebarLink, Video, File, Link, SidebarButton } from "@/types";
+import {
+  Photo,
+  SidebarLink,
+  Video,
+  File,
+  Link,
+  SidebarButton,
+  MememberGroup
+} from "@/types";
 
 export const themes = [
   { value: "light", label: "Light", icon: "mingcute:sun-fill" },
@@ -26,6 +34,44 @@ export const sidebarLinks: SidebarLink[] = [
     icon: "hugeicons:maps-global-01",
     route: "/map",
     label: "Your map"
+  }
+];
+
+export const members: MememberGroup[] = [
+  {
+    id: "1",
+    username: "Junnie",
+    ava: "/assets/ava/ava1.jpg",
+    addedBy: "",
+    isOnline: true
+  },
+  {
+    id: "2",
+    username: "MasterD",
+    ava: "/assets/ava/ava1.jpg",
+    addedBy: "Junnie",
+    isOnline: true
+  },
+  {
+    id: "3",
+    username: "Annie",
+    ava: "/assets/ava/ava1.jpg",
+    addedBy: "MasterD",
+    isOnline: true
+  },
+  {
+    id: "4",
+    username: "HaHa",
+    ava: "/assets/ava/ava1.jpg",
+    addedBy: "MasterD",
+    isOnline: false
+  },
+  {
+    id: "5",
+    username: "Hahaha",
+    ava: "/assets/ava/ava1.jpg",
+    addedBy: "MasterD",
+    isOnline: true
   }
 ];
 

@@ -100,12 +100,14 @@ const SidebarMess = () => {
                 {photo.length}
               </p>
             </div>
-            <Link
-              href="/"
-              className="flex flex-grow items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0"
-            >
-              See all
-            </Link>
+            <div className="flex flex-grow items-center justify-end">
+              <Link
+                href="/"
+                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
+              >
+                See all
+              </Link>
+            </div>
           </div>
           <div className="flex flex-row items-center w-full justify-between">
             {photo.length > 0
@@ -131,12 +133,14 @@ const SidebarMess = () => {
                 {video.length}
               </p>
             </div>
-            <Link
-              href="/"
-              className="flex flex-grow items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0"
-            >
-              See all
-            </Link>
+            <div className="flex flex-grow items-center justify-end">
+              <Link
+                href="/"
+                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
+              >
+                See all
+              </Link>
+            </div>
           </div>
           <div className="flex flex-row items-center w-full justify-between">
             {video.length > 0
@@ -162,12 +166,14 @@ const SidebarMess = () => {
                 {file.length}
               </p>
             </div>
-            <Link
-              href="/"
-              className="flex flex-grow items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0"
-            >
-              See all
-            </Link>
+            <div className="flex flex-grow items-center justify-end">
+              <Link
+                href="/"
+                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
+              >
+                See all
+              </Link>
+            </div>
           </div>
           <div className="flex flex-col justify-start w-full gap-[12px]">
             {file.length > 0
@@ -216,12 +222,14 @@ const SidebarMess = () => {
                 {link.length}
               </p>
             </div>
-            <Link
-              href="/"
-              className="flex flex-grow items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0"
-            >
-              See all
-            </Link>
+            <div className="flex flex-grow items-center justify-end">
+              <Link
+                href="/"
+                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
+              >
+                See all
+              </Link>
+            </div>
           </div>
           <div className="flex flex-col justify-start w-full gap-[12px]">
             {link.length > 0

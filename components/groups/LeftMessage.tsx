@@ -1,9 +1,12 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import GlobalSearch from "../search/globalSearch";
 import MessageBox from "../shared/groupAttribute/MessageBox";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { Button } from "../ui/button";
 
 const LeftMessage = () => {
-  const box = [
+  const [box, setBox] = useState([
     {
       id: "1",
       username: "Group ATSH",
@@ -38,17 +41,32 @@ const LeftMessage = () => {
       isOnline: false,
       isSeen: false
     }
-  ];
+  ]);
+
+  const handleAddGroup = () => {
+    const newGroup = {
+      id: (box.length + 1).toString(), // Tạo ID mới
+      username: `New Group ${box.length + 1}`,
+      ava: "/assets/images/icon.png",
+      content: "This is a new group message.",
+      sender: "You",
+      pin: false,
+      time: "just now",
+      isOnline: false,
+      isSeen: true
+    };
+    setBox([...box, newGroup]); // Thêm nhóm mới vào danh sách
+  };
 
   return (
-    <div className="flex flex-col w-full h-screen py-[16px] px-[8px]">
-      <div className="text-dark100_light900">
+    <div className="flex flex-col w-full h-full py-[16px] px-[8px]">
+      <div className="text-dark100_light900 ">
         <p className="h2-medium">Groups</p>
       </div>
 
       <GlobalSearch />
 
-      <div className="mt-[12px] flex w-full flex-col overflow-y-auto overflow-x-hidden">
+      <div className="mt-[12px] flex w-full flex-col overflow-y-auto overflow-x-hidden ">
         {box.length > 0
           ? box.map((item) => (
               <MessageBox
@@ -67,7 +85,19 @@ const LeftMessage = () => {
           : null}
       </div>
 
-      <div></div>
+      <div className="flex flex-row mt-auto justify-start w-full">
+        <Button
+          className="shadow-none border-none min-w-fit bg-transparent min-h-fit p-0 flex flex-row items-center justify-start"
+          onClick={handleAddGroup}
+        >
+          <div className="rounded-full p-[12px] bg-primary-500 bg-opacity-20">
+            <Icon icon="mingcute:add-fill" className=" text-primary-500  " />
+          </div>
+          <p className="paragraph-semibold text-primary-500 ml-[12px]">
+            Add group
+          </p>
+        </Button>
+      </div>
     </div>
   );
 };

@@ -195,6 +195,10 @@
     @apply text-[12px] font-semibold leading-[15.6px];
   }
 
+  .small-light {
+    @apply text-[12px] font-light;
+  }
+
   .small-bold-custom {
     @apply text-[12px] font-bold leading-[15.6px];
     white-space: nowrap;

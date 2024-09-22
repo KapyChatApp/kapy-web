@@ -29,7 +29,7 @@ const MessageBox = ({
   return (
     <Link
       key=""
-      href={`/group/${id}`}
+      href={`/groups/${id}`}
       className="text-dark100_light900 hover:background-light800_dark200 hover:dark:opacity-40 hover:rounded-[20px] h-[80px] flex items-center justify-start bg-transparent relative group"
     >
       <div className="bg-transparent flex items-center justify-start w-full relative">

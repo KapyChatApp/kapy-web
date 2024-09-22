@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import MessageFriend from "../shared/messAttibute/MessageFriend";
 import MessageInput from "../shared/messAttibute/MessageInput";
 import ToggleButton from "../shared/button/ToggleButton";
+import { members } from "@/constants";
 
 const data = [
   {
@@ -59,6 +60,8 @@ const RightMessage: React.FC<RightMessageProps> = ({ onToggleChange }) => {
     onToggleChange(data); // Gọi hàm callback để gửi state lên component cha
   };
 
+  const onlineCount = members.filter((member) => member.isOnline).length;
+
   return (
     <section className="flex bg-transparent w-full">
       <div className="flex flex-col flex-1 w-full py-[16px] px-[12px]">
@@ -72,10 +75,21 @@ const RightMessage: React.FC<RightMessageProps> = ({ onToggleChange }) => {
                 height={48}
                 className="rounded-full"
               />
-              <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
+              <div
+                className={`${
+                  onlineCount > 0 ? "bg-green-600" : "bg-transparent"
+                } rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]`}
+              ></div>
             </div>
-            <div className="flex items-center justify-center ml-[8px]">
-              <p className="paragraph-regular">Junnie</p>
+            <div className="flex flex-col justify-start ml-[8px] gap-[6px]">
+              <div className="flex items-center justify-start">
+                <p className="paragraph-regular">Group ATSH</p>
+              </div>
+              <div className="flex items-center justify-start">
+                <p className="small-light">
+                  {members.length} members, {onlineCount} onlines{" "}
+                </p>
+              </div>
             </div>
           </div>
 
