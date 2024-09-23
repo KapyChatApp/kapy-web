@@ -1,4 +1,5 @@
 import { Icon } from "@iconify/react";
+import { StringToBoolean } from "class-variance-authority/types";
 export interface SidebarLink {
   icon: string;
   route: string;
@@ -9,6 +10,35 @@ export interface SidebarButton {
   icon: string;
   label: string;
   onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  ava: string;
+  background: string;
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  ava: string;
+  createdAt: string;
+  createdBy: User;
+  members: MememberGroup[];
+}
+
+export interface MessageBox {
+  id: string;
+  username: string;
+  userId: string;
+  ava: string;
+  content: string;
+  sender: string;
+  pin: boolean;
+  time: string;
+  isOnline: boolean;
+  isSeen: boolean;
 }
 
 export interface Photo {

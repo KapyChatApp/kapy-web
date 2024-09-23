@@ -1,11 +1,12 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import { file, link, photo, sidebarMess, video } from "@/constants";
+import { file, link, photo, sidebarMess, user, video } from "@/constants";
 import Link from "next/link";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import RightsideButton from "../shared/button/RightsideButton";
 import { Button } from "../ui/button";
+import { usePathname } from "next/navigation";
 
 const SidebarMess = () => {
   // Quản lý trạng thái cho icon và label
@@ -34,18 +35,25 @@ const SidebarMess = () => {
   ): void => {
     setIsBest(!isBest);
   };
+
+  const pathname = usePathname();
+  const idFromPathname = pathname.split("/").pop();
+  const userInfo = user.filter((info) => info.id === idFromPathname);
+
   return (
     <div className="flex flex-col w-full h-fit items-center justify-center">
       <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[12px]">
         <div className="flex flex-col items-center justify-center w-full h-fit gap-[12px]">
           <Image
-            src="/assets/ava/ava1.jpg"
+            src={userInfo[userInfo.length - 1].ava}
             alt="ava"
             width={80}
             height={80}
             className="rounded-full"
           />
-          <p className="paragraph-regular text-dark100_light900">Junnie</p>
+          <p className="paragraph-regular text-dark100_light900">
+            {userInfo[userInfo.length - 1].name}
+          </p>
         </div>
         <div className="flex items-center justify-between w-full h-fit">
           {sidebarMess.map((item) => {

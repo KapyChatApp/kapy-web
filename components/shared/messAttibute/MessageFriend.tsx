@@ -9,7 +9,10 @@ interface Content {
 
 interface Props {
   id: string;
-  friend: string;
+  adminId: string;
+  userId: string;
+  adminName: string;
+  userName: string;
   ava: string;
   content: Content;
   createdAt: string;
@@ -18,7 +21,10 @@ interface Props {
 
 const MessageFriend = ({
   id,
-  friend,
+  adminId,
+  userId,
+  adminName,
+  userName,
   ava,
   content,
   createdAt,

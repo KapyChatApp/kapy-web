@@ -1,12 +1,16 @@
+import { user } from "@/constants";
+import { User } from "@/types";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 interface Props {
   id: string;
-  username: string;
-  sender: string;
+  groupId: string;
+  groupName: string;
+  members: User[];
   ava: string;
   content?: string;
   pin: boolean;
@@ -17,8 +21,9 @@ interface Props {
 
 const MessageBox = ({
   id,
-  username,
-  sender,
+  groupId,
+  groupName,
+  members,
   ava,
   content,
   pin,
@@ -26,11 +31,18 @@ const MessageBox = ({
   isOnline,
   isSeen
 }: Props) => {
+  const pathname = usePathname();
+  const isActive =
+    pathname.includes(groupId) || pathname === `/groups/${groupId}`;
   return (
     <Link
       key=""
-      href={`/groups/${id}`}
-      className="text-dark100_light900 hover:background-light800_dark200 hover:dark:opacity-40 hover:rounded-[20px] h-[80px] flex items-center justify-start bg-transparent relative group"
+      href={`/groups/${groupId}`}
+      className={`${
+        isActive
+          ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
+          : "text-dark100_light900 bg-transparent"
+      } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start bg-transparent relative group`}
     >
       <div className="bg-transparent flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">
@@ -49,12 +61,14 @@ const MessageBox = ({
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[8px] flex-grow overflow-hidden min-w-0">
-              <p className="paragraph-regular">{`${username}`}</p>
+              <p className="paragraph-regular">{`${groupName}`}</p>
               <div className="flex items-center w-full min-w-0">
                 {isSeen ? (
-                  <p className="small-custom-2 justify-start">{`${sender}`}:</p>
+                  <p className="small-custom-2 justify-start">
+                    {`${members[0].name}`}:
+                  </p>
                 ) : (
-                  <p className="small-bold-custom-2">{`${sender}`}:</p>
+                  <p className="small-bold-custom-2">{`${members[0].name}`}:</p>
                 )}
                 <div className="flex min-w-0">
                   {isSeen ? (

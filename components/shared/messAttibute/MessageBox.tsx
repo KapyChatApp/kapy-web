@@ -1,11 +1,13 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import React from "react";
 
 interface Props {
   id: string;
   username: string;
+  userId: string;
   sender: string;
   ava: string;
   content?: string;
@@ -18,6 +20,7 @@ interface Props {
 const MessageBox = ({
   id,
   username,
+  userId,
   sender,
   ava,
   content,
@@ -26,11 +29,17 @@ const MessageBox = ({
   isOnline,
   isSeen
 }: Props) => {
+  const pathname = usePathname();
+  const isActive = pathname.includes(id) || pathname === `/${id}`;
   return (
     <Link
       key=""
-      href={`/${id}`}
-      className="text-dark100_light900 hover:background-light800_dark200 hover:dark:opacity-40 hover:rounded-[20px] h-[80px] flex items-center justify-start bg-transparent relative group"
+      href={`/${userId}`}
+      className={`${
+        isActive
+          ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
+          : "text-dark100_light900 bg-transparent"
+      } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start bg-transparent relative group`}
     >
       <div className="bg-transparent flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">

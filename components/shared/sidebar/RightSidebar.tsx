@@ -20,12 +20,14 @@ const RightSidebar = () => {
   return (
     <div className="flex w-full background-light850_dark200 h-full">
       <div className="flex flex-col items-center justify-start w-full h-full">
-        {pathname === "/" ? (
-          <SidebarMess />
-        ) : !isManagementVisible ? (
-          <SidebarGroup onManageClick={handleManageClick} />
+        {pathname.includes("/groups") ? (
+          !isManagementVisible ? (
+            <SidebarGroup onManageClick={handleManageClick} />
+          ) : (
+            <Management onBackClick={handleBackClick} />
+          )
         ) : (
-          <Management onBackClick={handleBackClick} />
+          <SidebarMess />
         )}
       </div>
     </div>

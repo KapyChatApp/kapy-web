@@ -1,11 +1,20 @@
 "use client";
 import Image from "next/image";
 import React, { useState } from "react";
-import { file, link, members, photo, sidebarGroup, video } from "@/constants";
+import {
+  file,
+  group,
+  link,
+  members,
+  photo,
+  sidebarGroup,
+  video
+} from "@/constants";
 import Link from "next/link";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import RightsideButton from "../shared/button/RightsideButton";
 import { Button } from "../ui/button";
+import { usePathname } from "next/navigation";
 
 const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
   // Quản lý trạng thái cho icon và label
@@ -37,18 +46,24 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
     setIsAdd(!isAdd);
     console.log("checkadd");
   };
+  const pathname = usePathname();
+  const idFromPathname = pathname.split("/").pop();
+  const groupInfo = group.filter((info) => info.id === idFromPathname);
+
   return (
     <div className="flex flex-col w-full h-fit items-center justify-center">
       <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[12px]">
         <div className="flex flex-col items-center justify-center w-full h-fit gap-[12px]">
           <Image
-            src="/assets/ava/ava1.jpg"
+            src={groupInfo[0].ava}
             alt="ava"
             width={80}
             height={80}
             className="rounded-full"
           />
-          <p className="paragraph-regular text-dark100_light900">Group ATSH</p>
+          <p className="paragraph-regular text-dark100_light900">
+            {groupInfo[0].name}
+          </p>
         </div>
         <div className="flex items-center justify-between w-full h-fit">
           {sidebarGroup.map((item) => {
@@ -96,12 +111,12 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             <div className="flex flex-row w-fit items-center">
               <p className="text-dark100_light900 paragraph-bold">Members</p>
               <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
-                {members.length}
+                {groupInfo[0].members.length}
               </p>
             </div>
             <div className="flex flex-grow items-center justify-end">
               <Link
-                href="/groups"
+                href={`/groups/${groupInfo[0].id}`}
                 className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
               >
                 See all
@@ -109,45 +124,52 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             </div>
           </div>
           <div className="flex flex-col items-center w-full gap-[8px]">
-            {members.length > 0
-              ? members.slice(0, 3).map((item) => (
-                  <div className="flex flex-row items-center justify-start w-full gap-[12px]">
-                    <div className="relative flex-shrink-0 w-fit">
-                      <Image
-                        src={item.ava}
-                        alt="ava"
-                        width={36}
-                        height={36}
-                        className="rounded-full"
-                      />
-                      {item.isOnline && (
-                        <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
-                      <p className="paragraph-15-regular h-fit">
-                        {item.username}
-                      </p>
-                      <div className="flex items-center justify-start w-full min-w-0">
-                        {item.addedBy === "" ? (
-                          <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
-                            Leader
-                          </p>
-                        ) : (
-                          <div className="flex items-center">
-                            <p className="subtle-regular justify-start text-dark100_light900 h-fit">
-                              Added by
-                            </p>
-                            <p className="subtle-regular ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900 h-fit">
-                              {item.addedBy}
-                            </p>
-                          </div>
+            {groupInfo[0].members.length > 0
+              ? // Sắp xếp members để leader đứng đầu
+                groupInfo[0].members
+                  .sort((a, b) => (a.addedBy === "" ? -1 : 1)) // Sắp xếp người lãnh đạo lên đầu
+                  .slice(0, 3) // Lấy tối đa 3 người
+                  .map((item) => (
+                    <div
+                      className="flex flex-row items-center justify-start w-full gap-[12px]"
+                      key={item.id}
+                    >
+                      <div className="relative flex-shrink-0 w-fit">
+                        <Image
+                          src={item.ava}
+                          alt="ava"
+                          width={36}
+                          height={36}
+                          className="rounded-full"
+                        />
+                        {item.isOnline && (
+                          <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
                         )}
                       </div>
+
+                      <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
+                        <p className="paragraph-15-regular h-fit">
+                          {item.username}
+                        </p>
+                        <div className="flex items-center justify-start w-full min-w-0">
+                          {item.addedBy === "" ? (
+                            <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
+                              Leader
+                            </p>
+                          ) : (
+                            <div className="flex items-center">
+                              <p className="subtle-regular justify-start text-dark100_light900 h-fit">
+                                Added by
+                              </p>
+                              <p className="subtle-regular ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900 h-fit">
+                                {item.addedBy}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))
               : null}
           </div>
         </div>
@@ -161,7 +183,7 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             </div>
             <div className="flex flex-grow items-center justify-end">
               <Link
-                href="/"
+                href={`/groups/${groupInfo[0].id}`}
                 className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
               >
                 See all
@@ -194,7 +216,7 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             </div>
             <div className="flex flex-grow items-center justify-end">
               <Link
-                href="/"
+                href={`/groups/${groupInfo[0].id}`}
                 className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
               >
                 See all
@@ -227,7 +249,7 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             </div>
             <div className="flex flex-grow items-center justify-end">
               <Link
-                href="/"
+                href={`/groups/${groupInfo[0].id}`}
                 className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
               >
                 See all
@@ -283,7 +305,7 @@ const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
             </div>
             <div className="flex flex-grow items-center justify-end">
               <Link
-                href="/"
+                href={`/groups/${groupInfo[0].id}`}
                 className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
               >
                 See all
