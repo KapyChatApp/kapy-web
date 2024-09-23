@@ -61,7 +61,7 @@ const RightMessage: React.FC<RightMessageProps> = ({ onToggleChange }) => {
 
   return (
     <section className="flex bg-transparent w-full">
-      <div className="flex flex-col flex-1 w-full py-[16px] px-[12px]">
+      <div className="flex flex-col flex-1 w-full py-[16px] px-[12px] gap-2">
         <div className="flex flex-row h-[48px] w-full ml-[6px] justify-between items-center">
           <div className="flex flex-row">
             <div className="flex items-center bg-transparent relative">
@@ -102,7 +102,7 @@ const RightMessage: React.FC<RightMessageProps> = ({ onToggleChange }) => {
           </div>
         </div>
 
-        <div className="flex flex-row w-full h-full">
+        <div className="flex flex-row w-full h-full scrollable overflow-scroll">
           <div className="flex flex-col w-full h-full mt-[16px]">
             {data.length > 0
               ? data.map((item) => (

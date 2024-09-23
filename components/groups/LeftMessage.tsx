@@ -66,7 +66,7 @@ const LeftMessage = () => {
 
       <GlobalSearch />
 
-      <div className="mt-[12px] flex w-full flex-col overflow-y-auto overflow-x-hidden ">
+      <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll overflow-x-hidden ">
         {box.length > 0
           ? box.map((item) => (
               <MessageBox

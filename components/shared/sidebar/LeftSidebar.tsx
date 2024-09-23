@@ -90,8 +90,10 @@ const Leftsidebar = () => {
           }`}
         >
           {sidebarLinks.map((item) => {
+            console.log("Current pathname:", pathname);
+            console.log("Current item route:", item.route);
             const isActive =
-              (pathname.includes(item.route) && item.route.length > 0) ||
+              (pathname.includes(item.route) && item.route.length > 1) ||
               pathname === item.route;
             return (
               <Link
@@ -100,8 +102,8 @@ const Leftsidebar = () => {
                 className={`${
                   isActive
                     ? "bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg w-auto h-[44px] text-dark100_light900"
-                    : "text-dark100_light900"
-                } flex items-center justify-start bg-transparent hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg`}
+                    : "text-dark100_light900 bg-transparent"
+                } flex items-center justify-start hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg`}
               >
                 <div className="bg-transparent flex items-center justify-start p-[12px]">
                   <Icon

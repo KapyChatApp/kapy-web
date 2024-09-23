@@ -56,3 +56,8 @@ export interface MememberGroup {
   addedBy: string;
   isOnline: boolean;
 }
+
+export interface ManagementGroup {
+  id: string;
+  label: string;
+}

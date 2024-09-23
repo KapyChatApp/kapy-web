@@ -7,7 +7,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import RightsideButton from "../shared/button/RightsideButton";
 import { Button } from "../ui/button";
 
-const SidebarGroup = () => {
+const SidebarGroup = ({ onManageClick }: { onManageClick: () => void }) => {
   // Quản lý trạng thái cho icon và label
   const [isNotified, setIsNotified] = useState(false);
   const [isFind, setIsFind] = useState(false);
@@ -28,6 +28,7 @@ const SidebarGroup = () => {
     event: React.MouseEvent<HTMLButtonElement>
   ): void => {
     setIsOpen(!isOpen);
+    onManageClick();
     console.log("checkmanage");
   };
   const handleAddMembersClick = (

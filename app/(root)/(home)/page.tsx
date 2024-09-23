@@ -29,7 +29,7 @@ const message = () => {
         </div>
       </div>
       {isToggled && (
-        <div className="flex background-light850_dark200 flex-grow overflow-auto">
+        <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll">
           <RightSidebar />
         </div>
       )}

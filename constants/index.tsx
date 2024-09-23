@@ -5,7 +5,8 @@ import {
   File,
   Link,
   SidebarButton,
-  MememberGroup
+  MememberGroup,
+  ManagementGroup
 } from "@/types";
 
 export const themes = [
@@ -289,6 +290,21 @@ export const sidebarGroup: SidebarButton[] = [
     icon: "lets-icons:setting-fill",
     label: "Manage",
     onClick: handleOpenManageClick
+  }
+];
+
+export const manage: ManagementGroup[] = [
+  {
+    id: "Change",
+    label: "Change avatar and name of group"
+  },
+  {
+    id: "send",
+    label: "Send message"
+  },
+  {
+    id: "add",
+    label: "Add members"
   }
 ];
 

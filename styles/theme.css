@@ -284,4 +284,17 @@
   .underline {
     text-decoration: underline;
   }
+
+  .transition-all {
+    transition: all 0.3s ease-in-out;
+  }
+
+  .scrollable {
+    overflow-y: scroll;
+    scrollbar-width: none;
+  }
+
+  .scrollable::-webkit-scrollbar {
+    display: none;
+  }
 }
