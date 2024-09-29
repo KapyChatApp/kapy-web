@@ -1,17 +1,21 @@
-import React from "react";
-import { Button } from "../ui/button";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { manage } from "@/constants/groups";
-import { Switch } from "@/components/ui/switch";
-
-const Management = ({ onBackClick }: { onBackClick: () => void }) => {
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React from "react";
+interface ManagementProps {
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+}
+const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
+  const handleBack = () => {
+    setActiveComponent("");
+  };
   return (
     <div className="flex flex-col w-full h-full items-center justify-start">
       <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center h-[80px]">
         <Button
           className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-around py-[28px] px-[0px] h-auto"
-          onClick={onBackClick}
+          onClick={handleBack}
         >
           <Icon
             icon="weui:back-filled"
@@ -84,4 +88,4 @@ const Management = ({ onBackClick }: { onBackClick: () => void }) => {
   );
 };
 
-export default Management;
+export default ManagementComponent;

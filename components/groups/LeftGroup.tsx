@@ -1,21 +1,21 @@
 "use client";
 import React, { useState } from "react";
-import GlobalSearch from "../search/globalSearch";
-import MessageBox from "../shared/groupAttribute/MessageBox";
+import GlobalSearch from "../shared/search/globalSearch";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Button } from "../ui/button";
-import { boxGroup, members } from "@/constants";
+import { boxGroup } from "@/constants/groups";
+import MessageBox from "../mess-group/MessageBox";
 
-const LeftMessage = () => {
+const LeftGroup = () => {
   const [box, setBox] = useState(boxGroup);
 
   const handleAddGroup = () => {
     const newGroup = {
       id: (parseInt(box[box.length - 1].id) + 1).toString(),
-      groupId: (box.length + 1).toString(),
-      groupName: `New Group ${box.length + 1}`,
-      members: [],
+      otherId: (box.length + 1).toString(),
+      otherName: `New Group ${box.length + 1}`,
       ava: "/assets/images/icon.png",
+      sender: "",
       content: "This is a new group message.",
       pin: false,
       time: "just now",
@@ -23,35 +23,18 @@ const LeftMessage = () => {
       isSeen: false
     };
 
-    setBox([...box, newGroup]); // Thêm nhóm mới vào danh sách
+    setBox([...box, newGroup]);
+    console.log(box);
   };
 
   return (
-    <div className="flex flex-col w-full h-full py-[16px] px-[8px]">
-      <div className="text-dark100_light900 ">
-        <p className="h2-medium">Groups</p>
-      </div>
+    <div className="flex flex-col background-light900_dark400 w-full h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px]">
+      <p className="h2-medium text-dark100_light900">Group</p>
 
       <GlobalSearch />
 
       <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll overflow-x-hidden ">
-        {boxGroup.length > 0
-          ? boxGroup.map((item) => (
-              <MessageBox
-                key={item.id}
-                id={item.groupId}
-                groupId={item.groupId}
-                groupName={item.groupName}
-                members={item.members}
-                ava={item.ava}
-                content={item.content}
-                pin={item.pin}
-                time={item.time}
-                isOnline={item.isOnline}
-                isSeen={item.isSeen}
-              />
-            ))
-          : null}
+        {box.length > 0 ? box.map((item) => <MessageBox box={item} />) : null}
       </div>
 
       <div className="flex flex-row mt-auto justify-start w-full">
@@ -71,4 +54,4 @@ const LeftMessage = () => {
   );
 };
 
-export default LeftMessage;
+export default LeftGroup;

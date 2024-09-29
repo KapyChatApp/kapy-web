@@ -24,7 +24,7 @@ import {
 } from "@radix-ui/react-menubar";
 
 const Leftsidebar = () => {
-  const [isParagraphVisible, setIsParagraphVisible] = useState(true); // Bước 1: Tạo state
+  const [isParagraphVisible, setIsParagraphVisible] = useState(true);
 
   const toggleParagraphVisibility = () => {
     setIsParagraphVisible(!isParagraphVisible); // Bước 2: Cập nhật state khi nhấn nút
@@ -52,26 +52,14 @@ const Leftsidebar = () => {
   const pathname = usePathname();
   return (
     <section
-      className={`background-light850_dark200 flex h-screen flex-col justify-center overflow-hidden border-none p-[16px] ${
-        isParagraphVisible ? "w-auto" : "w-fit"
-      }`}
+      className={`background-light850_dark200 flex h-screen flex-col justify-center overflow-hidden border-none p-[16px] min-w-fit`}
     >
-      <div
-        className={`flex-1 ${
-          isParagraphVisible ? "w-auto" : "w-fit items-center justify-center"
-        }`}
-      >
-        <div
-          className={`flex flex-col ${
-            isParagraphVisible ? "w-auto" : "w-full items-center justify-center"
-          }`}
-        >
+      <div className={`flex-1 w-fit items-center justify-center`}>
+        <div className={`flex flex-col w-full items-center justify-center `}>
           <Link
             key="logo"
             href="/"
-            className={`text-dark100_light900 flex items-center justify-center bg-transparent gap-[18px] ${
-              isParagraphVisible ? "w-auto" : "w-fit"
-            }`}
+            className={`text-dark100_light900 flex items-center justify-center bg-transparent gap-[18px] w-full`}
           >
             <Image
               src="/assets/images/icon.png"
@@ -80,28 +68,32 @@ const Leftsidebar = () => {
               height={32}
             />
             {isParagraphVisible && (
-              <p className="h2-bold max-sm:hidden">KAPY ChatApp</p>
+              <p className="h2-bold max-sm:text-wrap">KAPY ChatApp</p>
             )}
           </Link>
         </div>
         <div
           className={`flex flex-col mt-[32px] ${
-            isParagraphVisible ? "w-auto" : "w-fit items-center justify-center"
+            isParagraphVisible ? "w-full" : "w-fit items-center justify-center"
           }`}
         >
           {sidebarLinks.map((item) => {
             console.log("Current pathname:", pathname);
             console.log("Current item route:", item.route);
+            const isDynamicPath = /^\/\d+$/.test(pathname);
+            const isGroupDynamicPath = pathname.startsWith("/groups/");
             const isActive =
-              (pathname.includes(item.route) && item.route.length > 1) ||
-              pathname === item.route;
+              pathname === item.route ||
+              (isDynamicPath && item.route === "/") ||
+              (isGroupDynamicPath && item.route === "/groups");
+            console.log(isActive);
             return (
               <Link
                 key={item.route}
                 href={item.route}
                 className={`${
                   isActive
-                    ? "bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg w-auto h-[44px] text-dark100_light900"
+                    ? "bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg w-full h-[44px] text-dark100_light900"
                     : "text-dark100_light900 bg-transparent"
                 } flex items-center justify-start hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg`}
               >

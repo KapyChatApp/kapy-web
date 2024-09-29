@@ -3,10 +3,10 @@ import React from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="background-light850_dark200 flex flex-row overflow-y-hidden w-full flex-grow">
+    <main className="background-light850_dark200 flex flex-row overflow-y-hidden w-full cursor-default">
       <LeftSidebar />
-      <section className="bg-transparent flex flex-row flex-grow">
-        <div className="ms-auto h-screen flex-grow">{children}</div>
+      <section className="bg-transparent w-full flex flex-row">
+        <div className="h-full w-full cursor-default">{children}</div>
       </section>
     </main>
   );

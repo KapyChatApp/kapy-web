@@ -1,0 +1,95 @@
+"use client";
+import { Button } from "@/components/ui/button";
+import { Actions } from "@/types/mess-group";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from "react";
+
+interface ActionButtonProps {
+  action: Actions;
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const ActionButton: React.FC<ActionButtonProps> = ({
+  action,
+  setActiveComponent
+}) => {
+  const { icon, label, click } = action;
+
+  const [isNotified, setIsNotified] = useState(false);
+  const [isFind, setIsFind] = useState(false);
+  const [isBest, setIsBest] = useState(false);
+  const [isBlock, setIsBlock] = useState(false);
+  const [isAdd, setIsAdd] = useState(false);
+  const [isManage, setIsManage] = useState(false);
+
+  const handleButton = () => {
+    switch (click) {
+      case "notified":
+        setIsNotified(!isNotified);
+        break;
+      case "find":
+        setIsFind(!isFind);
+        break;
+      case "block":
+        setIsBlock(!isBlock);
+        break;
+      case "best":
+        setIsBest(!isBest);
+        break;
+      case "add":
+        setIsAdd(!isAdd);
+        break;
+      case "manage":
+        setIsManage(!isManage);
+        break;
+    }
+  };
+
+  const displayLabel = isNotified ? "Turn on" : isBlock ? "Unblock" : label;
+  const displayIcon = isNotified ? "mingcute:notification-off-fill" : icon;
+
+  return (
+    <div className="flex flex-col items-center justify-center min-w-[60px] gap-[8px]">
+      <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
+        <div
+          className={`flex flex-col items-center justify-center rounded-full p-[6px] ${
+            isBest
+              ? "bg-primary-500 bg-opacity-20"
+              : isBlock
+              ? "bg-accent-red bg-opacity-20"
+              : "bg-light-700 dark:bg-dark-400 dar:bg-opacity-80"
+          }`}
+          onClick={() => {
+            handleButton(), setActiveComponent(click);
+          }}
+        >
+          <Icon
+            icon={displayIcon}
+            width={24}
+            height={24}
+            className={`${
+              isBest
+                ? "text-primary-500"
+                : isBlock
+                ? "text-accent-red"
+                : "text-dark100_light900"
+            }`}
+          />
+        </div>
+      </Button>
+      <p
+        className={`${
+          isBest
+            ? "text-primary-500 small-regular"
+            : isBlock
+            ? "text-accent-red small-regular"
+            : "text-dark100_light900 small-regular"
+        }`}
+      >
+        {displayLabel}
+      </p>
+    </div>
+  );
+};
+
+export default ActionButton;

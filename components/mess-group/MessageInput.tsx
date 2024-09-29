@@ -2,7 +2,7 @@
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Input } from "../../ui/input";
+import { Input } from "../ui/input";
 
 const MessageInput = () => {
   const [message, setMessage] = useState("");
