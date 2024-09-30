@@ -1,36 +1,44 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { user } from "@/constants/object";
-import { useToast } from "@/hooks/use-toast";
-import { ActiveComponentProps } from "@/types/mess-group";
-import React from "react";
-import LocalSearch from "@/components/shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import UserCheckbox from "./UserCheckbox";
+import React from "react";
+import { useToast } from "@/hooks/use-toast";
+import LocalSearch from "@/components/shared/search/localSearchbar";
+import { usePathname } from "next/navigation";
+import { group } from "@/constants/object";
+import { RadioGroup } from "@/components/ui/radio-group";
+import MemberRadio from "./MemberRadio";
 
-const AddComponent: React.FC<ActiveComponentProps> = ({
-  setActiveComponent
-}) => {
-  const userList = user.map((item) => item);
+interface ChangeLeaderProps {
+  setIsChange: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
+  const pathname = usePathname();
+  const id = pathname.split("/").pop();
+  const memberList = group
+    .filter((item) => item.id === id)
+    .map((groupItem) => groupItem.members)
+    .flat();
 
   const { toast } = useToast();
   const handleBack = () => {
-    setActiveComponent("");
+    setIsChange(false);
   };
-  const handleAdd = () => {
+  const handleChange = () => {
     toast({
-      title: "You added members successfully!",
+      title: "You changed leader of this group successfully!",
       className:
-        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center"
     });
-    setActiveComponent("");
+    setIsChange(false);
   };
   return (
     <div className="modal-overlay">
       <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
         <div className="flex w-full justify-between px-[10px] pt-[10px] pb-4">
           <p className="text-dark100_light900 paragraph-semibold mt-[6px] ml-[6px]">
-            Add members to this group
+            Change leader of Group
           </p>
           <Icon
             icon="iconoir:cancel"
@@ -50,16 +58,19 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
         </div>
 
         <div className="flex max-h-[307px] w-full overflow-scroll scrollable">
-          <div className="flex flex-col w-full h-full justify-center items-start gap-4 py-2">
-            {userList.map((item) => {
-              const user = {
+          <RadioGroup
+            onValueChange={(value) => console.log(value)}
+            className="flex flex-col w-full h-full justify-center items-start gap-4 py-2"
+          >
+            {memberList.map((item) => {
+              const member = {
                 id: item.id,
                 ava: item.ava,
-                name: item.name
+                name: item.username
               };
-              return <UserCheckbox user={user} />;
+              return <MemberRadio member={member} />;
             })}
-          </div>
+          </RadioGroup>
         </div>
 
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
@@ -74,7 +85,7 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
             </Button>
             <Button
               className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
-              onClick={handleAdd}
+              onClick={handleChange}
             >
               Confirm
             </Button>
@@ -85,4 +96,4 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
   );
 };
 
-export default AddComponent;
+export default ChangeLeader;

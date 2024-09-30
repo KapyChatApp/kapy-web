@@ -1,55 +1,31 @@
-"use client";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import React from "react";
+import { Input } from "@/components/ui/input";
+import { Icon } from "@iconify/react/dist/iconify.js";
 
 interface CustomInputProps {
-  route: string;
-  iconPosition: string;
-  imgSrc: string;
-  placeholder: string;
   otherClasses: string;
 }
 
-const LocalSearchbar = ({
-  route,
-  iconPosition,
-  imgSrc,
-  placeholder,
-  otherClasses
-}: CustomInputProps) => {
+const LocalSearch = ({ otherClasses }: CustomInputProps) => {
   return (
-    <div
-      className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}
-    >
-      {iconPosition === "left" && (
-        <Image
-          src={imgSrc}
-          alt="search icon"
-          width={24}
-          height={24}
-          className="cursor-pointer"
+    <div className="relative w-full">
+      <div
+        className={`${otherClasses} relative flex min-h-[36px] grow items-center gap-[12px] rounded-[10px] px-[16px] py-[8px]`}
+      >
+        <Icon
+          icon="ic:baseline-search"
+          width={18}
+          height={18}
+          className="text-dark100_light900 opacity-50 dark:opacity-80 cursor-pointer"
         />
-      )}
-
-      <Input
-        type="text"
-        placeholder={placeholder}
-        onChange={() => {}}
-        className="paragraph-regular no-focus placeholder text-dark400_light700 background-light800_darkgradient border-none shadow-none outline-none"
-      />
-
-      {iconPosition === "right" && (
-        <Image
-          src={imgSrc}
-          alt="search icon"
-          width={24}
-          height={24}
-          className="cursor-pointer"
-        />
-      )}
+        <Input
+          type="text"
+          placeholder="Search"
+          className="paragraph-light text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus background-light500_dark500 border-none shadow-none outline-none w-full h-full placeholder:paragraph-light p-[0px] bg-transparent"
+        ></Input>
+      </div>
     </div>
   );
 };
 
-export default LocalSearchbar;
+export default LocalSearch;

@@ -1,12 +1,23 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { manage } from "@/constants/groups";
+import { ActiveComponentProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
-interface ManagementProps {
-  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
-}
-const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
+import React, { use, useState } from "react";
+import ChangeLeader from "./ChangeLeader";
+import ModalConfirm from "./ModalConfirm";
+const ManagementComponent: React.FC<ActiveComponentProps> = ({
+  setActiveComponent
+}) => {
+  const [isDisband, setIsDisband] = useState(false);
+  const handleDisband = () => {
+    setIsDisband(!isDisband);
+  };
+  const [isChange, setIsChange] = useState(false);
+  const handleChange = () => {
+    setIsChange(!isChange);
+  };
   const handleBack = () => {
     setActiveComponent("");
   };
@@ -14,13 +25,13 @@ const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
     <div className="flex flex-col w-full h-full items-center justify-start">
       <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center h-[80px]">
         <Button
-          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-around py-[28px] px-[0px] h-auto"
+          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-start gap-3 py-[28px] px-8 h-auto"
           onClick={handleBack}
         >
           <Icon
-            icon="weui:back-filled"
-            width={12}
-            height={24}
+            icon="formkit:arrowleft"
+            width={28}
+            height={28}
             className="text-dark100_light900"
           />
           <p className="paragraph-semibold text-dark100_light900">
@@ -29,7 +40,7 @@ const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
         </Button>
       </div>
 
-      <div className="flex flex-col mt-[12px] w-full items-center justify-start gap-[24px] px-[8px]">
+      <div className="flex flex-col mt-8 w-full items-center justify-start gap-8 px-[8px]">
         <div className="flex flex-col w-full items-start justify-center gap-[12px]">
           <p className="body-semibold text-dark100_light900">
             Allow all members to:
@@ -63,9 +74,12 @@ const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
         </div>
 
         <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg justify-center items-center">
-          <Button className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-around py-[6px] px-0 h-auto">
+          <Button
+            className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-around py-[6px] h-auto"
+            onClick={handleChange}
+          >
             <p className="body-semibold text-dark100_light900">
-              Management of Group
+              Change the leader of group
             </p>
             <Icon
               icon="ooui:next-ltr"
@@ -78,12 +92,25 @@ const ManagementComponent = ({ setActiveComponent }: ManagementProps) => {
       </div>
 
       <div className="flex flex-grow mt-auto w-full items-end justify-end">
-        <Button className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-center py-[8px] bg-accent-red bg-opacity-20 rounded-lg hover:bg-accent-red hover:bg-opacity-20 ">
+        <Button
+          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-center py-[8px] bg-accent-red bg-opacity-20 rounded-lg hover:bg-accent-red hover:bg-opacity-20 "
+          onClick={handleDisband}
+        >
           <p className="paragraph-semibold text-accent-red">
             Disband this group
           </p>
         </Button>
       </div>
+
+      {isDisband && (
+        <ModalConfirm
+          setActiveComponent={setActiveComponent}
+          setConfirm={setIsDisband}
+          label="Are you sure to disband this group?"
+        />
+      )}
+
+      {isChange && <ChangeLeader setIsChange={setIsChange} />}
     </div>
   );
 };

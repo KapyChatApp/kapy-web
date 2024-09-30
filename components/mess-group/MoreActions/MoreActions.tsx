@@ -5,12 +5,11 @@ import { group, user } from "@/constants/object";
 import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
+import { ActiveComponentProps } from "@/types/mess-group";
 
-interface MoreActionsProps {
-  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
-}
-
-const MoreActions = ({ setActiveComponent }: MoreActionsProps) => {
+const MoreActions: React.FC<ActiveComponentProps> = ({
+  setActiveComponent
+}) => {
   const pathname = usePathname();
   const idFromPathname = pathname.split("/").pop();
   const userInfo = user.filter((info) => info.id === idFromPathname);
@@ -34,7 +33,7 @@ const MoreActions = ({ setActiveComponent }: MoreActionsProps) => {
 
       <MoreMiddle />
 
-      <MoreBottom />
+      <MoreBottom setActiveComponent={setActiveComponent} />
     </div>
   ) : (
     <div className="flex flex-col w-full h-fit items-center justify-center p-1">
@@ -42,7 +41,7 @@ const MoreActions = ({ setActiveComponent }: MoreActionsProps) => {
 
       <MoreMiddle />
 
-      <MoreBottom />
+      <MoreBottom setActiveComponent={setActiveComponent} />
     </div>
   );
 };

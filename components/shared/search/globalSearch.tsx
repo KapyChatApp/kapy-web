@@ -5,12 +5,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 const GlobalSearch = () => {
   return (
     <div className="relative w-full mt-[16px] ">
-      <div
-        className="background-light800_dark200-search relative flex min-h-[36px] grow items-center gap-[12px] rounded-[10px] px-[16px] py-[8px]"
-        style={{
-          backgroundColor: "rgb(240 240 240 / var(0.5))"
-        }}
-      >
+      <div className="background-light800_dark200-search relative flex min-h-[36px] grow items-center gap-[12px] rounded-[10px] px-[16px] py-[8px]">
         <Icon
           icon="ic:baseline-search"
           width={18}

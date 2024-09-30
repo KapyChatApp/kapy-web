@@ -51,3 +51,7 @@ export interface MoreTopProps {
   ava: string;
   name: string;
 }
+
+export interface ActiveComponentProps {
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+}

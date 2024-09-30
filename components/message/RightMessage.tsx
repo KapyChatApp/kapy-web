@@ -34,11 +34,11 @@ const RightMessage = () => {
   const renderComponent = () => {
     switch (activeComponent) {
       case "find":
-        return <FindComponent />;
+        return <FindComponent setActiveComponent={setActiveComponent} />;
       case "manage":
         return <ManagementComponent setActiveComponent={setActiveComponent} />;
       case "add":
-        return <AddComponent />;
+        return <AddComponent setActiveComponent={setActiveComponent} />;
       default:
         return <MoreActions setActiveComponent={setActiveComponent} />;
     }
