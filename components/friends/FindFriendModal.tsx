@@ -1,48 +1,42 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { user } from "@/constants/object";
-import { useToast } from "@/hooks/use-toast";
-import { ActiveComponentProps } from "@/types/mess-group";
-import React from "react";
-import LocalSearch from "@/components/shared/search/localSearchbar";
+import React, { useState } from "react";
+import { Button } from "../ui/button";
+import LocalSearch from "../shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import UserCheckbox from "./UserCheckbox";
+import { historyFindFriend } from "@/constants/friends";
+import FindFriendItems from "./FindFriendItems";
 import useSearch from "@/hooks/use-search";
 
-const AddComponent: React.FC<ActiveComponentProps> = ({
-  setActiveComponent
-}) => {
-  const userList = user.map((item) => item);
+interface FindFriendProps {
+  setFind: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const { toast } = useToast();
+const FindFriendModal = ({ setFind }: FindFriendProps) => {
   const handleBack = () => {
-    setActiveComponent("");
+    setFind(false);
   };
-  const handleAdd = () => {
-    toast({
-      title: "You added members successfully!",
-      className:
-        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
-    });
-    setActiveComponent("");
-  };
+  const { searchTerm, setSearchTerm, filteredFriends } =
+    useSearch(historyFindFriend);
 
-  const { searchTerm, setSearchTerm, filteredFriends } = useSearch(userList);
+  const handleFind = () => {};
 
   return (
     <div className="modal-overlay">
       <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
         <div className="flex w-full justify-between px-[10px] pt-[10px] pb-4">
           <p className="text-dark100_light900 paragraph-semibold mt-[6px] ml-[6px]">
-            Add members to this group
+            Add new friends
           </p>
-          <Icon
-            icon="iconoir:cancel"
-            width={18}
-            height={18}
-            className="text-dark100_light900 cursor-pointer"
+          <Button
+            className="flex bg-transparent shadow-none p-0 border-none hover:bg-transparent w-fit h-full"
             onClick={handleBack}
-          />
+          >
+            <Icon
+              icon="iconoir:cancel"
+              width={18}
+              height={18}
+              className="text-dark100_light900"
+            />
+          </Button>
         </div>
 
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
@@ -57,14 +51,9 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
         </div>
 
         <div className="flex h-[307px] w-full overflow-scroll scrollable">
-          <div className="flex flex-col w-full h-full justify-start items-start gap-4 py-2">
+          <div className="flex flex-col w-full h-full justify-start items-start py-2">
             {filteredFriends.map((item) => {
-              const user = {
-                id: item.id,
-                ava: item.ava,
-                name: item.name
-              };
-              return <UserCheckbox user={user} />;
+              return <FindFriendItems user={item} />;
             })}
           </div>
         </div>
@@ -81,9 +70,9 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
             </Button>
             <Button
               className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
-              onClick={handleAdd}
+              onClick={handleFind}
             >
-              Confirm
+              Find
             </Button>
           </div>
         </div>
@@ -92,4 +81,4 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
   );
 };
 
-export default AddComponent;
+export default FindFriendModal;

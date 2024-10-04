@@ -1,7 +1,8 @@
-import React from "react";
+import { redirect } from "next/navigation";
 
-const page = () => {
-  return <div>friends</div>;
-};
+export default function Page() {
+  const label = "all-friend";
+  redirect(`/friends/${label}`);
 
-export default page;
+  return null;
+}

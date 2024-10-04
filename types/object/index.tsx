@@ -1,8 +1,17 @@
+import { Photo } from "../media";
+
 export interface User {
   id: string;
   name: string;
   ava: string;
   background: string;
+  image: Photo[];
+  mutualFriend: number;
+  mutualGroup: number;
+  status: string;
+  birth: Date;
+  bio: string;
+  phone: string;
 }
 
 export interface Group {

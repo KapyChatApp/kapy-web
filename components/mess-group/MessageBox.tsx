@@ -4,7 +4,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface Box {
   box: MessageBoxProps;
@@ -26,6 +26,15 @@ const MessageBox: React.FC<Box> = ({ box }) => {
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/${id}`;
   const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const [isClick, setClick] = useState(isSeen);
+  const handleClickLink = () => {
+    if (isClick === false) {
+      setClick(true);
+      console.log("Clicked:", isClick);
+    }
+  };
+  console.log("isClick:", isClick, "isActive:", isActive);
+
   return isGroup ? (
     <Link
       key=""
@@ -35,6 +44,9 @@ const MessageBox: React.FC<Box> = ({ box }) => {
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
           : "text-dark100_light900 bg-transparent"
       } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
+      onClick={() => {
+        handleClickLink();
+      }}
     >
       <div className="flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">
@@ -57,7 +69,7 @@ const MessageBox: React.FC<Box> = ({ box }) => {
                 {otherName}
               </p>
               <div className="flex items-center w-full min-w-0">
-                {isSeen ? (
+                {isClick || isActive ? (
                   <p className="small-custom-2 justify-start text-dark100_light900">
                     {sender}:
                   </p>
@@ -67,7 +79,7 @@ const MessageBox: React.FC<Box> = ({ box }) => {
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {isSeen ? (
+                  {isClick || isActive ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
                     <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
@@ -106,13 +118,15 @@ const MessageBox: React.FC<Box> = ({ box }) => {
     </Link>
   ) : (
     <Link
-      key=""
       href={`/${otherId}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
           : "text-dark100_light900 bg-transparent"
       } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
+      onClick={() => {
+        handleClickLink();
+      }}
     >
       <div className="flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">
@@ -135,7 +149,7 @@ const MessageBox: React.FC<Box> = ({ box }) => {
                 {otherName}
               </p>
               <div className="flex items-center w-full min-w-0">
-                {isSeen ? (
+                {isClick || isActive ? (
                   <p className="small-custom-2 justify-start text-dark100_light900">
                     {sender}:
                   </p>
@@ -145,7 +159,7 @@ const MessageBox: React.FC<Box> = ({ box }) => {
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {isSeen ? (
+                  {isClick || isActive ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
                     <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">

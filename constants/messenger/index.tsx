@@ -30,7 +30,7 @@ export const box: MessageBoxProps[] = [
     id: "3",
     otherName: "Annie",
     otherId: "3",
-    ava: "/assets/ava/ava1.jpg",
+    ava: "/assets/ava/ava3.jpg",
     content: "Hello",
     sender: "Annie",
     pin: false,
@@ -56,7 +56,7 @@ export const segmentsMess: SegmentMessProps[] = [
   {
     userId: "3",
     userName: "Annie",
-    ava: "/assets/ava/ava1.jpg",
+    ava: "/assets/ava/ava3.jpg",
     content: "Loving the new JavaScript features."
   },
   {

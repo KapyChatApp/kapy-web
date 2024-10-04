@@ -7,6 +7,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { use, useState } from "react";
 import ChangeLeader from "./ChangeLeader";
 import ModalConfirm from "./ModalConfirm";
+import { Switch } from "@/components/ui/switch";
 const ManagementComponent: React.FC<ActiveComponentProps> = ({
   setActiveComponent
 }) => {
@@ -67,10 +68,7 @@ const ManagementComponent: React.FC<ActiveComponentProps> = ({
           <p className="body-semibold text-dark100_light900">
             Allow all members to:
           </p>
-          <Checkbox
-            id="terms2"
-            className={`data-[state=checked]:bg-primary-500 data-[state=checked]:text-light-900 disabled:opacity-1 h-[18px] w-[28px] border-none bg-light-500 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px]`}
-          />
+          <Switch id="block-mode" />
         </div>
 
         <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg justify-center items-center">

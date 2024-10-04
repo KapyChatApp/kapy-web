@@ -16,26 +16,19 @@ const FindComponent: React.FC<ActiveComponentProps> = ({
   };
   return (
     <div className="flex flex-col w-full h-full ">
-      <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center">
-        <Button
-          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-start gap-3 py-[28px] px-8 h-auto"
-          onClick={handleBack}
-        >
-          <Icon
-            icon="formkit:arrowleft"
-            width={28}
-            height={28}
-            className="text-dark100_light900"
-          />
-          <p className="paragraph-semibold text-dark100_light900">
-            {isGroup ? "Find messages of Group" : "Find your messages"}
-          </p>
-        </Button>
-      </div>
+      <Button
+        className="flex shadow-none border-none bg-transparent w-full items-center justify-end px-0 h-auto"
+        onClick={handleBack}
+      >
+        <Icon
+          icon="iconoir:cancel"
+          width={28}
+          height={28}
+          className="text-dark100_light900 text-opacity-60"
+        />
+      </Button>
 
-      <span className="background-light600_dark400 w-full h-[0.5px] mt-5"></span>
-
-      <div className="flex flex-row w-full h-full mt-6 px-2 overflow-scroll scrollable">
+      <div className="flex flex-row w-full h-full px-2 overflow-scroll scrollable">
         <LocalSearch otherClasses="bg-transparent border border-light-500 dark:border-dark-500 w-full" />
       </div>
     </div>

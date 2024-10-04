@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { boxGroup } from "@/constants/groups";
 import MessageBox from "../mess-group/MessageBox";
 import CreateGroup from "./CreateGroup";
+import useSearchMessageBox from "@/hooks/use-search-message-box";
 
 const LeftGroup = () => {
   const [box, setBox] = useState(boxGroup);
@@ -32,16 +33,19 @@ const LeftGroup = () => {
     setBox([...box, newGroup]);
     console.log(box);
   };
+  const { searchTerm, setSearchTerm, filteredBox } = useSearchMessageBox(box);
 
   return (
     <>
       <div className="flex flex-col background-light900_dark400 w-full h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px]">
-        <p className="h2-medium text-dark100_light900">Group</p>
+        <p className="h2-medium text-dark100_light900 px-2">Group</p>
 
-        <GlobalSearch />
+        <GlobalSearch onChange={(e) => setSearchTerm(e.target.value)} />
 
-        <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll overflow-x-hidden ">
-          {box.length > 0 ? box.map((item) => <MessageBox box={item} />) : null}
+        <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll ">
+          {filteredBox.length > 0
+            ? filteredBox.map((item) => <MessageBox box={item} />)
+            : null}
         </div>
 
         <div className="flex flex-row mt-auto justify-start w-full">

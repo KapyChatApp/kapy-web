@@ -4,9 +4,10 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 
 interface CustomInputProps {
   otherClasses: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const LocalSearch = ({ otherClasses }: CustomInputProps) => {
+const LocalSearch = ({ otherClasses, onChange }: CustomInputProps) => {
   return (
     <div className="relative w-full">
       <div
@@ -22,6 +23,7 @@ const LocalSearch = ({ otherClasses }: CustomInputProps) => {
           type="text"
           placeholder="Search"
           className="paragraph-light text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus background-light500_dark500 border-none shadow-none outline-none w-full h-full placeholder:paragraph-light p-[0px] bg-transparent"
+          onChange={onChange}
         ></Input>
       </div>
     </div>

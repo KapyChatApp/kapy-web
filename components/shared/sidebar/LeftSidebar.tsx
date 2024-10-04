@@ -27,24 +27,21 @@ const Leftsidebar = () => {
   const [isParagraphVisible, setIsParagraphVisible] = useState(true);
 
   const toggleParagraphVisibility = () => {
-    setIsParagraphVisible(!isParagraphVisible); // Bước 2: Cập nhật state khi nhấn nút
+    setIsParagraphVisible(!isParagraphVisible);
   };
 
   const [selectedLanguage, setSelectedLanguage] = useState("");
 
-  // Hàm xử lý khi nút "Vietnamese" được nhấn
   const handleButtonVietNamClick = () => {
-    setSelectedLanguage("vietnamese"); // Đặt trạng thái là "vietnamese"
+    setSelectedLanguage("vietnamese");
   };
 
-  // Hàm xử lý khi nút "English" được nhấn
   const handleButtonEnglishClick = () => {
-    setSelectedLanguage("english"); // Đặt trạng thái là "english"
+    setSelectedLanguage("english");
   };
 
   const [isMenubarOpen, setIsMenubarOpen] = useState(false);
 
-  // Toggle trạng thái menubar
   const toggleMenubar = () => {
     setIsMenubarOpen(!isMenubarOpen);
   };
@@ -78,15 +75,14 @@ const Leftsidebar = () => {
           }`}
         >
           {sidebarLinks.map((item) => {
-            console.log("Current pathname:", pathname);
-            console.log("Current item route:", item.route);
             const isDynamicPath = /^\/\d+$/.test(pathname);
             const isGroupDynamicPath = pathname.startsWith("/groups/");
+            const isFriendDynamicPath = pathname.startsWith("/friends/");
             const isActive =
               pathname === item.route ||
               (isDynamicPath && item.route === "/") ||
-              (isGroupDynamicPath && item.route === "/groups");
-            console.log(isActive);
+              (isGroupDynamicPath && item.route === "/groups") ||
+              (isFriendDynamicPath && item.route === "/friends");
             return (
               <Link
                 key={item.route}

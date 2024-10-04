@@ -8,6 +8,7 @@ import { usePathname } from "next/navigation";
 import { group } from "@/constants/object";
 import { RadioGroup } from "@/components/ui/radio-group";
 import MemberRadio from "./MemberRadio";
+import useSearchMember from "@/hooks/use-search-member-group";
 
 interface ChangeLeaderProps {
   setIsChange: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,6 +34,10 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
     });
     setIsChange(false);
   };
+
+  const { searchTerm, setSearchTerm, filteredMembers } =
+    useSearchMember(memberList);
+
   return (
     <div className="modal-overlay">
       <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
@@ -52,17 +57,20 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
         <div className="flex flex-col w-full px-4 pt-3">
-          <LocalSearch otherClasses="border-none bg-light-800 dark:bg-dark-400 bg-opacity-50 dark:bg-opacity-50" />
+          <LocalSearch
+            otherClasses="border-none bg-light-800 dark:bg-dark-400 bg-opacity-50 dark:bg-opacity-50"
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
           <span className="flex w-full h-[0.5px] background-light500_dark400 mt-3"></span>
         </div>
 
-        <div className="flex max-h-[307px] w-full overflow-scroll scrollable">
+        <div className="flex h-[307px] w-full overflow-scroll scrollable">
           <RadioGroup
             onValueChange={(value) => console.log(value)}
-            className="flex flex-col w-full h-full justify-center items-start gap-4 py-2"
+            className="flex flex-col w-full h-full justify-start items-start gap-4 py-2"
           >
-            {memberList.map((item) => {
+            {filteredMembers.map((item) => {
               const member = {
                 id: item.id,
                 ava: item.ava,

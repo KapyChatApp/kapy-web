@@ -82,23 +82,6 @@
     @apply text-dark-600 dark:text-light-600;
   }
 
-  .border-light500_dark500 {
-    @apply border-light-500 dark:border-dark-500;
-  }
-
-  .border-light500_dark400 {
-    @apply border-light-500 dark:border-dark-400;
-  }
-
-  .border-light600_dark500 {
-    @apply border-light-600 dark:border-dark-500;
-  }
-
-  .border-light500_dark200 {
-    @apply border-light500 dark:border-dark-200 dark:border-opacity-50;
-    border-width: 0.5px;
-  }
-
   .border-custom {
     @apply border-none !important;
   }
@@ -169,6 +152,10 @@
 
   .paragraph-15-semibold {
     @apply text-[15px] font-semibold leading-[20.8px];
+  }
+
+  .paragraph-15-light {
+    @apply text-[15px] font-light leading-[22.4px];
   }
 
   .body-light {
@@ -247,6 +234,10 @@
 
   .subtle-regular {
     @apply text-[10px] font-normal leading-[13px];
+  }
+
+  .subtle-light {
+    @apply text-[10px] font-light leading-[13px];
   }
 
   .placeholder {
