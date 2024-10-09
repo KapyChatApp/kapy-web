@@ -13,13 +13,13 @@ const ConfirmModal: React.FC<Confirm> = ({ confirm }) => {
     setConfirm(false);
   };
   const handleConfirm = () => {
-    setIndex(listId);
+    console.log("Handle successfully!");
     handleBack();
   };
   return (
     <div className="modal-overlay">
       <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
-        <div className="flex w-full justify-end items-center pr-2 pt-2">
+        <div className="flex w-full justify-end items-center px-4 pt-2">
           <Icon
             icon="iconoir:cancel"
             width={18}
@@ -35,7 +35,7 @@ const ConfirmModal: React.FC<Confirm> = ({ confirm }) => {
         </div>
         <span className="flex w-full h-[0.5px] background-light500_dark400 mt-7 mb-2"></span>
 
-        <div className="flex justify-end w-full items-center pr-2 pb-2">
+        <div className="flex justify-end w-full items-center px-4 pb-2">
           <div className="flex flex-row w-full h-fit gap-6 justify-end">
             <Button
               onClick={handleBack}

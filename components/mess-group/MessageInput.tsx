@@ -16,7 +16,7 @@ const MessageInput = () => {
     <div className="flex justify-start w-full">
       <div className="relative w-full">
         <Input
-          className="background-light800_dark500 file:background-light800_dark500 file:text-[14px] file:text-wrap file:text-start file:text-dark100_light900 file:font-[320] placeholder:text-start placeholder:text-[14px] placeholder:text-dark100_light900 placeholder:font-[320] h-[36px] rounded-[20px] border-none text-[14px] font-[320] px-[16px] py-[9px] "
+          className="text-dark100_light900 background-light800_dark500 file:background-light800_dark500 file:text-[14px] file:text-wrap file:text-start file:text-dark100_light900 file:font-[320] placeholder:text-start placeholder:text-[14px] placeholder:text-dark100_light900 placeholder:font-[320] h-[36px] rounded-[20px] border-none text-[14px] font-[320] px-[16px] py-[9px] "
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Aa"

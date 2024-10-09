@@ -5,10 +5,12 @@ import { group, user } from "@/constants/object";
 import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
-import { ActiveComponentProps } from "@/types/mess-group";
+import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
 
-const MoreActions: React.FC<ActiveComponentProps> = ({
-  setActiveComponent
+const MoreActions: React.FC<SeeAllProps> = ({
+  setActiveComponent,
+  setItemSent,
+  itemSent
 }) => {
   const pathname = usePathname();
   const idFromPathname = pathname.split("/").pop();
@@ -31,7 +33,11 @@ const MoreActions: React.FC<ActiveComponentProps> = ({
     <div className="flex flex-col w-full h-fit items-center justify-center p-1">
       <MoreTop top={topGroup} setActiveComponent={setActiveComponent} />
 
-      <MoreMiddle />
+      <MoreMiddle
+        setActiveComponent={setActiveComponent}
+        setItemSent={setItemSent}
+        itemSent={itemSent}
+      />
 
       <MoreBottom setActiveComponent={setActiveComponent} />
     </div>
@@ -39,7 +45,11 @@ const MoreActions: React.FC<ActiveComponentProps> = ({
     <div className="flex flex-col w-full h-fit items-center justify-center p-1">
       <MoreTop top={top} setActiveComponent={setActiveComponent} />
 
-      <MoreMiddle />
+      <MoreMiddle
+        setActiveComponent={setActiveComponent}
+        setItemSent={setItemSent}
+        itemSent={itemSent}
+      />
 
       <MoreBottom setActiveComponent={setActiveComponent} />
     </div>

@@ -12,6 +12,13 @@ import { group } from "@/constants/object";
 import FindComponent from "../mess-group/MoreActions/FindComponent";
 import ManagementComponent from "../mess-group/MoreActions/ManagementComponent";
 import AddComponent from "../mess-group/MoreActions/AddComponent";
+import SeeAllMember from "../mess-group/MoreActions/SeeAll/SeeAllMember";
+import SeeAllFile from "../mess-group/MoreActions/SeeAll/SeeAllFile";
+import SeeAllPhoto from "../mess-group/MoreActions/SeeAll/SeeAllPhoto";
+import SeeAllLink from "../mess-group/MoreActions/SeeAll/SeeAllLink";
+import SeeAllVideo from "../mess-group/MoreActions/SeeAll/SeeAllVideo";
+import { MememberGroup } from "@/types/object";
+import { Files, Links, Photo, Video } from "@/types/media";
 
 const RightGroup = () => {
   const [openMore, setOpenMore] = useState(false);
@@ -35,6 +42,10 @@ const RightGroup = () => {
   };
 
   const [activeComponent, setActiveComponent] = useState<string>("");
+  const [itemSent, setItemSent] = useState(
+    [] as MememberGroup[] | Photo[] | Video[] | Files[] | Links[]
+  );
+
   const renderComponent = () => {
     switch (activeComponent) {
       case "find":
@@ -45,11 +56,61 @@ const RightGroup = () => {
         return (
           <>
             <AddComponent setActiveComponent={setActiveComponent} />
-            <MoreActions setActiveComponent={setActiveComponent} />
+            <MoreActions
+              setActiveComponent={setActiveComponent}
+              setItemSent={setItemSent}
+              itemSent={itemSent}
+            />
           </>
         );
+      case "member":
+        return (
+          <SeeAllMember
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
+      case "file":
+        return (
+          <SeeAllFile
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
+      case "photo":
+        return (
+          <SeeAllPhoto
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
+      case "link":
+        return (
+          <SeeAllLink
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
+      case "video":
+        return (
+          <SeeAllVideo
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
       default:
-        return <MoreActions setActiveComponent={setActiveComponent} />;
+        return (
+          <MoreActions
+            setActiveComponent={setActiveComponent}
+            setItemSent={setItemSent}
+            itemSent={itemSent}
+          />
+        );
     }
   };
 
@@ -108,12 +169,16 @@ const RightGroup = () => {
         </div>
         {openMore ? (
           activeComponent ? (
-            <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll px-4 w-[40%] h-full">
+            <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[36%] h-full">
               {renderComponent()}
             </div>
           ) : (
-            <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll px-4 w-[40%]">
-              <MoreActions setActiveComponent={setActiveComponent} />
+            <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[36%]">
+              <MoreActions
+                setActiveComponent={setActiveComponent}
+                setItemSent={setItemSent}
+                itemSent={itemSent}
+              />
             </div>
           )
         ) : null}

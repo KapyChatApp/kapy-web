@@ -28,17 +28,15 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
   };
   return (
     <>
-      <Button
-        className="flex flex-row shadow-none border-[0.5px] bg-transparent border-light-500 dark:border-dark-200 dark:border-opacity-50 rounded-lg p-4 items-center justify-between w-full h-fit"
-        onClick={handleClick}
-      >
+      <div className="flex flex-row shadow-none border-[0.5px] bg-transparent border-light-500 dark:border-dark-200 dark:border-opacity-50 rounded-lg p-4 items-center justify-between w-full h-fit">
         <div className="flex flex-row justify-start items-center gap-3 w-fit h-fit">
           <Image
             src={info.ava}
             alt="ava"
             width={80}
             height={80}
-            className="rounded-lg"
+            className="rounded-lg cursor-pointer"
+            onClick={handleClick}
           />
           <div className="flex flex-col justify-start items-start gap-2 ">
             <p className="text-dark100_light900 base-medium">{info.name}</p>
@@ -67,7 +65,7 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
             ))}
           </PopoverContent>
         </Popover>
-      </Button>
+      </div>
 
       {isClick && !isPop && <AccountModal account={account} />}
     </>

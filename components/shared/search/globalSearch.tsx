@@ -19,7 +19,7 @@ const GlobalSearch = ({ onChange }: globalSearchProps) => {
         <Input
           type="text"
           placeholder="Search"
-          className="paragraph-light text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus background-light800_dark200 border-none shadow-none outline-none w-full h-full placeholder:paragraph-light p-[0px]"
+          className="paragraph-light text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border-none shadow-none outline-none w-full h-full placeholder:paragraph-light p-[0px]"
           onChange={onChange}
         ></Input>
       </div>

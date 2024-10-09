@@ -22,8 +22,8 @@ const FindFriendModal = ({ setFind }: FindFriendProps) => {
   return (
     <div className="modal-overlay">
       <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
-        <div className="flex w-full justify-between px-[10px] pt-[10px] pb-4">
-          <p className="text-dark100_light900 paragraph-semibold mt-[6px] ml-[6px]">
+        <div className="flex w-full justify-between px-4 pt-2 pb-4">
+          <p className="text-dark100_light900 paragraph-semibold mt-2">
             Add new friends
           </p>
           <Button
@@ -50,8 +50,8 @@ const FindFriendModal = ({ setFind }: FindFriendProps) => {
           <span className="flex w-full h-[0.5px] background-light500_dark400 mt-3"></span>
         </div>
 
-        <div className="flex h-[307px] w-full overflow-scroll scrollable">
-          <div className="flex flex-col w-full h-full justify-start items-start py-2">
+        <div className="flex h-[307px] w-full overflow-scroll scrollable py-2">
+          <div className="flex flex-col w-full h-fit justify-start items-start ">
             {filteredFriends.map((item) => {
               return <FindFriendItems user={item} />;
             })}
@@ -60,7 +60,7 @@ const FindFriendModal = ({ setFind }: FindFriendProps) => {
 
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
-        <div className="flex justify-end w-full items-center pr-2 py-2">
+        <div className="flex justify-end w-full items-center pr-4 py-2">
           <div className="flex flex-row w-full h-fit gap-6 justify-end">
             <Button
               onClick={handleBack}

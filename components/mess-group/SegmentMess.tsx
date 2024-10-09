@@ -24,7 +24,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments }) => {
       >
         <p
           className={`${
-            isActive ? "text-dark900_light100" : "text-light-900"
+            isActive ? "text-dark100_light900" : "text-light-900"
           } flex-wrap text-[14px] font-[320px]`}
         >
           {content}

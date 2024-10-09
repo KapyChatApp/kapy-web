@@ -46,10 +46,10 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
 
   return (
     <div className="flex flex-col w-full h-full px-4 pt-4 pb-3 gap-6 overflow-scroll scrollable">
-      <div className="flex flex-row w-full h-fit items-center justify-between">
+      <div className="flex flex-row w-full h-fit items-start justify-between">
         <div className="flex flex-row w-fit h-fit gap-2 items-end justify-start">
           <p className="text-dark100_light900 h3-medium">{label}</p>
-          <p className="text-dark100_light900 h3-regular">{quantity}</p>
+          <p className="text-dark100_light900 h3-regular">({quantity})</p>
         </div>
 
         <div className="flex w-fit h-fit justify-center items-center">

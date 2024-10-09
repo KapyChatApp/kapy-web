@@ -26,7 +26,7 @@ const ManagementComponent: React.FC<ActiveComponentProps> = ({
     <div className="flex flex-col w-full h-full items-center justify-start">
       <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center h-[80px]">
         <Button
-          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-start gap-3 py-[28px] px-8 h-auto"
+          className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-start gap-3 py-[28px] h-auto"
           onClick={handleBack}
         >
           <Icon
@@ -35,9 +35,11 @@ const ManagementComponent: React.FC<ActiveComponentProps> = ({
             height={28}
             className="text-dark100_light900"
           />
-          <p className="paragraph-semibold text-dark100_light900">
-            Management of Group
-          </p>
+          <div className="flex justify-center items-center w-full">
+            <p className="paragraph-semibold text-dark100_light900">
+              Management of Group
+            </p>
+          </div>
         </Button>
       </div>
 
@@ -57,7 +59,7 @@ const ManagementComponent: React.FC<ActiveComponentProps> = ({
                 </label>
                 <Checkbox
                   id="terms2"
-                  className={`data-[state=checked]:bg-primary-500 data-[state=checked]:text-light-900 disabled:opacity-1 h-[18px] w-[18px] border-none bg-light-500 dark:bg-dark-400 dark:bg-opacity-80`}
+                  className={`data-[state=checked]:bg-primary-500 data-[state=checked]:text-light-900 disabled:opacity-1 h-[18px] w-[18px] border-none bg-light-500 dark:bg-dark-400 dark:bg-opacity-80 dark:data-[state=checked]:bg-primary-500 dark:data-[state=checked]:text-light-900`}
                 />
               </div>
             ))}

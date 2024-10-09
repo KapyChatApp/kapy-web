@@ -1,4 +1,4 @@
-import { Group, User } from "@/types/object";
+import { Admin, Group, User } from "@/types/object";
 import { photo } from "../media";
 
 export const user: User[] = [
@@ -109,7 +109,7 @@ export const user: User[] = [
   {
     id: "9",
     name: "HIHI",
-    ava: "/assets/ava/48.jpg",
+    ava: "",
     background: "/assets/ava/ava1.jpg",
     image: photo,
     mutualFriend: 6,
@@ -118,6 +118,45 @@ export const user: User[] = [
     birth: new Date("11/11/2000"), // Ngày sinh
     bio: "Life is short, make it sweet.", // Tiểu sử
     phone: "+1234588" // Số điện thoại
+  },
+  {
+    id: "10",
+    name: "HAHAhahaha",
+    ava: "",
+    background: "/assets/ava/ava2.jpg",
+    image: photo,
+    mutualFriend: 9,
+    mutualGroup: 0,
+    status: "block",
+    birth: new Date("02/02/2001"), // Ngày sinh
+    bio: "Humor and fun are my life.", // Tiểu sử
+    phone: "+1234586" // Số điện thoại
+  },
+  {
+    id: "11",
+    name: "HIHIhihihi",
+    ava: "",
+    background: "/assets/ava/ava1.jpg",
+    image: photo,
+    mutualFriend: 6,
+    mutualGroup: 0,
+    status: "block",
+    birth: new Date("07/07/2000"), // Ngày sinh
+    bio: "Always ready for an adventure!", // Tiểu sử
+    phone: "+1234587" // Số điện thoại
+  },
+  {
+    id: "12",
+    name: "Anhouufe",
+    ava: "",
+    background: "/assets/ava/ava1.jpg",
+    image: photo,
+    mutualFriend: 6,
+    mutualGroup: 0,
+    status: "block",
+    birth: new Date("07/07/2000"), // Ngày sinh
+    bio: "Always ready for an adventure!", // Tiểu sử
+    phone: "+1234587" // Số điện thoại
   }
 ];
 
@@ -248,3 +287,18 @@ export const group: Group[] = [
     ]
   }
 ];
+
+export const admin: Admin = {
+  id: "admin-123",
+  name: "Quinanh",
+  ava: "/assets/ava/ava1.jpg",
+  background: "",
+  image: photo,
+  mutualFriend: 0,
+  mutualGroup: 0,
+  status: "active",
+  birth: new Date("2004-06-01"),
+  bio: "I am an admin",
+  phone: "123-456-7890",
+  sex: 1
+};

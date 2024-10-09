@@ -32,7 +32,7 @@ const MemberRadio: React.FC<MemberList> = ({ member }) => {
       />
       <div className="flex flex-row gap-3 items-center justify-start">
         <Image
-          src={ava}
+          src={ava !== "" ? ava : "/assets/ava/default.png"}
           alt=""
           width={36}
           height={36}

@@ -25,8 +25,8 @@ const AccountModal: React.FC<Account> = ({ account }) => {
   return (
     <div className="modal-overlay">
       <div className="w-[36.2%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col gap-4 pb-4">
-        <div className="flex w-full justify-between px-[10px] pt-[10px]">
-          <p className="text-dark100_light900 paragraph-semibold mt-[6px] ml-[6px]">
+        <div className="flex w-full justify-between px-4 pt-2">
+          <p className="text-dark100_light900 paragraph-semibold mt-2">
             Information of account
           </p>
           <Button

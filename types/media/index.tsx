@@ -26,7 +26,7 @@ export interface Files {
   createBy: string;
 }
 
-export interface Link {
+export interface Links {
   id: string;
   linkName: string;
   icon: string;

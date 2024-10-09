@@ -1,3 +1,6 @@
+import { Files, Links, Photo, Video } from "../media";
+import { MememberGroup } from "../object";
+
 export interface SegmentMessProps {
   userId: string;
   userName: string;
@@ -54,4 +57,14 @@ export interface MoreTopProps {
 
 export interface ActiveComponentProps {
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+export interface SeeAllProps {
+  setItemSent: React.Dispatch<
+    React.SetStateAction<
+      MememberGroup[] | Photo[] | Video[] | Files[] | Links[]
+    >
+  >;
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+  itemSent: MememberGroup[] | Photo[] | Video[] | Files[] | Links[];
 }

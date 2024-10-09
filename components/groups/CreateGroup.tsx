@@ -51,7 +51,7 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
               icon="solar:camera-bold"
               width={24}
               height={24}
-              className="text-dark900_light100"
+              className="text-dark100_light900"
             />
           </Button>
 

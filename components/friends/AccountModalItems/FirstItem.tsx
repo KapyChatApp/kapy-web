@@ -49,7 +49,7 @@ const FirstItem = ({ user }: FirstItemProps) => {
         {/* Avatar */}
         <div className="mt-[112px] h-fit w-fit">
           <Image
-            src={user.ava}
+            src={user.ava !== "" ? user.ava : "/assets/ava/default.png"}
             alt="ava"
             width={80}
             height={80}

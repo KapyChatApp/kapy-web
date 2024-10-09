@@ -1,4 +1,4 @@
-import { Files, Link, Photo, Video } from "@/types/media";
+import { Files, Links, Photo, Video } from "@/types/media";
 
 export const photo: Photo[] = [
   {
@@ -141,7 +141,7 @@ export const file: Files[] = [
   }
 ];
 
-export const link: Link[] = [
+export const link: Links[] = [
   {
     id: "1",
     linkName: "Helllloooo1",

@@ -200,19 +200,14 @@
 
   .small-custom {
     @apply text-[12px] leading-[15.6px];
-    font-weight: 350;
+    font-weight: normal;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 100%;
   }
 
-  .small-custom-2 {
-    @apply text-[12px] leading-[15.6px];
-    font-weight: 350;
-  }
-
-  .small-bold-custom-2 {
+  .small-bold {
     @apply text-[12px] font-bold leading-[15.6px];
   }
 
@@ -226,6 +221,10 @@
 
   .small-11-semibold {
     @apply text-[11px] font-semibold leading-[15.6px];
+  }
+
+  .small-11-bold {
+    @apply text-[11px] font-bold leading-[15.6px];
   }
 
   .subtle-medium {
@@ -299,10 +298,10 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 20;
   }
 }

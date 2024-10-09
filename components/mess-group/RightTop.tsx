@@ -32,17 +32,17 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
         {isActiveGroup ? (
           <div className="flex flex-col justify-start ml-[8px] gap-[6px]">
             <div className="flex items-center justify-start">
-              <p className="paragraph-regular">{name}</p>
+              <p className="paragraph-regular text-dark100_light900">{name}</p>
             </div>
             <div className="flex items-center justify-start">
-              <p className="small-light">
+              <p className="small-light text-dark100_light900">
                 {membersGroup} members, {onlineGroup} onlines
               </p>
             </div>
           </div>
         ) : (
           <div className="flex items-center justify-center ml-[8px]">
-            <p className="paragraph-regular">{name}</p>
+            <p className="paragraph-regular text-dark100_light900">{name}</p>
           </div>
         )}
       </div>
@@ -98,17 +98,17 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
         {isActiveGroup ? (
           <div className="flex flex-col justify-start ml-[8px] gap-[6px]">
             <div className="flex items-center justify-start">
-              <p className="paragraph-regular">{name}</p>
+              <p className="paragraph-regular text-dark100_light900">{name}</p>
             </div>
             <div className="flex items-center justify-start">
-              <p className="small-light">
+              <p className="small-light text-dark100_light900">
                 {membersGroup} members, {onlineGroup} onlines
               </p>
             </div>
           </div>
         ) : (
           <div className="flex items-center justify-center ml-[8px]">
-            <p className="paragraph-regular">{name}</p>
+            <p className="paragraph-regular text-dark100_light900">{name}</p>
           </div>
         )}
       </div>

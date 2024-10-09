@@ -70,13 +70,11 @@ const MessageBox: React.FC<Box> = ({ box }) => {
               </p>
               <div className="flex items-center w-full min-w-0">
                 {isClick || isActive ? (
-                  <p className="small-custom-2 justify-start text-dark100_light900">
+                  <p className="small-regular justify-start text-dark100_light900">
                     {sender}:
                   </p>
                 ) : (
-                  <p className="small-bold-custom-2 text-dark100_light900">
-                    {sender}:
-                  </p>
+                  <p className="small-bold text-dark100_light900">{sender}:</p>
                 )}
                 <div className="flex min-w-0 ">
                   {isClick || isActive ? (
@@ -150,13 +148,11 @@ const MessageBox: React.FC<Box> = ({ box }) => {
               </p>
               <div className="flex items-center w-full min-w-0">
                 {isClick || isActive ? (
-                  <p className="small-custom-2 justify-start text-dark100_light900">
+                  <p className="small-regular justify-start text-dark100_light900">
                     {sender}:
                   </p>
                 ) : (
-                  <p className="small-bold-custom-2 text-dark100_light900">
-                    {sender}:
-                  </p>
+                  <p className="small-bold text-dark100_light900">{sender}:</p>
                 )}
                 <div className="flex min-w-0 ">
                   {isClick || isActive ? (
