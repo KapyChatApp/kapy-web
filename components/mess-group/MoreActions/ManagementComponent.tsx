@@ -75,18 +75,20 @@ const ManagementComponent: React.FC<ActiveComponentProps> = ({
 
         <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg justify-center items-center">
           <Button
-            className="flex flex-row shadow-none border-none bg-transparent w-full items-center justify-around py-[6px] h-auto"
+            className="flex flex-row shadow-none border-none bg-transparent w-full h-auto px-3"
             onClick={handleChange}
           >
-            <p className="body-semibold text-dark100_light900">
-              Change the leader of group
-            </p>
-            <Icon
-              icon="ooui:next-ltr"
-              width={12}
-              height={24}
-              className="text-dark100_light900"
-            />
+            <div className="flex w-full h-full items-center justify-center xl:gap-4 sm:gap-2 gap-3">
+              <p className="body-semibold text-dark100_light900 mb-[2px]">
+                Change the leader of group
+              </p>
+              <Icon
+                icon="ooui:next-ltr"
+                width={12}
+                height={18}
+                className="text-dark100_light900"
+              />
+            </div>
           </Button>
         </div>
       </div>

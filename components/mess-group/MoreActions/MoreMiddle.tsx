@@ -38,14 +38,14 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
 
   return (
     <>
-      <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[18px] mt-[24px] mb-[24px]">
+      <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[18px] mt-[24px] mb-[24px] responsive-moreAction">
         {/* Members */}
         {isGroup && (
           <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
             <div className="flex flex-row items-center justify-start w-full">
-              <div className="flex flex-row w-fit items-center">
+              <div className="flex flex-row w-fit items-end">
                 <p className="text-dark100_light900 paragraph-bold">Members</p>
-                <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
+                <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
                   {groupInfo[0].members.length}
                 </p>
               </div>
@@ -113,9 +113,9 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
         {/* Photo */}
         <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
           <div className="flex flex-row items-center justify-start w-full">
-            <div className="flex flex-row w-fit items-center">
+            <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Photo</p>
-              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
+              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
                 {photo.length}
               </p>
             </div>
@@ -128,10 +128,10 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </Button>
             </div>
           </div>
-          <div className="flex flex-row items-center w-full justify-between">
+          <div className="flex flex-row items-center w-full md:justify-between justify-around">
             {photo.length > 0
               ? photo.slice(0, 3).map((item) => (
-                  <div className="flex w-[26%] relative">
+                  <div className="flex md:w-[26%] sm:w-[36%] w-[30%] relative">
                     <Image
                       src={item.path}
                       alt={item.fileName}
@@ -148,9 +148,9 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
         {/* Video */}
         <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
           <div className="flex flex-row items-center justify-start w-full">
-            <div className="flex flex-row w-fit items-center">
+            <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Video</p>
-              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
+              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
                 {video.length}
               </p>
             </div>
@@ -163,10 +163,10 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </Button>
             </div>
           </div>
-          <div className="flex flex-row items-center w-full justify-between">
+          <div className="flex flex-row items-center w-full md:justify-between justify-around">
             {video.length > 0
               ? video.slice(0, 3).map((item) => (
-                  <div className="flex w-[26%] relative">
+                  <div className="flex md:w-[26%] sm:w-[36%] w-[30%] relative">
                     <Image
                       src={item.path}
                       alt={item.fileName}
@@ -183,9 +183,9 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
         {/* File */}
         <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
           <div className="flex flex-row items-center justify-start w-full">
-            <div className="flex flex-row w-fit items-center">
+            <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">File</p>
-              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
+              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
                 {file.length}
               </p>
             </div>
@@ -241,9 +241,9 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
         {/* Link */}
         <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
           <div className="flex flex-row items-center justify-start w-full">
-            <div className="flex flex-row w-fit items-center">
+            <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Link</p>
-              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom ml-[8px]">
+              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
                 {link.length}
               </p>
             </div>

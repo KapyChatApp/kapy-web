@@ -49,13 +49,13 @@ const OtherBoxButton: React.FC<OtherButton> = ({
   return (
     <div className="flex w-full h-fit">
       <Button
-        className="flex flex-row w-full items-center py-2 px-3 gap-3 shadow-none border-none hover:background-light700_dark400 rounded-lg justify-start"
+        className="flex flex-row w-full py-2 px-3 gap-3 shadow-none border-none hover:background-light700_dark400 rounded-lg justify-start items-end"
         onClick={handleButton}
       >
         <Icon
           icon={icon}
-          width={18}
-          height={18}
+          width={20}
+          height={20}
           className={
             icon === "solar:heart-bold"
               ? "text-primary-500"

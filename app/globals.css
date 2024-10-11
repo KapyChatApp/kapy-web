@@ -5,7 +5,14 @@
 @import url("../styles/theme.css");
 
 body {
-  font-family: "Lexend", sans-serif;
+  font-family: "Helvetica";
+}
+
+@font-face {
+  font-family: "Helvetica";
+  src: url("/font/helvetica/HelveticaWorld-Regular.ttf") format("truetype"); /* Đảm bảo đường dẫn đúng */
+  font-weight: normal; /* hoặc bold, tùy thuộc vào phiên bản font bạn đang sử dụng */
+  font-style: normal;
 }
 
 @layer utilities {

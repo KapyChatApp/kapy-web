@@ -59,7 +59,7 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
               />
             </div>
           </PopoverTrigger>
-          <PopoverContent className="flex flex-col background-light900_dark200 h-fit rounded-lg justify-start items-start">
+          <PopoverContent className="flex flex-col background-light900_dark200 h-fit rounded-lg justify-start items-start dark:border-dark-300">
             {otherBox.map((item) => (
               <OtherBoxButton account={info} other={item} setIndex={setIndex} />
             ))}

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { sidebarLinks } from "@/constants/index";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -65,31 +65,53 @@ const Leftsidebar = () => {
     setSetting(!isSetting);
     setDropdownOpen(false);
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width <= 992) {
+        setIsParagraphVisible(false);
+      } else {
+        setIsParagraphVisible(true);
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <>
       <section
-        className={`background-light850_dark200 flex h-screen flex-col justify-center overflow-hidden border-none p-[16px] min-w-fit`}
+        className={`background-light850_dark200 flex h-screen flex-col justify-center overflow-hidden border-none p-[16px] ${
+          isParagraphVisible ? "w-[22%]" : "min-h-fit"
+        }`}
       >
-        <div className={`flex-1 w-fit items-center justify-center`}>
+        <div className={`flex-1 w-full items-center justify-center`}>
           <div className={`flex flex-col w-full items-center justify-center `}>
             <Link
               key="logo"
               href="/"
-              className={`text-dark100_light900 flex items-center justify-center bg-transparent gap-[18px] w-full`}
+              className={`text-dark100_light900 flex items-center ${
+                isParagraphVisible ? "justify-start" : "justify-center"
+              } bg-transparent gap-3 md:gap-1 w-full`}
             >
               <Image
                 src="/assets/images/icon.png"
                 alt="logo"
-                width={32}
-                height={32}
+                width={34}
+                height={34}
               />
               {isParagraphVisible && (
-                <p className="h2-bold max-sm:text-wrap">KAPY ChatApp</p>
+                <p className="max-sm:text-wrap h-fit chewy-regular xl:h2-bold h3-medium">
+                  KAPY ChatApp
+                </p>
               )}
             </Link>
           </div>
           <div
-            className={`flex flex-col mt-[32px] ${
+            className={`flex flex-col mt-[24px] ${
               isParagraphVisible
                 ? "w-full"
                 : "w-fit items-center justify-center"
@@ -114,11 +136,11 @@ const Leftsidebar = () => {
                       : "text-dark100_light900 bg-transparent"
                   } flex items-center justify-start hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg`}
                 >
-                  <div className="bg-transparent flex items-center justify-start p-[12px]">
+                  <div className="bg-transparent flex items-end justify-start p-[12px]">
                     <Icon
                       icon={item.icon}
-                      width={18}
-                      height={18}
+                      width={20}
+                      height={20}
                       className="text-light900_dark100"
                     />
                     {isParagraphVisible && (
@@ -147,7 +169,7 @@ const Leftsidebar = () => {
               <DropdownMenuTrigger
                 className={`shadow-none border-custom ${
                   isParagraphVisible
-                    ? "w-full flex bg-light-700 dark:bg-dark-400 rounded-lg text-dark100_light900 h-[32px] px-3 py-[4px] items-center justify-start dark:bg-opacity-80"
+                    ? "w-full flex bg-light-700 dark:bg-dark-400 rounded-lg text-dark100_light900 h-[32px] lg:px-3 px-2 py-[4px] items-center justify-start dark:bg-opacity-80"
                     : "w-fit bg-transparent justify-center p-0"
                 }`}
               >
@@ -157,13 +179,13 @@ const Leftsidebar = () => {
                       admin.ava !== "" ? admin.ava : "/assets/ava/default.png"
                     }
                     alt="logo"
-                    width={26}
-                    height={26}
-                    className="rounded-full"
+                    width={isParagraphVisible ? 28 : 32}
+                    height={isParagraphVisible ? 28 : 32}
+                    className={`rounded-full`}
                   />
                   {isParagraphVisible && (
                     <div className="flex w-full justify-start items-center">
-                      <p className="paragraph-regular ml-[12px] text-dark100_light900">
+                      <p className="xl:paragraph-regular lg:body-regular md:small-regular lg:ml-[12px] ml-1 text-dark100_light900">
                         {admin.name}
                       </p>
                     </div>
@@ -176,11 +198,11 @@ const Leftsidebar = () => {
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent border-none shadow-none p-0 w-full"
                     onClick={handleAccount}
                   >
-                    <div className="flex flex-row p-[8px] gap-[12px]">
+                    <div className="flex flex-row p-[8px] gap-[12px] justify-center items-end">
                       <Icon
                         icon="tabler:user-filled"
-                        width={18}
-                        height={18}
+                        width={20}
+                        height={20}
                         className="text-light900_dark100"
                       />
 
@@ -195,11 +217,11 @@ const Leftsidebar = () => {
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent border-none shadow-none p-0 w-full"
                     onClick={handleSetting}
                   >
-                    <div className="flex flex-row p-[8px] gap-[12px]">
+                    <div className="flex flex-row p-[8px] gap-[12px] justify-center items-end">
                       <Icon
                         icon="lets-icons:setting-fill"
-                        width={18}
-                        height={18}
+                        width={20}
+                        height={20}
                         className="text-light900_dark100"
                       />
 
@@ -213,18 +235,18 @@ const Leftsidebar = () => {
                   <div className="w-full h-[1px] bg-light-500 dark:bg-dark-400"></div>
                 </DropdownMenuSeparator>
                 <DropdownMenuLabel className="hover:bg-light-700 hover:rounded-lg hover:dark:bg-dark-400 hover:dark:bg-opacity-80">
-                  <div className="w-full flex relative">
+                  <div className="w-full flex relative ">
                     <Menubar className="w-full flex">
                       <MenubarMenu>
                         <MenubarTrigger
                           className="shadow-none border-none flex flex-1 items-center justify-between bg-transparent w-full"
                           onClick={toggleMenubar}
                         >
-                          <div className="flex flex-row p-[8px] gap-[12px]">
+                          <div className="flex flex-row p-[8px] gap-[12px] justify-center items-end">
                             <Icon
                               icon="ic:baseline-language"
-                              width={18}
-                              height={18}
+                              width={20}
+                              height={20}
                               className="text-dark100_light900"
                             />
 
@@ -234,8 +256,8 @@ const Leftsidebar = () => {
                           </div>
                           <Icon
                             icon="grommet-icons:next"
-                            width={18}
-                            height={18}
+                            width={20}
+                            height={20}
                             className="text-dark100_light900"
                           />
                         </MenubarTrigger>
@@ -249,11 +271,11 @@ const Leftsidebar = () => {
                                 className="flex flex-row p-[8px] border-none shadow-none w-full justify-between items-center hover:border-none"
                                 onClick={handleButtonVietNamClick}
                               >
-                                <div className="flex gap-[12px] justify-start items-center w-fit">
+                                <div className="flex gap-[12px] justify-start items-end w-fit">
                                   <Icon
                                     icon="twemoji:flag-vietnam"
-                                    width={18}
-                                    height={18}
+                                    width={20}
+                                    height={20}
                                     className="justify-start w-fit"
                                   />
 
@@ -264,8 +286,8 @@ const Leftsidebar = () => {
                                 {selectedLanguage === "vietnamese" && (
                                   <Icon
                                     icon="mdi:tick"
-                                    width={18}
-                                    height={18}
+                                    width={20}
+                                    height={20}
                                     className="text-primary-500"
                                   />
                                 )}
@@ -279,11 +301,11 @@ const Leftsidebar = () => {
                                 className="flex flex-row p-[8px] border-none shadow-none w-full justify-between items-center hover:border-none"
                                 onClick={handleButtonEnglishClick}
                               >
-                                <div className="flex gap-[12px] justify-start items-center w-fit">
+                                <div className="flex gap-[12px] justify-start items-end w-fit">
                                   <Icon
                                     icon="twemoji:flag-liberia"
-                                    width={18}
-                                    height={18}
+                                    width={20}
+                                    height={20}
                                     className="justify-start w-fit"
                                   />
 
@@ -294,8 +316,8 @@ const Leftsidebar = () => {
                                 {selectedLanguage === "english" && (
                                   <Icon
                                     icon="mdi:tick"
-                                    width={18}
-                                    height={18}
+                                    width={20}
+                                    height={20}
                                     className="text-primary-500"
                                   />
                                 )}
@@ -316,11 +338,11 @@ const Leftsidebar = () => {
                     href="/signin"
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent w-full"
                   >
-                    <div className="flex flex-row p-[8px] gap-[12px]">
+                    <div className="flex flex-row p-[8px] gap-[12px] justify-center items-end">
                       <Icon
                         icon="material-symbols:logout"
-                        width={18}
-                        height={18}
+                        width={20}
+                        height={20}
                         className="text-accent-red"
                       />
 
@@ -333,7 +355,11 @@ const Leftsidebar = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <div className={`flex ${isParagraphVisible ? "ml-[12px]" : ""}`}>
+          <div
+            className={`responsive-sidebar ${
+              isParagraphVisible ? "ml-[12px]" : ""
+            }`}
+          >
             <Button
               className="flex rounded-full background-light700_dark400 h-[32px] w-[32px] justify-center items-center"
               onClick={toggleParagraphVisibility}

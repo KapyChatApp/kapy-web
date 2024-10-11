@@ -22,7 +22,7 @@ const MoreBottom: React.FC<ActiveComponentProps> = ({ setActiveComponent }) => {
   const displayLabelButton = isGroup ? "Leave Group" : "Unfriend";
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-[8px] w-full mt-auto">
+      <div className="flex flex-col items-center justify-center gap-[8px] w-full mt-auto responsive-moreAction">
         <div className="flex items-center justify-center gap-[8px] w-full rounded-lg bg-light-700 dark:bg-dark-400 dark:bg-opacity-80">
           <Button
             className="shadow-none border-none flex items-center justify-center w-full bg-transparent"

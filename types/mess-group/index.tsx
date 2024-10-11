@@ -1,20 +1,40 @@
 import { Files, Links, Photo, Video } from "../media";
 import { MememberGroup } from "../object";
 
+export interface ImageContent {
+  type: "image";
+  url: string;
+  altText?: string;
+}
+export interface LinkContent {
+  type: "link";
+  url: string;
+  title?: string;
+}
+export interface FileContent {
+  type: "file";
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+}
+
 export interface SegmentMessProps {
   userId: string;
   userName: string;
   ava: string;
-  content?: string;
+  content: string | ImageContent | LinkContent | FileContent;
+  time?: Date;
+  recipientId?: string;
 }
 
 export interface SegmentGroupProps {
   groupId: string;
   userId: string;
   userName: string;
-  userAva: string;
   ava: string;
-  content?: string;
+  content: string | ImageContent | LinkContent | FileContent;
+  time?: Date;
+  recipientId?: string;
 }
 
 export interface MessageBoxProps {

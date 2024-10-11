@@ -2,8 +2,8 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useRef } from "react";
 import Image from "next/image";
-import MessageInput from "./MessageInput";
-import { Button } from "../ui/button";
+import MessageInput from "../MessageInput";
+import { Button } from "../../ui/button";
 
 const RightBottom = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -15,12 +15,12 @@ const RightBottom = () => {
   };
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">
-      <div className="flex flex-row gap-[16px] items-center justify-center">
+      <div className="flex flex-row lg:gap-4 gap-3 items-center justify-center">
         <Icon
           icon="carbon:add-filled"
           width={28}
           height={28}
-          className="text-primary-500 cursor-pointer"
+          className="text-primary-500 cursor-pointer lg:w-[28px] lg:h-[28px] w-[22px] h-[22px]"
         />
         <Button
           className="flex border-none shadow-none w-fit h-fit bg-transparent p-0"
@@ -30,14 +30,14 @@ const RightBottom = () => {
             icon="basil:picture-solid"
             width={28}
             height={28}
-            className="text-primary-500 cursor-pointer"
+            className="text-primary-500 cursor-pointer lg:w-[28px] lg:h-[28px] w-[22px] h-[22px]"
           />
         </Button>
         <Icon
           icon="fluent:mic-record-28-filled"
           width={28}
           height={28}
-          className="text-primary-500 cursor-pointer"
+          className="text-primary-500 cursor-pointer lg:w-[28px] lg:h-[28px] w-[22px] h-[22px]"
         />
       </div>
       {/* Input file ẩn */}
@@ -53,18 +53,18 @@ const RightBottom = () => {
         }}
       />
 
-      <div className="flex flex-row ml-[24px] w-[80.5%] ">
+      <div className="flex flex-row lg:ml-[24px] ml-2 w-[80.5%] ">
         <MessageInput />
       </div>
 
-      <div className="flex items-center justify-start w-fit ml-[16px]">
-        <div className="flex items-center ">
+      <div className="flex items-center justify-start w-fit lg:ml-[16px] ml-1">
+        <div className="flex items-center w-6 h-6 xl:w-[28px] xl:h-[28px] justify-start">
           <Image
             src="/assets/images/icon.png"
             alt="ava"
             width={28}
             height={28}
-            className="bg-transparent"
+            className="w-full h-auto  cursor-pointer object-cover"
           />
         </div>
       </div>

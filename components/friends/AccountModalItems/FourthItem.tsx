@@ -21,7 +21,7 @@ const FourthItem = ({ user }: FourthItemProps) => {
       </div>
 
       <div className="flex flex-row items-center justify-between h-fit w-full">
-        <div className="flex flex-row gap-3 w-fit h-fit">
+        <div className="flex flex-row gap-3 w-fit h-fit items-center">
           <Icon
             icon="mdi:user-block"
             width={18}

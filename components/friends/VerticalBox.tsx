@@ -65,7 +65,13 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
         className="flex flex-col shadow-none border-[0.5px] bg-transparent border-light-500 dark:border-dark-200 dark:border-opacity-50 rounded-lg p-3 items-center justify-center w-fit h-fit cursor-pointer hover:border-primary-100 hover:border-opacity-10 hover:bg-primary-100 hover:bg-opacity-10"
         onClick={handleClick}
       >
-        <Image src={list.ava} alt="ava" width={172} height={166} />
+        <Image
+          src={list.ava}
+          alt="ava"
+          width={172}
+          height={166}
+          className="responsive-friend-vertical"
+        />
 
         <div className="flex flex-col gap-1 w-full h-fit justify-center items-start mt-3">
           <p className="text-dark100_light900 base-medium">{list.name}</p>

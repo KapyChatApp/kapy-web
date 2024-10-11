@@ -4,13 +4,19 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 interface Box {
   box: MessageBoxProps;
+  setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
+  setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const MessageBox: React.FC<Box> = ({ box }) => {
+const MessageBox: React.FC<Box> = ({
+  box,
+  setClickBox,
+  setClickOtherRight
+}) => {
   const {
     id,
     otherName,
@@ -27,13 +33,15 @@ const MessageBox: React.FC<Box> = ({ box }) => {
   const isActive = pathname.includes(id) || pathname === `/${id}`;
   const isGroup = /^\/groups\/\d+$/.test(pathname);
   const [isClick, setClick] = useState(isSeen);
+
   const handleClickLink = () => {
-    if (isClick === false) {
-      setClick(true);
-      console.log("Clicked:", isClick);
+    if (setClickBox) {
+      setClickBox(true); //Click box for responsive
+      if (isClick === false) {
+        setClick(true); //Set click seeen
+      }
     }
   };
-  console.log("isClick:", isClick, "isActive:", isActive);
 
   return isGroup ? (
     <Link
@@ -50,22 +58,22 @@ const MessageBox: React.FC<Box> = ({ box }) => {
     >
       <div className="flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">
-          <div className="flex flex-row bg-transparent gap-[12px] min-w-0 items-center pr-1">
+          <div className="flex flex-row bg-transparent lg:gap-[12px] gap-2 min-w-0 items-center pr-1">
             <div className="relative flex-shrink-0 w-fit">
               <Image
                 src={ava}
                 alt="ava"
                 width={48}
                 height={48}
-                className="rounded-full"
+                className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
               {isOnline && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
               )}
             </div>
 
-            <div className="flex flex-col bg-transparent items-start justify-start gap-[8px] flex-grow overflow-hidden min-w-0">
-              <p className="paragraph-regular text-dark100_light900">
+            <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
+              <p className="lg:paragraph-regular body-regular text-dark100_light900 ">
                 {otherName}
               </p>
               <div className="flex items-center w-full min-w-0">
@@ -128,22 +136,22 @@ const MessageBox: React.FC<Box> = ({ box }) => {
     >
       <div className="flex items-center justify-start w-full relative">
         <div className="flex flex-row bg-transparent py-[16px] px-[8px] w-full justify-between items-center relative">
-          <div className="flex flex-row bg-transparent gap-[12px] min-w-0 items-center pr-1">
+          <div className="flex flex-row bg-transparent lg:gap-[12px] gap-2 min-w-0 items-center pr-1">
             <div className="relative flex-shrink-0 w-fit">
               <Image
                 src={ava}
                 alt="ava"
                 width={48}
                 height={48}
-                className="rounded-full"
+                className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
               {isOnline && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
               )}
             </div>
 
-            <div className="flex flex-col bg-transparent items-start justify-start gap-[8px] flex-grow overflow-hidden min-w-0">
-              <p className="paragraph-regular text-dark100_light900">
+            <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
+              <p className="lg:paragraph-regular body-regular  text-dark100_light900">
                 {otherName}
               </p>
               <div className="flex items-center w-full min-w-0">
@@ -156,9 +164,9 @@ const MessageBox: React.FC<Box> = ({ box }) => {
                 )}
                 <div className="flex min-w-0 ">
                   {isClick || isActive ? (
-                    <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
+                    <p className="lg:small-custom subtle-regular ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
-                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
+                    <p className="lg:small-bold-custom subtle-bold justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
                       {content}
                     </p>
                   )}
@@ -168,7 +176,7 @@ const MessageBox: React.FC<Box> = ({ box }) => {
           </div>
 
           <div className="flex flex-col bg-transparent items-center justify-end gap-[7px] relative">
-            <p className="small-custom">{time}</p>
+            <p className="small-custom ">{time}</p>
             {pin ? (
               <div className="w-full justify-end items-end flex">
                 <Icon

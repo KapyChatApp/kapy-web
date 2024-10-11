@@ -1,24 +1,66 @@
 "use client";
-import LeftGroup from "@/components/groups/LeftGroup";
-import RightGroup from "@/components/groups/RightGroup";
-import { useState } from "react";
+import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
+import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
+import { useEffect, useState } from "react";
 
 const page = () => {
-  const [isToggled, setIsToggled] = useState(false);
+  const [isClickBox, setClickBox] = useState(true);
+  const [isClickOtherRight, setClickOtherRight] = useState(false);
+  const divClassName = "flex h-full lg:hidden md:hidden w-full ";
+  //Click open more responsive
+  const [isMdScreen, setIsMdScreen] = useState(false);
+  const [openMore, setOpenMore] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      // Kiểm tra kích thước cửa sổ
+      if (window.innerWidth >= 768 && window.innerWidth < 878) {
+        setIsMdScreen(true);
+      } else {
+        setIsMdScreen(false);
+      }
+    };
 
-  const handleToggleChange = (newValue: boolean) => {
-    setIsToggled(newValue);
-    console.log("Toggle button state:", newValue);
-  };
+    // Kiểm tra kích thước ngay khi component render lần đầu
+    handleResize();
+
+    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
+    window.addEventListener("resize", handleResize);
+
+    // Hủy lắng nghe sự kiện khi component unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-screen">
-      <div className="flex flex-row w-full">
-        <div className="flex h-full w-[25.6608%]">
-          <LeftGroup />
+      <div className={`flex flex-row w-full`}>
+        {divClassName.includes("w-full") &&
+          (isClickBox ? (
+            <div className="flex md:hidden h-full w-full bg-transparent ">
+              <RightMessage
+                setClickBox={setClickBox}
+                setClickOtherRight={setClickOtherRight}
+                isClickOtherRight={isClickOtherRight}
+                setOpenMore={setOpenMore}
+                openMore={openMore}
+              />
+            </div>
+          ) : (
+            <div className={divClassName}>
+              <LeftMessage
+                setClickBox={setClickBox}
+                setClickOtherRight={setClickOtherRight}
+              />
+            </div>
+          ))}
+        <div
+          className={`md:flex hidden h-full  ${
+            isMdScreen && openMore ? "w-[70%]" : "lg:w-[25.6608%]  w-[30%]"
+          }`}
+        >
+          <LeftMessage />
         </div>
-        <div className="flex h-full w-full bg-transparent ">
-          <RightGroup />
+        <div className="md:flex hidden h-full w-full bg-transparent ">
+          <RightMessage setOpenMore={setOpenMore} openMore={openMore} />
         </div>
       </div>
     </section>

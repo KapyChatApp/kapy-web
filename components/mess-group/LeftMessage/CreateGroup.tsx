@@ -1,12 +1,12 @@
 import React from "react";
-import { Button } from "../ui/button";
-import UserCheckbox from "../mess-group/MoreActions/UserCheckbox";
-import LocalSearch from "../shared/search/localSearchbar";
+import { Button } from "../../ui/button";
+import UserCheckbox from "../MoreActions/UserCheckbox";
+import LocalSearch from "../../shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useToast } from "@/hooks/use-toast";
 import { user } from "@/constants/object";
 import { ActiveComponentProps } from "@/types/mess-group";
-import { Input } from "../ui/input";
+import { Input } from "../../ui/input";
 
 interface CreateGroupProps {
   setCreated: React.Dispatch<React.SetStateAction<boolean>>;

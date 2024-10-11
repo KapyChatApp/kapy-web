@@ -74,17 +74,19 @@ const LeftComponent = () => {
   return (
     <>
       <div className="flex flex-col p-4 w-full h-full gap-6">
-        <div className="flex flex-row items-center justify-between w-full h-fit">
-          <p className="h2-medium text-dark100_light900">Your friends</p>
+        <div className="flex flex-row items-start justify-between w-full h-fit">
+          <p className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
+            Your friends
+          </p>
           <Button
-            className="flex h-full w-fit bg-transparent border-none shadow-none hover:bg-transparent"
+            className="flex h-full w-fit bg-transparent border-none shadow-none hover:bg-transparent p-0 items"
             onClick={handleIconAdd}
           >
             <Icon
               icon="mdi:user-add"
               width={30}
               height={30}
-              className="text-dark-500 dark:text-light-900 "
+              className="text-dark-500 dark:text-light-900 lg:h-[30px] lg:w-[30px] md:w-[22px] md:h-[22px] "
             />
           </Button>
         </div>

@@ -18,7 +18,7 @@ const ConfirmModal: React.FC<Confirm> = ({ confirm }) => {
   };
   return (
     <div className="modal-overlay">
-      <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
+      <div className="lg:w-[26%] md:w-[36%] min-w-[60%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col md:shadow-none shadow-sm drop-shadow-sm shadow-zinc-700">
         <div className="flex w-full justify-end items-center px-4 pt-2">
           <Icon
             icon="iconoir:cancel"

@@ -37,16 +37,16 @@ const SeeAllPhoto: React.FC<SeeAllProps> = ({
           </div>
         </Button>
       </div>
-      <div className="flex flex-row flex-wrap items-center w-full justify-between px-2 gap-2">
+      <div className="flex flex-row flex-wrap items-center w-full md:justify-between justify-start md:px-2 px-0 md:gap-2 gap-4">
         {photoList.length > 0
           ? photoList.map((item) => (
-              <div className="flex w-[30%] relative">
+              <div className="flex w-[20%] md:w-[30%] relative">
                 <Image
                   src={item.path}
                   alt={item.fileName}
-                  width={100}
-                  height={100}
-                  className="rounded-[4px] cursor-pointer"
+                  width={500}
+                  height={500}
+                  className="w-full h-auto rounded-[4px] cursor-pointer object-cover"
                 />
               </div>
             ))

@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Actions } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 
 interface ActionButtonProps {
@@ -13,6 +14,9 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   action,
   setActiveComponent
 }) => {
+  const pathname = usePathname();
+  const isGroup = /^\/groups\/\d+$/.test(pathname);
+
   const { icon, label, click } = action;
 
   const [isNotified, setIsNotified] = useState(false);
@@ -49,7 +53,11 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const displayIcon = isNotified ? "mingcute:notification-off-fill" : icon;
 
   return (
-    <div className="flex flex-col items-center justify-center min-w-[60px] gap-[8px]">
+    <div
+      className={`${
+        isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-fit"
+      } flex flex-col items-center justify-center gap-[8px]`}
+    >
       <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
         <div
           className={`flex flex-col items-center justify-center rounded-full p-[6px] ${
@@ -73,7 +81,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
                 : isBlock
                 ? "text-accent-red"
                 : "text-dark100_light900"
-            }`}
+            } `}
           />
         </div>
       </Button>

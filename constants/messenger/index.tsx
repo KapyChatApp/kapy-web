@@ -45,36 +45,68 @@ export const segmentsMess: SegmentMessProps[] = [
     userId: "1",
     userName: "Junnie",
     ava: "/assets/ava/ava1.jpg",
-    content: "Exploring the wonders of nature!"
+    content: "Hello admin!",
+    time: new Date("2024-10-11T08:20:00")
+  },
+  {
+    userId: "1",
+    userName: "Junnie",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Exploring the wonders of nature!",
+    time: new Date("2024-10-11T08:30:00")
   },
   {
     userId: "2",
     userName: "MasterD",
     ava: "/assets/ava/ava2.jpg",
-    content: "Just finished a 10K marathon!"
+    content: {
+      type: "image",
+      url: "/assets/ava/48.jpg",
+      altText: "MasterD after completing a marathon"
+    },
+    time: new Date("2024-10-11T09:00:00")
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Reminder: Please submit your reports.",
+    time: new Date("2024-10-11T09:30:00"),
+    recipientId: "2" // Gửi cho user MasterD (id: 2)
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "System maintenance will happen tonight.",
+    time: new Date("2024-10-11T10:00:00"),
+    recipientId: "1" // Gửi cho user Junnie (id: 1)
   },
   {
     userId: "3",
     userName: "Annie",
     ava: "/assets/ava/ava3.jpg",
-    content: "Loving the new JavaScript features."
+    content: "Loving the new JavaScript features.",
+    time: new Date("2024-10-11T09:15:00")
   },
   {
     userId: "1",
     userName: "Junnie",
     ava: "/assets/ava/ava1.jpg",
-    content: "Reading a fantastic book on leadership."
+    content: {
+      type: "file",
+      fileName: "leadership-book.pdf",
+      fileUrl: "/assets/files/leadership-book.pdf",
+      fileType: "application/pdf"
+    },
+    time: new Date("2024-10-11T10:00:00")
   },
   {
-    userId: "1",
-    userName: "Junnie",
-    ava: "/assets/ava/ava1.jpg",
-    content: "Reading a fantastic book on leadership."
-  },
-  {
-    userId: "001",
+    userId: "001", // Admin
     userName: "Quynh Anh",
     ava: "/assets/ava/ava1.jpg",
-    content: "I am an admin."
+    content: "System update completed.",
+    time: new Date("2024-10-11T11:00:00"),
+    recipientId: "3" // Gửi cho user Annie (id: 3)
   }
 ];

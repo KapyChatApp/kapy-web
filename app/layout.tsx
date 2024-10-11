@@ -26,7 +26,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${lexend.variable}`}>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Chewy&family=M+PLUS+Rounded+1c:wght@100;300;400;500;700;800;900&display=swap"
+          rel="stylesheet"
+        ></link>
+      </head>
+      <body className="font-helvetica">
         <ThemeProvider>{children}</ThemeProvider>
         <Toaster />
       </body>
