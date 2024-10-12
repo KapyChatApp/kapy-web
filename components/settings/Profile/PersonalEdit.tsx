@@ -27,15 +27,15 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
   };
   return (
     <div className="modal-overlay">
-      <div className="w-[26%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
+      <div className="min-w-[376px] max-w-[376px] md:max-w-[400px] lg:w-[400px] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
         <div className="flex w-full justify-between px-4 pt-2 pb-4">
           <p className="text-dark100_light900 paragraph-semibold mt-2">
             Edit your personal information
           </p>
           <Icon
             icon="iconoir:cancel"
-            width={18}
-            height={18}
+            width={24}
+            height={24}
             className="text-dark100_light900 cursor-pointer"
             onClick={handleBack}
           />

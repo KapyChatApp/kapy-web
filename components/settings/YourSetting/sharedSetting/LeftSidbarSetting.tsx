@@ -5,36 +5,58 @@ import { LeftSidbarSettingProps } from "@/types/settings";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 
+interface props {
+  setShowRight: React.Dispatch<React.SetStateAction<boolean>>;
+  left: LeftSidbarSettingProps;
+  showRight: boolean;
+  showLeft: boolean;
+  handleRender: () => JSX.Element;
+}
+
 const LeftSidbarSetting = ({
-  setRenderRight,
-  renderRight
-}: LeftSidbarSettingProps) => {
+  left,
+  setShowRight,
+  showRight,
+  showLeft,
+  handleRender
+}: props) => {
+  const { setRenderRight, renderRight } = left;
   return (
-    <div className="flex flex-col items-center justify-start w-[34%] h-full background-light900_dark400">
-      <div className="flex flex-col w-full h-full pt-4 px-1">
-        {sidebarSettingButton.map((item) => (
-          <Button
-            className={`${
-              renderRight === item.value
-                ? "bg-light-700 dark:bg-dark-200 dark:bg-opacity-50"
-                : "bg-transparent"
-            } flex w-full h-fit rounded-lg hover:bg-light-700 dark:hover:bg-dark-200 dark:hover:bg-opacity-50 items-center justify-start py-3 pl-6 shadow-none border-none `}
-            onClick={() => setRenderRight(item.value)}
-          >
-            <div className="flex flex-row gap-3 w-full h-fit items-end">
-              <Icon
-                icon={item.icon}
-                width={20}
-                height={20}
-                className="text-dark100_light900"
-              />
-              <p className="text-dark100_light900 paragraph-regular">
-                {item.label}
-              </p>
-            </div>
-          </Button>
-        ))}
-      </div>
+    <div className="flex flex-col items-center justify-start w-full h-full">
+      {(!showRight || !showLeft) && (
+        <div
+          className={`${
+            showLeft ? "pt-3" : "pt-4"
+          } flex flex-col w-full h-full px-1`}
+        >
+          {sidebarSettingButton.map((item) => (
+            <Button
+              className={`${
+                renderRight === item.value
+                  ? "bg-light-700 dark:bg-dark-200 dark:bg-opacity-50"
+                  : "bg-transparent"
+              } flex w-full h-fit rounded-lg hover:bg-light-700 dark:hover:bg-dark-200 dark:hover:bg-opacity-50 items-center justify-start py-3 pl-6 shadow-none border-none `}
+              onClick={() => {
+                setRenderRight(item.value);
+                setShowRight(true);
+              }}
+            >
+              <div className="flex flex-row gap-3 w-full h-fit items-end">
+                <Icon
+                  icon={item.icon}
+                  width={20}
+                  height={20}
+                  className="text-dark100_light900"
+                />
+                <p className="text-dark100_light900 paragraph-regular">
+                  {item.label}
+                </p>
+              </div>
+            </Button>
+          ))}
+        </div>
+      )}
+      {showRight && showLeft && handleRender()}
     </div>
   );
 };

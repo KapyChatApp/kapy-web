@@ -24,7 +24,7 @@ const AccountModal: React.FC<Account> = ({ account }) => {
   };
   return (
     <div className="modal-overlay">
-      <div className="w-[36.2%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col gap-4 pb-4">
+      <div className="min-w-[400px] max-w-[400px] md:max-w-[520px] lg:w-[520px] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col gap-4 pb-4">
         <div className="flex w-full justify-between px-4 pt-2">
           <p className="text-dark100_light900 paragraph-semibold mt-2">
             Information of account
@@ -35,8 +35,8 @@ const AccountModal: React.FC<Account> = ({ account }) => {
           >
             <Icon
               icon="iconoir:cancel"
-              width={18}
-              height={18}
+              width={24}
+              height={24}
               className="text-dark100_light900"
             />
           </Button>

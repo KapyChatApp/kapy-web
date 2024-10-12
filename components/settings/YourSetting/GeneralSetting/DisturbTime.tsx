@@ -27,7 +27,7 @@ const DisturbTime = ({ setDisturb, setDisturbSwitchOff }: DisturbTimeProps) => {
   };
   return (
     <div className="modal-overlay">
-      <div className="w-[20%] h-fit rounded-lg background-light850_dark200 items-center flex flex-col gap-4 px-3 py-2">
+      <div className="w-[264px] rounded-lg background-light850_dark200 items-center flex flex-col gap-4 px-3 py-2">
         <div className="flex flex-row w-full h-fit items-center justify-between">
           <div className="flex items-center justify-center h-fit w-full">
             <p className="text-dark100_light900 paragraph-medium w-fit">

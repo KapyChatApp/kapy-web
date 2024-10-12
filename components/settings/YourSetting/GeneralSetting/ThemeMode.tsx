@@ -1,17 +1,31 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import SettingItem from "../sharedSetting/SettingItem";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { themeMode } from "@/constants/settings";
 import { useTheme } from "@/context/ThemeProvider";
 
 const ThemeMode = () => {
-  const [selectedValue, setSelectedValue] = useState("light");
+  const { mode, setMode } = useTheme();
+  const [selectedValue, setSelectedValue] = useState(mode);
   const handleValueChange = (value: string) => {
     setSelectedValue(value);
   };
 
-  const { mode, setMode } = useTheme();
+  useEffect(() => {
+    if (selectedValue === "system") {
+      const isSystemDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      const newMode = isSystemDark ? "dark" : "light";
+      setMode(newMode);
+    } else {
+      setMode(selectedValue);
+    }
+  }, [selectedValue, setMode]);
+
+  console.log("Mode of your web: ", mode);
+
   return (
     <div className="flex flex-col background-light900_dark400 items-start justify-start py-3 px-4 rounded-lg w-full h-fit gap-4">
       <p className="text-dark100_light900 paragraph-medium">Mode</p>
@@ -23,10 +37,21 @@ const ThemeMode = () => {
             description: item.description
           };
           return (
-            <RadioGroup value={selectedValue} onValueChange={handleValueChange}>
+            <RadioGroup
+              value={selectedValue}
+              onValueChange={handleValueChange}
+              key={item.description}
+            >
               <div
                 className="flex flex-row items-start justify-between w-full h-fit"
-                onClick={() => handleValueChange(item.description)}
+                onClick={() => {
+                  handleValueChange(item.description);
+                  if (item.description !== "system") {
+                    localStorage.theme = item.description;
+                  } else {
+                    localStorage.removeItem("theme");
+                  }
+                }}
                 style={{ cursor: "pointer" }}
               >
                 <SettingItem general={general} />
@@ -35,15 +60,6 @@ const ThemeMode = () => {
                     value={item.description}
                     id={item.description}
                     className="data-[state=checked]:bg-primary-500 border-light-600 dark:border-dark-500 border text-light-900 data-[state=checked]:border-none h-5 w-5"
-                    onClick={() => {
-                      setMode(item.description);
-
-                      if (item.description !== "system") {
-                        localStorage.theme = item.description;
-                      } else {
-                        localStorage.removeItem("theme");
-                      }
-                    }}
                   />
                 </div>
               </div>

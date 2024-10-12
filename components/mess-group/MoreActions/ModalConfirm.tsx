@@ -23,12 +23,12 @@ const ModalConfirm = ({
   };
   return (
     <div className="modal-overlay">
-      <div className="lg:w-[26%] md:w-[36%] min-w-[60%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col md:shadow-none shadow-sm drop-shadow-sm shadow-zinc-700">
+      <div className="max-w-[400px] min-w-[400px] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col md:shadow-none shadow-sm drop-shadow-sm shadow-zinc-700">
         <div className="flex w-full justify-end items-center pr-4 pt-2">
           <Icon
             icon="iconoir:cancel"
-            width={18}
-            height={18}
+            width={24}
+            height={24}
             className="text-dark100_light900 cursor-pointer"
             onClick={handleBack}
           />

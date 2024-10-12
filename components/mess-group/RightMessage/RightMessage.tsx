@@ -113,7 +113,7 @@ const RightMessage = ({
           className={` ${
             isMdScreen && openMore
               ? "hidden"
-              : "flex flex-col flex-1 w-full py-[16px] md:px-[12px] pl-0 pr-[12px] justify-between"
+              : "flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pl-0 pr-[12px] justify-between"
           }`}
         >
           <RightTop

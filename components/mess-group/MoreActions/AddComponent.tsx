@@ -33,7 +33,7 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="lg:w-[26%] w-[40%] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col md:shadow-none shadow-sm drop-shadow-sm shadow-zinc-700">
+      <div className="min-w-[376px] max-w-[376px] md:max-w-[400px] lg:w-[400px] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col md:shadow-none shadow-sm drop-shadow-sm shadow-zinc-700">
         <div className="flex w-full justify-between px-4 pt-2 pb-4">
           <p className="text-dark100_light900 paragraph-semibold mt-2">
             Add members to this group

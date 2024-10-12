@@ -75,7 +75,7 @@ const RightMiddle = ({
             )}
 
             <div
-              className={`flex flex-col h-full flex-grow gap-[2px] max-w-[50%] ${
+              className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
                 group[0].userId === "001" ? "items-end" : "items-start"
               }`}
             >

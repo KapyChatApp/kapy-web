@@ -53,7 +53,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     <>
       <div className="flex flex-col background-light900_dark400 w-full h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[12px] rounded-br-[12px] lg:rounded-tr-[0px] lg:rounded-br-[0px] md:rounded-tr-[0px] md:rounded-br-[0px]">
         <p className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900 px-2">
-          Messages
+          {isGroup ? "Groups" : "Messages"}
         </p>
 
         <GlobalSearch onChange={(e) => setSearchTerm(e.target.value)} />

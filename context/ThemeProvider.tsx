@@ -13,16 +13,29 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState("");
 
   const handleThemeChange = () => {
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-schema:dark)").matches)
-    ) {
+    if (mode === "dark") {
+      // Nếu người dùng chọn "dark"
+      localStorage.theme = "dark";
       setMode("dark");
       document.documentElement.classList.add("dark");
-    } else {
+    } else if (mode === "light") {
+      // Nếu người dùng chọn "light"
+      localStorage.theme = "light";
       setMode("light");
       document.documentElement.classList.remove("dark");
+    } else {
+      // Nếu người dùng chọn "system"
+      localStorage.removeItem("theme"); // Xóa cài đặt của người dùng để dùng system theme
+      const isSystemDark = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      if (isSystemDark) {
+        setMode("dark");
+        document.documentElement.classList.add("dark");
+      } else {
+        setMode("light");
+        document.documentElement.classList.remove("dark");
+      }
     }
   };
 

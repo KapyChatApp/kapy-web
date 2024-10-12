@@ -82,7 +82,7 @@ const MoreTop: React.FC<Top> = ({
           <p className="paragraph-regular text-dark100_light900">{name}</p>
         </div>
       </div>
-      <div className="flex items-center md:justify-between justify-center w-full h-fit">
+      <div className="flex items-center md:justify-between justify-center gap-3 md:gap-0 w-full h-fit">
         {actionsButton
           .filter(
             (action) => action.click !== "best" && action.click !== "block"
@@ -122,7 +122,7 @@ const MoreTop: React.FC<Top> = ({
           <p className="paragraph-regular text-dark100_light900">{name}</p>
         </div>
       </div>
-      <div className="flex items-center md:justify-between justify-center w-full h-fit">
+      <div className="flex items-center md:justify-between w-full h-fit justify-center gap-3 md:gap-0">
         {actionsButton
           .filter(
             (action) => action.click !== "add" && action.click !== "manage"
