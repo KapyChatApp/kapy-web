@@ -12,15 +12,13 @@ interface Top {
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
-  openMore?: boolean;
 }
 
 const MoreTop: React.FC<Top> = ({
   top,
   setActiveComponent,
   setOpenMore,
-  setClickOtherRight,
-  openMore
+  setClickOtherRight
 }) => {
   const pathname = usePathname();
   const isGroup = /^\/groups\/\d+$/.test(pathname);
@@ -38,7 +36,12 @@ const MoreTop: React.FC<Top> = ({
 
   //Open More Responsive
   const [isMdScreen, setIsMdScreen] = useState(false);
+  const [storedOpenMore, setStoredOpenMore] = useState(false);
   useEffect(() => {
+    const stored = sessionStorage.getItem("openMore");
+    if (stored !== null) {
+      setStoredOpenMore(JSON.parse(stored));
+    }
     const handleResize = () => {
       // Kiểm tra kích thước cửa sổ
       if (window.innerWidth >= 768 && window.innerWidth < 878) {
@@ -59,9 +62,8 @@ const MoreTop: React.FC<Top> = ({
     <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[12px]">
       <div className="flex items-start md:justify-center justify-start w-full h-fit">
         <div
-          className={`flex h-fit w-fit cursor-pointer ${
-            isMdScreen && openMore ? "flex" : "md:hidden"
-          }`}
+          className={`flex h-fit w-fit cursor-pointer  
+            ${isMdScreen && storedOpenMore ? "flex" : "md:hidden"}`}
         >
           <Icon
             icon="eva:arrow-back-fill"
@@ -100,7 +102,7 @@ const MoreTop: React.FC<Top> = ({
       <div className="flex items-start md:justify-center justify-start w-full h-fit">
         <div
           className={`flex h-fit w-fit cursor-pointer ${
-            isMdScreen && openMore ? "flex" : "md:hidden"
+            isMdScreen && storedOpenMore ? "flex" : "md:hidden"
           }`}
         >
           <Icon

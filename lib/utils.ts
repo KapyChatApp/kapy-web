@@ -67,3 +67,35 @@ export function formatDate(dateString: string): string {
   }
   return date.toLocaleDateString("en-US", options);
 }
+
+export function formatTime(dateString: Date): string {
+  const date = new Date(dateString);
+  const now = new Date();
+
+  const options: Intl.DateTimeFormatOptions = {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true
+  };
+
+  // Kiểm tra ngày
+  const isToday = date.toDateString() === now.toDateString();
+  const isYesterday =
+    new Date(now.setDate(now.getDate() - 1)).toDateString() ===
+    date.toDateString();
+
+  const isSameYear = date.getFullYear() === now.getFullYear(); // Kiểm tra năm
+
+  if (isToday) {
+    return `Today, ${date.toLocaleTimeString([], options)}`;
+  } else if (isYesterday) {
+    return `Yesterday, ${date.toLocaleTimeString([], options)}`;
+  } else {
+    // Nếu năm không giống nhau, hiển thị năm
+    const dateStringFormat = isSameYear
+      ? date.toLocaleDateString(undefined, { month: "long", day: "numeric" }) // Không hiển thị năm
+      : date.toLocaleDateString(); // Hiển thị năm
+
+    return `${dateStringFormat}, ${date.toLocaleTimeString([], options)}`;
+  }
+}

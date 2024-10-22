@@ -67,6 +67,34 @@ export const segmentsMess: SegmentMessProps[] = [
     time: new Date("2024-10-11T09:00:00")
   },
   {
+    userId: "2",
+    userName: "MasterD",
+    ava: "/assets/ava/ava2.jpg",
+    content: "Im nice today",
+    time: new Date("2024-10-12T11:00:00")
+  },
+  {
+    userId: "2",
+    userName: "MasterD",
+    ava: "/assets/ava/ava2.jpg",
+    content: "How about u?",
+    time: new Date("2024-10-12T11:00:16")
+  },
+  {
+    userId: "2",
+    userName: "MasterD",
+    ava: "/assets/ava/ava2.jpg",
+    content: "You wanna hang out with me???",
+    time: new Date("2024-10-12T11:00:59")
+  },
+  {
+    userId: "2",
+    userName: "MasterD",
+    ava: "/assets/ava/ava2.jpg",
+    content: "I have two tickets for a new movie",
+    time: new Date("2024-10-12T11:01:00")
+  },
+  {
     userId: "001", // Admin
     userName: "Quynh Anh",
     ava: "/assets/ava/ava1.jpg",
@@ -81,6 +109,38 @@ export const segmentsMess: SegmentMessProps[] = [
     content: "System maintenance will happen tonight.",
     time: new Date("2024-10-11T10:00:00"),
     recipientId: "1" // Gửi cho user Junnie (id: 1)
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Reminder: Please submit your reports.",
+    time: new Date("2024-10-11T09:30:02"),
+    recipientId: "2" // Gửi cho user MasterD (id: 2)
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Hi.",
+    time: new Date("2024-10-12T09:30:02"),
+    recipientId: "2" // Gửi cho user MasterD (id: 2)
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Hi.",
+    time: new Date("2024-10-12T10:53:02"),
+    recipientId: "2" // Gửi cho user MasterD (id: 2)
+  },
+  {
+    userId: "001", // Admin
+    userName: "Quynh Anh",
+    ava: "/assets/ava/ava1.jpg",
+    content: "Are u ok?",
+    time: new Date("2024-10-12T10:55:02"),
+    recipientId: "2" // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "3",
@@ -99,7 +159,7 @@ export const segmentsMess: SegmentMessProps[] = [
       fileUrl: "/assets/files/leadership-book.pdf",
       fileType: "application/pdf"
     },
-    time: new Date("2024-10-11T10:00:00")
+    time: new Date("2024-10-11T10:00:01")
   },
   {
     userId: "001", // Admin

@@ -8,10 +8,12 @@ import { group, user } from "@/constants/object";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { segmentsGroup } from "@/constants/groups";
+import App from "next/app";
+import { StateType } from "@/types/mess-group";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
-  setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
+  setClickOtherRight: React.Dispatch<React.SetStateAction<boolean>>;
   isClickOtherRight?: boolean;
   openMore: boolean;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -82,6 +84,7 @@ const RightMessage = ({
   useEffect(() => {
     const handleResize = () => {
       // Kiểm tra kích thước cửa sổ
+      const otherRight = sessionStorage.getItem("otherRight");
       if (window.innerWidth >= 768 && window.innerWidth < 878) {
         setIsMdScreen(true);
       } else {

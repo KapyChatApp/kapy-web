@@ -9,7 +9,7 @@ import { RightTopProps } from "@/types/mess-group";
 interface rightTop {
   top: RightTopProps;
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
-  setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
+  setClickOtherRight: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const RightTop: React.FC<rightTop> = ({
@@ -29,10 +29,10 @@ const RightTop: React.FC<rightTop> = ({
   };
 
   const handleOpenMore = () => {
+    const newOpenMore = !openMore;
     setOpenMore(!openMore);
-    if (setClickOtherRight) {
-      setClickOtherRight(true); //Responsive
-    }
+    sessionStorage.setItem("openMore", JSON.stringify(newOpenMore));
+    setClickOtherRight(true); //Responsive
   };
 
   return (

@@ -30,12 +30,12 @@ const LeftSidbarSetting = ({
           } flex flex-col w-full h-full px-1`}
         >
           {sidebarSettingButton.map((item) => (
-            <Button
+            <div
               className={`${
                 renderRight === item.value
                   ? "bg-light-700 dark:bg-dark-200 dark:bg-opacity-50"
-                  : "bg-transparent"
-              } flex w-full h-fit rounded-lg hover:bg-light-700 dark:hover:bg-dark-200 dark:hover:bg-opacity-50 items-center justify-start py-3 pl-6 shadow-none border-none `}
+                  : "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200 dark:hover:bg-opacity-30 hover:bg-opacity-40"
+              } flex w-full h-fit rounded-lg items-center justify-start py-3 pl-6 shadow-none border-none `}
               onClick={() => {
                 setRenderRight(item.value);
                 setShowRight(true);
@@ -52,7 +52,7 @@ const LeftSidbarSetting = ({
                   {item.label}
                 </p>
               </div>
-            </Button>
+            </div>
           ))}
         </div>
       )}

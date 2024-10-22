@@ -23,7 +23,7 @@ export interface SegmentMessProps {
   userName: string;
   ava: string;
   content: string | ImageContent | LinkContent | FileContent;
-  time?: Date;
+  time: Date;
   recipientId?: string;
 }
 
@@ -33,7 +33,7 @@ export interface SegmentGroupProps {
   userName: string;
   ava: string;
   content: string | ImageContent | LinkContent | FileContent;
-  time?: Date;
+  time: Date;
   recipientId?: string;
 }
 
@@ -87,4 +87,13 @@ export interface SeeAllProps {
   >;
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
   itemSent: MememberGroup[] | Photo[] | Video[] | Files[] | Links[];
+}
+
+export interface StateType {
+  isNotified: boolean;
+  isFind: boolean;
+  isBest: boolean;
+  isBlock: boolean;
+  isAdd: boolean;
+  isManage: boolean;
 }

@@ -291,12 +291,11 @@
   }
 
   .scrollable {
-    overflow-y: scroll;
-    scrollbar-width: none;
+    scrollbar-width: none; /* Ẩn thanh cuộn trong Firefox */
   }
 
   .scrollable::-webkit-scrollbar {
-    display: none;
+    display: none; /* Ẩn thanh cuộn trong Chrome, Safari, và Opera */
   }
 
   .modal-overlay {

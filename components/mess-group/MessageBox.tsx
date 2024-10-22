@@ -50,8 +50,8 @@ const MessageBox: React.FC<Box> = ({
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
-          : "text-dark100_light900 bg-transparent"
-      } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
+          : "text-dark100_light900 bg-transparent hover:bg-light-800 hover:bg-opacity-50 hover:dark:bg-dark-200 hover:dark:bg-opacity-20"
+      }  rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
       onClick={() => {
         handleClickLink();
       }}
@@ -128,8 +128,8 @@ const MessageBox: React.FC<Box> = ({
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
-          : "text-dark100_light900 bg-transparent"
-      } hover:bg-light-800 hover:dark:bg-dark-200 hover:dark:bg-opacity-40 rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
+          : "text-dark100_light900 bg-transparent hover:bg-light-800 hover:bg-opacity-50 hover:dark:bg-dark-200 hover:dark:bg-opacity-20"
+      }  rounded-[20px] hover:rounded-[20px] h-[80px] flex items-center justify-start relative group`}
       onClick={() => {
         handleClickLink();
       }}

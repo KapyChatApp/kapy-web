@@ -133,8 +133,8 @@ const Leftsidebar = () => {
                   className={`${
                     isActive
                       ? "bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg w-full h-[44px] text-dark100_light900"
-                      : "text-dark100_light900 bg-transparent"
-                  } flex items-center justify-start hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg`}
+                      : "text-dark100_light900 bg-transparent hover:bg-light-500 hover:bg-opacity-30 hover:dark:bg-dark-400 hover:dark:bg-opacity-40"
+                  } flex items-center justify-start hover:rounded-lg`}
                 >
                   <div className="bg-transparent flex items-end justify-start p-[12px]">
                     <Icon

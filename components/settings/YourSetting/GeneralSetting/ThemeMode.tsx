@@ -8,23 +8,21 @@ import { useTheme } from "@/context/ThemeProvider";
 const ThemeMode = () => {
   const { mode, setMode } = useTheme();
   const [selectedValue, setSelectedValue] = useState(mode);
+
   const handleValueChange = (value: string) => {
     setSelectedValue(value);
-  };
-
-  useEffect(() => {
-    if (selectedValue === "system") {
+    if (value !== "system") {
+      setMode(value);
+      localStorage.setItem("theme", value);
+    } else {
       const isSystemDark = window.matchMedia(
         "(prefers-color-scheme: dark)"
       ).matches;
       const newMode = isSystemDark ? "dark" : "light";
       setMode(newMode);
-    } else {
-      setMode(selectedValue);
+      localStorage.removeItem("theme");
     }
-  }, [selectedValue, setMode]);
-
-  console.log("Mode of your web: ", mode);
+  };
 
   return (
     <div className="flex flex-col background-light900_dark400 items-start justify-start py-3 px-4 rounded-lg w-full h-fit gap-4">
@@ -46,6 +44,7 @@ const ThemeMode = () => {
                 className="flex flex-row items-start justify-between w-full h-fit"
                 onClick={() => {
                   handleValueChange(item.description);
+                  setMode(item.description);
                   if (item.description !== "system") {
                     localStorage.theme = item.description;
                   } else {

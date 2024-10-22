@@ -19,14 +19,8 @@ const page = () => {
         setIsMdScreen(false);
       }
     };
-
-    // Kiểm tra kích thước ngay khi component render lần đầu
     handleResize();
-
-    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
     window.addEventListener("resize", handleResize);
-
-    // Hủy lắng nghe sự kiện khi component unmount
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
@@ -60,7 +54,11 @@ const page = () => {
           <LeftMessage />
         </div>
         <div className="md:flex hidden h-full w-full bg-transparent ">
-          <RightMessage setOpenMore={setOpenMore} openMore={openMore} />
+          <RightMessage
+            setOpenMore={setOpenMore}
+            openMore={openMore}
+            setClickOtherRight={setClickOtherRight}
+          />
         </div>
       </div>
     </section>

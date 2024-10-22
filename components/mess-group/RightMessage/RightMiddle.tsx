@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import SegmentMess from "../SegmentMess";
 import Image from "next/image";
 import { SegmentGroupProps, SegmentMessProps } from "@/types/mess-group";
+import { formatTime } from "@/lib/utils";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: SegmentMessProps[] | SegmentGroupProps[];
@@ -23,21 +24,23 @@ const RightMiddle = ({
   let groupedMessages: SegmentMessProps[] = [];
   let messagesToDisplay: SegmentMessProps[][] = [];
   combinedSegments.forEach((item, index) => {
-    // Nếu không có tin nhắn trong mảng gộp thì thêm vào
     if (groupedMessages.length === 0) {
       groupedMessages.push(item);
     } else {
       const lastItem = groupedMessages[groupedMessages.length - 1];
 
-      // Kiểm tra nếu ID của item hiện tại giống ID của item cuối cùng trong mảng gộp
-      if (item.userId === lastItem.userId) {
-        groupedMessages.push(item); // Thêm vào mảng gộp
+      // Check time
+      const timeDiff =
+        (new Date(item.time || 0).getTime() -
+          new Date(lastItem.time || 0).getTime()) /
+        60000;
+
+      if (item.userId === lastItem.userId && timeDiff < 1) {
+        groupedMessages.push(item);
       } else {
-        // Nếu gặp ID admin (trong trường hợp không phải là admin)
         if (lastItem.userId === "001") {
-          messagesToDisplay.push([...groupedMessages]); // Chuyển mảng gộp vào mảng hiển thị
+          messagesToDisplay.push([...groupedMessages]);
         } else {
-          // Nếu không phải là admin, thêm nhóm trước vào mảng hiển thị
           messagesToDisplay.push([...groupedMessages]);
         }
 
@@ -52,45 +55,93 @@ const RightMiddle = ({
     }
   });
 
-  return (
-    <div className="flex flex-col flex-grow justify-end items-center w-full gap-[6px] overflow-scroll scrollable py-4">
-      {messagesToDisplay.map((group, index) => (
-        <div className="flex flex-col w-full">
-          <div
-            key={index}
-            className={`flex w-full ${
-              group[0].userId === "001" ? "justify-end" : "justify-start"
-            } gap-3`}
-          >
-            {group[0].userId !== "001" && (
-              <div className="flex items-end h-full w-7 flex-shrink-0 relative">
-                <Image
-                  src={group[0].ava ? group[0].ava : "/assets/ava/default.png"}
-                  alt=""
-                  width={28}
-                  height={28}
-                  className="w-7 h-7 cursor-pointer rounded-full object-cover"
-                />
-              </div>
-            )}
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    // Cuộn đến đáy khi component được render
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
+  }, [messagesToDisplay]);
 
-            <div
-              className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
-                group[0].userId === "001" ? "items-end" : "items-start"
-              }`}
-            >
-              {group.map((item, itemIndex) => (
-                <SegmentMess
-                  key={itemIndex}
-                  segments={item}
-                  index={itemIndex}
-                  length={group.length}
-                />
-              ))}
-            </div>
-          </div>
+  return (
+    <div
+      className="flex flex-col flex-grow overflow-scroll scrollable h-[591px]"
+      ref={messageContainerRef}
+    >
+      <div className="flex-grow">
+        <div className="flex flex-col justify-end items-center w-full h-full gap-[10px] py-4 ">
+          {messagesToDisplay.map((group, index) => {
+            const prevGroup = messagesToDisplay[index - 1];
+            let timeDifference = 0;
+
+            if (prevGroup) {
+              timeDifference =
+                group[0].time && prevGroup?.[prevGroup.length - 1]?.time
+                  ? Math.abs(
+                      new Date(group[0].time).getTime() -
+                        new Date(prevGroup[prevGroup.length - 1].time).getTime()
+                    ) /
+                    (1000 * 60)
+                  : 0;
+            }
+            return (
+              <div
+                className={`flex flex-col w-full  ${
+                  (timeDifference >= 30 || !timeDifference) && "gap-[10px]"
+                }`}
+              >
+                {(timeDifference >= 30 || !timeDifference) && (
+                  <div className="md:body-regular small-regular text-dark100_light900 opacity-60 text-center">
+                    {formatTime(group[0].time)}
+                  </div>
+                )}
+                <div className="flex flex-col w-full">
+                  <div
+                    key={index}
+                    className={`flex w-full ${
+                      group[0].userId === "001"
+                        ? "justify-end"
+                        : "justify-start"
+                    } gap-3`}
+                  >
+                    {group[0].userId !== "001" && (
+                      <div className="flex items-end h-full w-7 flex-shrink-0 relative">
+                        <Image
+                          src={
+                            group[0].ava
+                              ? group[0].ava
+                              : "/assets/ava/default.png"
+                          }
+                          alt=""
+                          width={28}
+                          height={28}
+                          className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                        />
+                      </div>
+                    )}
+
+                    <div
+                      className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
+                        group[0].userId === "001" ? "items-end" : "items-start"
+                      }`}
+                    >
+                      {group.map((item, itemIndex) => (
+                        <SegmentMess
+                          key={itemIndex}
+                          segments={item}
+                          index={itemIndex}
+                          length={group.length}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-      ))}
+      </div>
     </div>
   );
 };

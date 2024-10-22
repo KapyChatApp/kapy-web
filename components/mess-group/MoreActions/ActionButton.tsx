@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Actions } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface ActionButtonProps {
   action: Actions;
@@ -26,25 +26,44 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const [isAdd, setIsAdd] = useState(false);
   const [isManage, setIsManage] = useState(false);
 
+  useEffect(() => {
+    const handleResize = () => {
+      // Kiểm tra kích thước màn hình
+      if (window.matchMedia("(min-width: 768px)").matches) {
+        setActiveComponent("");
+      } else {
+        setActiveComponent("");
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [setActiveComponent]);
+
   const handleButton = () => {
     switch (click) {
       case "notified":
-        setIsNotified(!isNotified);
+        setIsNotified((prev) => !prev);
         break;
       case "find":
-        setIsFind(!isFind);
+        setIsFind((prev) => !prev);
+        setActiveComponent(click);
         break;
       case "block":
-        setIsBlock(!isBlock);
+        setIsBlock((prev) => !prev);
         break;
       case "best":
-        setIsBest(!isBest);
+        setIsBest((prev) => !prev);
         break;
       case "add":
-        setIsAdd(!isAdd);
+        setIsAdd((prev) => !prev);
+        setActiveComponent(click);
         break;
       case "manage":
-        setIsManage(!isManage);
+        setIsManage((prev) => !prev);
+        setActiveComponent(click);
         break;
     }
   };
@@ -55,7 +74,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   return (
     <div
       className={`${
-        isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-fit"
+        isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-[57px]"
       } flex flex-col items-center justify-center gap-[8px]`}
     >
       <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
@@ -67,9 +86,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
               ? "bg-accent-red bg-opacity-20"
               : "bg-light-700 dark:bg-dark-400 dar:bg-opacity-80"
           }`}
-          onClick={() => {
-            handleButton(), setActiveComponent(click);
-          }}
+          onClick={handleButton}
         >
           <Icon
             icon={displayIcon}

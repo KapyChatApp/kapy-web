@@ -5,7 +5,11 @@ import { group, user } from "@/constants/object";
 import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
-import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
+import {
+  ActiveComponentProps,
+  SeeAllProps,
+  StateType
+} from "@/types/mess-group";
 
 interface MoreActionsProps {
   propsAll: SeeAllProps;
@@ -45,7 +49,6 @@ const MoreActions = ({
         setActiveComponent={setActiveComponent}
         setOpenMore={setOpenMore}
         setClickOtherRight={setClickOtherRight}
-        openMore={openMore}
       />
 
       <MoreMiddle
@@ -63,7 +66,6 @@ const MoreActions = ({
         setActiveComponent={setActiveComponent}
         setOpenMore={setOpenMore}
         setClickOtherRight={setClickOtherRight}
-        openMore={openMore}
       />
 
       <MoreMiddle
