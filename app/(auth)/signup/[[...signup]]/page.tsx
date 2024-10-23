@@ -5,36 +5,40 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React from "react";
 
-const Signin = () => {
+const Signup = () => {
   return (
-    <div className="flex flex-col items-start justify-center w-full h-fit gap-[48px]">
+    <div className="flex flex-col items-start justify-center w-full h-fit gap-10 pb-5">
       <div className="flex flex-col gap-4 items-start justify-center w-full h-fit">
         <p className="text-primary-500 h1-bold">Welcome Back</p>
         <p className="text-dark100_ligh900 paragraph-light">
-          Please enter log in details below
+          Please enter sign up details below
         </p>
       </div>
 
-      <div className="flex flex-col w-full h-fit gap-3">
+      <div className="flex flex-col w-full h-fit gap-6">
         <div className="flex flex-col gap-6 w-full h-fit">
-          {inputCustomItems.slice(0, 2).map((item) => (
+          {inputCustomItems.slice(2, 6).map((item) => (
             <InputCustom placeholder={item.placeholder} value={item.value} />
           ))}
         </div>
-        <Link
-          href="/forget-password"
-          className="flex items-center justify-end w-full h-fit "
-        >
-          <p className="text-dark100_light900 paragraph-light italic">
-            Forget password
-          </p>
-        </Link>
+        <div className="flex flex-row justify-between w-full h-fit items-center gap-6">
+          <div className="flex flex-col gap-6 w-[50%] h-fit">
+            {inputCustomItems.slice(6, 8).map((item) => (
+              <InputCustom placeholder={item.placeholder} value={item.value} />
+            ))}
+          </div>
+          <div className="flex flex-col gap-6 w-[50%] h-fit">
+            {inputCustomItems.slice(8, 10).map((item) => (
+              <InputCustom placeholder={item.placeholder} value={item.value} />
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
-        <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px] ">
+        <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px]">
           <p className="text-[20px] font-bold text-light-900 h-[30px]">
-            Sign in
+            Create an account
           </p>
         </Button>
 
@@ -55,10 +59,10 @@ const Signin = () => {
           </Button>
           <div className="flex flex-row gap-3 w-full items-center justify-center h-fit">
             <p className="text-dark100_light900 paragraph-light">
-              Don't have an account?
+              You have an account?
             </p>
-            <Link href="/signup">
-              <p className="text-primary-500 paragraph-bold">Sign up</p>
+            <Link href="/signin">
+              <p className="text-primary-500 paragraph-bold">Sign in</p>
             </Link>
           </div>
         </div>
@@ -67,4 +71,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;
