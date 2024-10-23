@@ -37,9 +37,11 @@ const Signup = () => {
 
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
         <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px]">
-          <p className="text-[20px] font-bold text-light-900 h-[30px]">
-            Create an account
-          </p>
+          <div className="w-full h-[30px] items-center justify-center flex">
+            <p className="text-[20px] font-bold text-light-900 ">
+              Create an account
+            </p>
+          </div>
         </Button>
 
         <div className="flex flex-row gap-3 justify-between items-center h-fit w-full">
