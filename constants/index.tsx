@@ -1,6 +1,4 @@
 import { SidebarLink } from "@/types";
-import { SegmentGroupProps, SegmentMessProps } from "@/types/mess-group";
-import { Group, User } from "@/types/object";
 
 export const themes = [
   { value: "light", label: "Light", icon: "mingcute:sun-fill" },

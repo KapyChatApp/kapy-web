@@ -19,22 +19,13 @@ export interface FileContent {
 }
 
 export interface SegmentMessProps {
+  groupId?: string;
   userId: string;
   userName: string;
   ava: string;
   content: string | ImageContent | LinkContent | FileContent;
   time: Date;
-  recipientId?: string;
-}
-
-export interface SegmentGroupProps {
-  groupId: string;
-  userId: string;
-  userName: string;
-  ava: string;
-  content: string | ImageContent | LinkContent | FileContent;
-  time: Date;
-  recipientId?: string;
+  recipientId?: string[];
 }
 
 export interface MessageBoxProps {

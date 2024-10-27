@@ -25,7 +25,7 @@ const page = () => {
   }, []);
 
   return (
-    <section className="py-[16px] pr-[16px] w-full flex h-screen">
+    <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>
         {divClassName.includes("w-full") &&
           (isClickBox ? (

@@ -100,7 +100,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "Reminder: Please submit your reports.",
     time: new Date("2024-10-11T09:30:00"),
-    recipientId: "2" // Gửi cho user MasterD (id: 2)
+    recipientId: ["2"] // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "001", // Admin
@@ -108,7 +108,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "System maintenance will happen tonight.",
     time: new Date("2024-10-11T10:00:00"),
-    recipientId: "1" // Gửi cho user Junnie (id: 1)
+    recipientId: ["1"] // Gửi cho user Junnie (id: 1)
   },
   {
     userId: "001", // Admin
@@ -116,7 +116,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "Reminder: Please submit your reports.",
     time: new Date("2024-10-11T09:30:02"),
-    recipientId: "2" // Gửi cho user MasterD (id: 2)
+    recipientId: ["2"] // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "001", // Admin
@@ -124,7 +124,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "Hi.",
     time: new Date("2024-10-12T09:30:02"),
-    recipientId: "2" // Gửi cho user MasterD (id: 2)
+    recipientId: ["2"] // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "001", // Admin
@@ -132,7 +132,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "Hi.",
     time: new Date("2024-10-12T10:53:02"),
-    recipientId: "2" // Gửi cho user MasterD (id: 2)
+    recipientId: ["2"] // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "001", // Admin
@@ -140,7 +140,7 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "Are u ok?",
     time: new Date("2024-10-12T10:55:02"),
-    recipientId: "2" // Gửi cho user MasterD (id: 2)
+    recipientId: ["2"] // Gửi cho user MasterD (id: 2)
   },
   {
     userId: "3",
@@ -167,6 +167,6 @@ export const segmentsMess: SegmentMessProps[] = [
     ava: "/assets/ava/ava1.jpg",
     content: "System update completed.",
     time: new Date("2024-10-11T11:00:00"),
-    recipientId: "3" // Gửi cho user Annie (id: 3)
+    recipientId: ["3"] // Gửi cho user Annie (id: 3)
   }
 ];

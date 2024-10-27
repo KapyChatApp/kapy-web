@@ -1,12 +1,12 @@
 import React, { useEffect, useRef } from "react";
 import SegmentMess from "../SegmentMess";
 import Image from "next/image";
-import { SegmentGroupProps, SegmentMessProps } from "@/types/mess-group";
+import { SegmentMessProps } from "@/types/mess-group";
 import { formatTime } from "@/lib/utils";
 
 interface RightMiddleProps {
-  filteredSegmentAdmin: SegmentMessProps[] | SegmentGroupProps[];
-  filteredSegmentOther: SegmentMessProps[] | SegmentGroupProps[];
+  filteredSegmentAdmin: SegmentMessProps[];
+  filteredSegmentOther: SegmentMessProps[];
 }
 
 const RightMiddle = ({

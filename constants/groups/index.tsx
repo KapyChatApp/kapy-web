@@ -1,5 +1,8 @@
-import { ManagementGroup, MessageBoxProps } from "@/types/mess-group";
-import { SegmentGroupProps } from "@/types/mess-group";
+import {
+  ManagementGroup,
+  MessageBoxProps,
+  SegmentMessProps
+} from "@/types/mess-group";
 
 export const manage: ManagementGroup[] = [
   {
@@ -55,7 +58,7 @@ export const boxGroup: MessageBoxProps[] = [
   }
 ];
 
-export const segmentsGroup: SegmentGroupProps[] = [
+export const segmentsGroup: SegmentMessProps[] = [
   {
     groupId: "1",
     userId: "1",

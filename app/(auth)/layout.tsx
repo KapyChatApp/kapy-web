@@ -3,7 +3,7 @@ import React from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
-    <main className="background-light900_dark200 flex flex-row w-full cursor-default min-h-[728px] md:pr-6 md:py-6 md:pl-14 md:justify-between sm:justify-center justify-start p-4 overflow-scroll scrollable">
+    <main className="background-light900_dark200 flex flex-row w-full cursor-default min-h-[728px] md:pr-6 md:py-6 md:pl-14 md:justify-between sm:justify-center justify-start p-4 overflow-scroll custom-scrollbar">
       <div className="flex md:max-w-[50%] md:w-[50%] w-fit h-full pr-14 items-center justify-center pb-5">
         <div className="flex flex-col items-center justify-start gap-[72px] md:w-full w-[490px] h-fit ">
           <div className="flex flex-row gap-4 w-full justify-start items-center h-fit">

@@ -1,4 +1,4 @@
-import { SegmentGroupProps, SegmentMessProps } from "@/types/mess-group";
+import { SegmentMessProps } from "@/types/mess-group";
 import Image from "next/image";
 
 import { usePathname } from "next/navigation";
