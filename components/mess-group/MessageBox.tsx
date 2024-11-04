@@ -73,16 +73,20 @@ const MessageBox: React.FC<Box> = ({
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
-              <p className="lg:paragraph-regular body-regular text-dark100_light900 ">
-                {otherName}
-              </p>
+              <div className="flex items-center w-full min-w-0">
+                <p className="lg:paragraph-regular body-regular text-dark100_light900 overflow-hidden text-ellipsis whitespace-nowrap">
+                  {otherName}
+                </p>
+              </div>
               <div className="flex items-center w-full min-w-0">
                 {isClick || isActive ? (
                   <p className="small-regular justify-start text-dark100_light900">
-                    {sender}:
+                    {sender ? `${sender}:` : ""}
                   </p>
                 ) : (
-                  <p className="small-bold text-dark100_light900">{sender}:</p>
+                  <p className="small-bold text-dark100_light900 ">
+                    {sender ? `${sender}:` : ""}
+                  </p>
                 )}
                 <div className="flex min-w-0 ">
                   {isClick || isActive ? (
@@ -157,10 +161,12 @@ const MessageBox: React.FC<Box> = ({
               <div className="flex items-center w-full min-w-0">
                 {isClick || isActive ? (
                   <p className="small-regular justify-start text-dark100_light900">
-                    {sender}:
+                    {sender ? `${sender}:` : ""}
                   </p>
                 ) : (
-                  <p className="small-bold text-dark100_light900">{sender}:</p>
+                  <p className="small-bold text-dark100_light900">
+                    {sender ? `${sender}:` : ""}
+                  </p>
                 )}
                 <div className="flex min-w-0 ">
                   {isClick || isActive ? (

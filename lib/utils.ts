@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -99,3 +100,34 @@ export function formatTime(dateString: Date): string {
     return `${dateStringFormat}, ${date.toLocaleTimeString([], options)}`;
   }
 }
+
+// Hàm định dạng thời gian
+export const formatTimeMessageBox = (time: Date | string) => {
+  const date = new Date(time);
+  const now = new Date();
+  const currentYear = now.getFullYear(); // Lấy năm hiện tại
+
+  // Tính khoảng thời gian giữa hiện tại và thời gian được tạo
+  const timeDifference = now.getTime() - date.getTime();
+  const hoursDiff = Math.floor(timeDifference / (1000 * 60 * 60));
+  const daysDiff = Math.floor(hoursDiff / 24);
+
+  // Định dạng theo yêu cầu
+  if (hoursDiff < 1) {
+    const minutesDiff = Math.floor(timeDifference / (1000 * 60));
+    return `${minutesDiff}min`; // Ví dụ: 1p, 2p,...
+  } else if (hoursDiff < 24) {
+    return `${hoursDiff}h`; // Ví dụ: 2h, 3h
+  } else if (isToday(date)) {
+    return format(date, "HH:mm"); // Ví dụ: 12:00 hoặc 00:01
+  } else if (isYesterday(date)) {
+    return `Yesterday`; // Ví dụ: Hôm qua 12:00
+  } else {
+    // Kiểm tra năm hiện tại
+    if (date.getFullYear() === currentYear) {
+      return format(date, "dd/MM"); // Ví dụ: 12/02
+    } else {
+      return format(date, "dd/MM/yyyy"); // Ví dụ: 12/02/2021
+    }
+  }
+};

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import GlobalSearch from "../../shared/search/globalSearch";
 import { box } from "@/constants/messenger";
 import MessageBox from "../MessageBox";
@@ -8,20 +8,140 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
+import { MessageBoxProps } from "@/types/mess-group";
+import axios from "axios";
+import { formatTimeMessageBox } from "@/lib/utils";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+const userId = "671e15779aec1bb053bb7d8c";
+const token =
+  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MWUxNTc3OWFlYzFiYjA1M2JiN2Q4YyIsInVzZXJuYW1lIjoiMTIzNDU2Nzg5Iiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3MzA3MzIyNDEsImV4cCI6MTczMDczOTQ0MX0.hDcpG6lhWR5o-BpnxOFzgTi-6KQ7phEMqyu8SxRK7rI";
+
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = /^\/groups\/\d+$/.test(pathname);
 
+  //FetchData from BE
+  const [dataChat, setDataChat] = useState<MessageBoxProps[]>([]);
+  const [dataGroup, setDataGroup] = useState<MessageBoxProps[]>([]);
+  const [error, setError] = useState(null);
+  const fetchMessageBox = async () => {
+    try {
+      const responseChat = await axios.get(
+        `${process.env.BASE_URL}message/all-box-chat?userId=${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${token}`
+          }
+        }
+      );
+      const responseGroup = await axios.get(
+        `${process.env.BASE_URL}message/all-box-group?userId=${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${token}`
+          }
+        }
+      );
+      const apiDataChat = responseChat.data;
+      const apiDataGroup = responseGroup.data;
+
+      const dataChat: MessageBoxProps[] = apiDataChat.box.box.map(
+        (item: any) => {
+          if (item.lastMessage.readedId) {
+            const isSeen = item.lastMessage.readedId.some(
+              (reader: any) => reader._id === userId
+            );
+            return {
+              id: item._id,
+              otherName: item.receiverIds[0]?.nickName || "Unknown",
+              otherId: item.receiverIds[0]?._id || "",
+              ava: item.receiverIds[0]?.avatar || "/assets/ava/default.png",
+              sender:
+                item.senderId?._id === userId
+                  ? "You"
+                  : item.senderId?.nickName || "Unknown",
+              content: item.lastMessage.contentId[0]?.content || "",
+              time: formatTimeMessageBox(
+                item.lastMessage.contentId[
+                  item.lastMessage.contentId.length - 1
+                ]?.createAt
+              ),
+              pin: false,
+              isOnline: true,
+              isSeen: isSeen
+            };
+          }
+          return null;
+        }
+      );
+
+      const dataGroup: MessageBoxProps[] = apiDataGroup.box.box.map(
+        (item: any) => {
+          const isSeen =
+            item.lastMessage && item.lastMessage.readedId
+              ? item.lastMessage.readedId.some(
+                  (reader: any) => reader._id === userId
+                )
+              : false;
+          if (item.messageIds.length > 0) {
+            return {
+              id: item._id,
+              otherName: item.groupName,
+              otherId: "",
+              ava: item.groupAva,
+              sender:
+                item.senderId?._id === userId
+                  ? "You"
+                  : item.senderId?.nickName || "Unknown",
+              content: item.lastMessage.contentId[0]?.content || "",
+              time: formatTimeMessageBox(
+                item.lastMessage.contentId[
+                  item.lastMessage.contentId.length - 1
+                ]?.createAt
+              ),
+              pin: false,
+              isOnline: true,
+              isSeen: isSeen
+            };
+          } else {
+            return {
+              id: item._id,
+              otherName: item.groupName,
+              otherId: "",
+              ava: item.groupAva,
+              sender: "",
+              content: "This is a new group message.",
+              time: formatTimeMessageBox(item.createAt),
+              pin: false,
+              isOnline: true,
+              isSeen: true
+            };
+          }
+        }
+      );
+      setDataChat(dataChat);
+      setDataGroup(dataGroup);
+    } catch (err: any) {
+      console.error("Error fetching messages:", err);
+      setError(err.message);
+    }
+  };
+
+  useEffect(() => {
+    fetchMessageBox();
+  }, []);
+
   //SEARCH
   const { searchTerm, setSearchTerm, filteredBox } = isGroup
-    ? useSearchMessageBox(boxGroup)
-    : useSearchMessageBox(box);
+    ? useSearchMessageBox(dataGroup)
+    : useSearchMessageBox(dataChat);
 
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
