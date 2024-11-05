@@ -1,68 +1,24 @@
-"use client";
 import InputCustom from "@/components/auth/InputCustom";
 import { Button } from "@/components/ui/button";
 import { inputCustomItems } from "@/constants/auth";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
-import React, { useState } from "react";
+import React from "react";
 
-const Signin = () => {
-  const [phone, setPhone] = useState("");
-  const [pass, setPass] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  const handleLogin = async () => {
-    try {
-      const response = await fetch(`${process.env.BASE_URL}auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          phoneNumber: phone,
-          password: pass
-        })
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
-        return;
-      }
-
-      const data = await response.json();
-      const token = data.token;
-
-      localStorage.setItem("token", token);
-      window.location.href = "/";
-    } catch (error) {
-      setError("An error occurred during login");
-      console.error("Login error:", error);
-    }
-  };
+const ForgetPassword = () => {
   return (
     <div className="flex flex-col items-start justify-center w-full h-fit gap-[48px]">
       <div className="flex flex-col gap-4 items-start justify-center w-full h-fit">
-        <p className="text-primary-500 h1-bold">Welcome Back</p>
-        <p
-          className={`paragraph-light ${
-            error ? "text-accent-red" : "text-dark100_light900"
-          }`}
-        >
-          {error || "Please enter log in details below"}
+        <p className="text-primary-500 h1-bold">Forgot Password</p>
+        <p className="text-dark100_ligh900 paragraph-light">
+          No worries, we'll send you code to reset your password!
         </p>
       </div>
 
       <div className="flex flex-col w-full h-fit gap-3">
         <div className="flex flex-col gap-6 w-full h-fit">
-          {inputCustomItems.slice(0, 2).map((item, index) => (
-            <InputCustom
-              key={index}
-              placeholder={item.placeholder}
-              value={item.value}
-              setPhone={setPhone}
-              setPass={setPass}
-            />
+          {inputCustomItems.slice(0, 2).map((item) => (
+            <InputCustom placeholder={item.placeholder} value={item.value} />
           ))}
         </div>
         <Link
@@ -76,10 +32,7 @@ const Signin = () => {
       </div>
 
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
-        <Button
-          className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px] "
-          onClick={handleLogin}
-        >
+        <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px] ">
           <p className="text-[20px] font-bold text-light-900 h-[30px]">
             Sign in
           </p>
@@ -114,4 +67,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default ForgetPassword;

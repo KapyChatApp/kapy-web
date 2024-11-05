@@ -17,9 +17,7 @@ export interface LeftMessageProps {
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const userId = "671e15779aec1bb053bb7d8c";
-const token =
-  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY3MWUxNTc3OWFlYzFiYjA1M2JiN2Q4YyIsInVzZXJuYW1lIjoiMTIzNDU2Nzg5Iiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3MzA3MzIyNDEsImV4cCI6MTczMDczOTQ0MX0.hDcpG6lhWR5o-BpnxOFzgTi-6KQ7phEMqyu8SxRK7rI";
+const token = localStorage.getItem("token");
 
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
@@ -32,7 +30,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const fetchMessageBox = async () => {
     try {
       const responseChat = await axios.get(
-        `${process.env.BASE_URL}message/all-box-chat?userId=${userId}`,
+        `${process.env.BASE_URL}message/all-box-chat`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -41,7 +39,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         }
       );
       const responseGroup = await axios.get(
-        `${process.env.BASE_URL}message/all-box-group?userId=${userId}`,
+        `${process.env.BASE_URL}message/all-box-group`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -56,7 +54,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         (item: any) => {
           if (item.lastMessage.readedId) {
             const isSeen = item.lastMessage.readedId.some(
-              (reader: any) => reader._id === userId
+              (reader: any) => reader._id === apiDataChat.userId
             );
             return {
               id: item._id,
@@ -64,7 +62,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
               otherId: item.receiverIds[0]?._id || "",
               ava: item.receiverIds[0]?.avatar || "/assets/ava/default.png",
               sender:
-                item.senderId?._id === userId
+                item.senderId?._id === apiDataChat.userId
                   ? "You"
                   : item.senderId?.nickName || "Unknown",
               content: item.lastMessage.contentId[0]?.content || "",
@@ -87,7 +85,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           const isSeen =
             item.lastMessage && item.lastMessage.readedId
               ? item.lastMessage.readedId.some(
-                  (reader: any) => reader._id === userId
+                  (reader: any) => reader._id === apiDataGroup.userId
                 )
               : false;
           if (item.messageIds.length > 0) {
@@ -97,7 +95,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
               otherId: "",
               ava: item.groupAva,
               sender:
-                item.senderId?._id === userId
+                item.senderId?._id === apiDataGroup.userId
                   ? "You"
                   : item.senderId?.nickName || "Unknown",
               content: item.lastMessage.contentId[0]?.content || "",

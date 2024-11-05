@@ -46,7 +46,7 @@ const MessageBox: React.FC<Box> = ({
   return isGroup ? (
     <Link
       key=""
-      href={`/groups/${otherId}`}
+      href={`/groups/${id}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
@@ -128,7 +128,7 @@ const MessageBox: React.FC<Box> = ({
     </Link>
   ) : (
     <Link
-      href={`/${otherId}`}
+      href={`/${id}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"

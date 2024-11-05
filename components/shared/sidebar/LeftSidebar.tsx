@@ -65,6 +65,25 @@ const Leftsidebar = () => {
     setSetting(!isSetting);
     setDropdownOpen(false);
   };
+  const handleLogout = async () => {
+    try {
+      const response = await fetch(`${process.env.BASE_URL}auth/logout`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        }
+      });
+
+      if (response.ok) {
+        localStorage.removeItem("token");
+      } else {
+        const errorData = await response.json();
+        console.error("Logout failed:", errorData.message);
+      }
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -337,6 +356,7 @@ const Leftsidebar = () => {
                     key="logout"
                     href="/signin"
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent w-full"
+                    onClick={handleLogout}
                   >
                     <div className="flex flex-row p-[8px] gap-[12px] justify-center items-end">
                       <Icon
