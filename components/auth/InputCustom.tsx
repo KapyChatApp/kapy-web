@@ -18,12 +18,28 @@ import {
 import { Calendar } from "../ui/calendar";
 import { genderList } from "@/constants/auth";
 
-const InputCustom = ({ placeholder, value }: InputCustomProps) => {
+const InputCustom = ({
+  placeholder,
+  value,
+  setPhone,
+  setPass
+}: InputCustomProps) => {
   const [date, setDate] = React.useState<Date | undefined>();
   const [showPassword, setShowPassword] = useState(false);
 
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
+  };
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    if (
+      (placeholder === "Password" || placeholder === "Confirmed password") &&
+      setPass
+    ) {
+      setPass(newValue);
+    } else if (setPhone && placeholder === "Username or PhoneNumber") {
+      setPhone(newValue);
+    }
   };
   return placeholder === "Password" || placeholder === "Confirmed password" ? (
     <div className=" border-light-500 border-b relative flex h-[24px] min-h-[36px] grow items-center gap-[12px] w-full bg-transparent">
@@ -32,7 +48,7 @@ const InputCustom = ({ placeholder, value }: InputCustomProps) => {
         className="bg-transparent border-none focus:outline-none ring-0 border-light-500 border-b placeholder:text-dark600_light600 placeholder:paragraph-light px-2 py-1 w-full"
         placeholder={placeholder}
         //value={value}
-        // onChange={onChange}
+        onChange={handleChange}
       />
       <Icon
         icon={showPassword ? "fluent:eye-12-filled" : "mingcute:eye-close-fill"}
@@ -49,7 +65,7 @@ const InputCustom = ({ placeholder, value }: InputCustomProps) => {
         type="number"
         placeholder={placeholder}
         // onChange={handleChange}
-        // onBlur={handleEditToggle}
+        onChange={handleChange}
       />
     </div>
   ) : placeholder === "Birth" ? (
@@ -111,7 +127,7 @@ const InputCustom = ({ placeholder, value }: InputCustomProps) => {
         type="text"
         placeholder={placeholder}
         // onChange={handleChange}
-        // onBlur={handleEditToggle}
+        onChange={handleChange}
       />
     </div>
   );
