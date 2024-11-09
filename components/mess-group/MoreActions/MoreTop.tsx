@@ -21,7 +21,7 @@ const MoreTop: React.FC<Top> = ({
   setClickOtherRight
 }) => {
   const pathname = usePathname();
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
   const { ava, name } = top;
 
   //RESPONSIVE

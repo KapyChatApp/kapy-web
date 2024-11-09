@@ -34,7 +34,9 @@ const Signin = () => {
       const token = data.token;
 
       localStorage.setItem("token", token);
-      window.location.href = "/";
+      localStorage.setItem("phone", phone);
+
+      window.location.href = "/chat";
     } catch (error) {
       setError("An error occurred during login");
       console.error("Login error:", error);

@@ -1,28 +1,42 @@
-import React, { useEffect, useRef } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 import SegmentMess from "../SegmentMess";
 import Image from "next/image";
 import { SegmentMessProps } from "@/types/mess-group";
 import { formatTime } from "@/lib/utils";
+import { RenderMessageSegment, ResponseMessageDTO } from "@/lib/dataMessages";
 
 interface RightMiddleProps {
-  filteredSegmentAdmin: SegmentMessProps[];
-  filteredSegmentOther: SegmentMessProps[];
+  filteredSegmentAdmin: RenderMessageSegment[];
+  filteredSegmentOther: RenderMessageSegment[];
 }
 
 const RightMiddle = ({
   filteredSegmentAdmin,
   filteredSegmentOther
 }: RightMiddleProps) => {
+  const [adminId, setAdminId] = useState("");
+  useEffect(() => {
+    const apiAdminId = localStorage.getItem("adminId");
+    if (apiAdminId) {
+      setAdminId(apiAdminId);
+    } else {
+      console.log("Error: adminId can't get");
+    }
+  });
+
   const combinedSegments = [
     ...filteredSegmentAdmin,
     ...filteredSegmentOther
   ].sort(
-    (a, b) => new Date(a.time || 0).getTime() - new Date(b.time || 0).getTime()
+    (a, b) =>
+      new Date(a.contentModel || 0).getTime() -
+      new Date(b.createAt || 0).getTime()
   );
 
   //DISPLAY MESSAGE
-  let groupedMessages: SegmentMessProps[] = [];
-  let messagesToDisplay: SegmentMessProps[][] = [];
+  let groupedMessages: RenderMessageSegment[] = [];
+  let messagesToDisplay: RenderMessageSegment[][] = [];
   combinedSegments.forEach((item, index) => {
     if (groupedMessages.length === 0) {
       groupedMessages.push(item);
@@ -31,14 +45,14 @@ const RightMiddle = ({
 
       // Check time
       const timeDiff =
-        (new Date(item.time || 0).getTime() -
-          new Date(lastItem.time || 0).getTime()) /
+        (new Date(item.createAt || 0).getTime() -
+          new Date(lastItem.createAt || 0).getTime()) /
         60000;
 
-      if (item.userId === lastItem.userId && timeDiff < 1) {
+      if (item.infoCreateBy.id === lastItem.infoCreateBy.id && timeDiff < 1) {
         groupedMessages.push(item);
       } else {
-        if (lastItem.userId === "001") {
+        if (lastItem.infoCreateBy.id === adminId) {
           messagesToDisplay.push([...groupedMessages]);
         } else {
           messagesToDisplay.push([...groupedMessages]);
@@ -54,7 +68,6 @@ const RightMiddle = ({
       messagesToDisplay.push([...groupedMessages]); // Đưa phần tử cuối cùng vào mảng hiển thị
     }
   });
-
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     // Cuộn đến đáy khi component được render
@@ -77,10 +90,12 @@ const RightMiddle = ({
 
             if (prevGroup) {
               timeDifference =
-                group[0].time && prevGroup?.[prevGroup.length - 1]?.time
+                group[0].createAt && prevGroup?.[prevGroup.length - 1]?.createAt
                   ? Math.abs(
-                      new Date(group[0].time).getTime() -
-                        new Date(prevGroup[prevGroup.length - 1].time).getTime()
+                      new Date(group[0].createAt).getTime() -
+                        new Date(
+                          prevGroup[prevGroup.length - 1].createAt
+                        ).getTime()
                     ) /
                     (1000 * 60)
                   : 0;
@@ -93,24 +108,24 @@ const RightMiddle = ({
               >
                 {(timeDifference >= 30 || !timeDifference) && (
                   <div className="md:body-regular small-regular text-dark100_light900 opacity-60 text-center">
-                    {formatTime(group[0].time)}
+                    {formatTime(group[0].createAt)}
                   </div>
                 )}
                 <div className="flex flex-col w-full">
                   <div
                     key={index}
                     className={`flex w-full ${
-                      group[0].userId === "001"
+                      group[0].infoCreateBy.id === adminId
                         ? "justify-end"
                         : "justify-start"
                     } gap-3`}
                   >
-                    {group[0].userId !== "001" && (
+                    {group[0].infoCreateBy.id !== adminId && (
                       <div className="flex items-end h-full w-7 flex-shrink-0 relative">
                         <Image
                           src={
-                            group[0].ava
-                              ? group[0].ava
+                            group[0]
+                              ? group[0].infoCreateBy.avatar
                               : "/assets/ava/default.png"
                           }
                           alt=""
@@ -123,7 +138,9 @@ const RightMiddle = ({
 
                     <div
                       className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
-                        group[0].userId === "001" ? "items-end" : "items-start"
+                        group[0].infoCreateBy.id === adminId
+                          ? "items-end"
+                          : "items-start"
                       }`}
                     >
                       {group.map((item, itemIndex) => (
@@ -132,6 +149,7 @@ const RightMiddle = ({
                           segments={item}
                           index={itemIndex}
                           length={group.length}
+                          adminId={adminId}
                         />
                       ))}
                     </div>

@@ -75,7 +75,7 @@ const Leftsidebar = () => {
       });
 
       if (response.ok) {
-        localStorage.removeItem("token");
+        localStorage.clear();
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
@@ -137,13 +137,13 @@ const Leftsidebar = () => {
             }`}
           >
             {sidebarLinks.map((item) => {
-              const isDynamicPath = /^\/\d+$/.test(pathname);
-              const isGroupDynamicPath = pathname.startsWith("/groups/");
+              const isDynamicPath = pathname.startsWith("/chat/");
+              const isGroupDynamicPath = pathname.startsWith("/group-chat/");
               const isFriendDynamicPath = pathname.startsWith("/friends/");
               const isActive =
                 pathname === item.route ||
-                (isDynamicPath && item.route === "/") ||
-                (isGroupDynamicPath && item.route === "/groups") ||
+                (isDynamicPath && item.route === "/chat") ||
+                (isGroupDynamicPath && item.route === "/group-chat") ||
                 (isFriendDynamicPath && item.route === "/friends");
               return (
                 <Link
@@ -354,7 +354,7 @@ const Leftsidebar = () => {
                 <DropdownMenuLabel className="hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg">
                   <Link
                     key="logout"
-                    href="/signin"
+                    href="/"
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent w-full"
                     onClick={handleLogout}
                   >

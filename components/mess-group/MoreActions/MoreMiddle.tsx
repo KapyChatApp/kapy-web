@@ -11,7 +11,7 @@ import { SeeAllProps } from "@/types/mess-group";
 
 const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
   const idFromPathname = pathname.split("/").pop();
   const groupInfo = group.filter((info) => info.id === idFromPathname);
 

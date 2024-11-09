@@ -15,7 +15,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   setActiveComponent
 }) => {
   const pathname = usePathname();
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
 
   const { icon, label, click } = action;
 

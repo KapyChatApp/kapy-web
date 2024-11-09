@@ -10,7 +10,7 @@ const FindComponent: React.FC<ActiveComponentProps> = ({
   setActiveComponent
 }) => {
   const pathname = usePathname();
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
   const handleBack = () => {
     setActiveComponent("");
   };
