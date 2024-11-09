@@ -9,12 +9,12 @@ export const themes = [
 export const sidebarLinks: SidebarLink[] = [
   {
     icon: "tabler:message-circle-filled",
-    route: "/",
+    route: "/chat",
     label: "Message"
   },
   {
     icon: "mingcute:group-2-fill",
-    route: "/groups",
+    route: "/group-chat",
     label: "Groups"
   },
   {

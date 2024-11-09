@@ -30,7 +30,7 @@ const MoreActions = ({
   const userInfo = user.filter((info) => info.id === idFromPathname);
   const groupInfo = group.filter((info) => info.id === idFromPathname);
 
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
 
   const top = {
     ava: userInfo[userInfo.length - 1].ava,

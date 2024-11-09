@@ -1,3 +1,12 @@
+import {
+  FileContent,
+  GPSContent,
+  ImageContent,
+  LinkContent,
+  RenderMessageSegment,
+  VideoContent,
+  VoiceContent
+} from "@/lib/dataMessages";
 import { SegmentMessProps } from "@/types/mess-group";
 import Image from "next/image";
 
@@ -5,62 +14,106 @@ import { usePathname } from "next/navigation";
 import React from "react";
 
 interface SegmentMessage {
-  segments: SegmentMessProps;
+  segments: RenderMessageSegment;
   index: number;
   length: number;
+  adminId: string;
 }
 
-const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
+const SegmentMess: React.FC<SegmentMessage> = ({
+  segments,
+  index,
+  length,
+  adminId
+}) => {
   const pathname = usePathname();
 
-  const { userId, content } = segments;
-  const isActive = userId !== "001";
+  const { infoCreateBy, contentId } = segments;
+  const isActive = infoCreateBy.id !== adminId;
 
   //Render Content
   let renderedContent;
-  if (typeof content === "string") {
-    // Nội dung là văn bản
-    renderedContent = content;
-  } else if (content?.type === "image") {
+  const lastContent = contentId[contentId.length - 1]; // Lấy phần tử cuối cùng trong contentId
+
+  if (typeof lastContent.content === "string") {
+    renderedContent = lastContent.content;
+  } else if (lastContent.content.type === "image") {
     // Nội dung là hình ảnh
+    const imageContent = lastContent.content as ImageContent;
     renderedContent = (
       <Image
-        src={content.url}
-        alt={content.type}
+        src={imageContent.url}
+        alt={imageContent.altText || "Image"}
         width={200}
         height={100}
         className="max-w-full h-auto rounded-lg"
       />
     );
-  } else if (content?.type === "link") {
+  } else if (lastContent.content.type === "link") {
     // Nội dung là liên kết
+    const linkContent = lastContent.content as LinkContent;
     renderedContent = (
       <a
-        href={content.url}
+        href={linkContent.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-blue-500"
+        className="text-accent-blue"
       >
-        {content.url}
+        {linkContent.title || linkContent.url}
       </a>
     );
-  } else if (content?.type === "file") {
+  } else if (lastContent.content.type === "file") {
     // Nội dung là tệp
+    const fileContent = lastContent.content as FileContent;
     renderedContent = (
       <a
-        href={content.fileUrl}
+        href={fileContent.fileUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="text-blue-500"
       >
-        {content.fileName}
+        {fileContent.fileName}
       </a>
     );
+  } else if (lastContent.content.type === "video") {
+    // Nội dung là video
+    const videoContent = lastContent.content as VideoContent;
+    renderedContent = (
+      <video width={200} controls>
+        <source src={videoContent.fileUrl} type={videoContent.fileType} />
+        Your browser does not support the video tag.
+      </video>
+    );
+  } else if (lastContent.content.type === "voice") {
+    // Nội dung là giọng nói (audio)
+    const voiceContent = lastContent.content as VoiceContent;
+    renderedContent = (
+      <audio controls>
+        <source src={voiceContent.fileUrl} type={voiceContent.fileType} />
+        Your browser does not support the audio element.
+      </audio>
+    );
+  } else if (lastContent.content.type === "gps") {
+    // Nội dung là thông tin GPS
+    const gpsContent = lastContent.content as GPSContent;
+    renderedContent = (
+      <div>
+        <p>
+          Location: {gpsContent.latitude}, {gpsContent.longitude}
+        </p>
+        {gpsContent.description && <p>{gpsContent.description}</p>}
+      </div>
+    );
+  } else {
+    console.log("Content type is not supported.");
   }
 
   //Rounded content
   const getContainerClasses = () => {
-    if (typeof content !== "string" && content.type === "image") {
+    if (
+      typeof lastContent.content !== "string" &&
+      lastContent.content.type === "image"
+    ) {
       return "bg-transparent p-0 rounded-lg"; // Nếu là hình ảnh, giữ nguyên bo góc
     }
     if (length > 1) {
@@ -95,7 +148,8 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
         className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
       >
         {/* Chỉ hiển thị đoạn văn bản nếu nội dung không phải là hình ảnh */}
-        {typeof content !== "object" || content.type !== "image" ? (
+        {typeof lastContent.content !== "object" ||
+        lastContent.content.type !== "image" ? (
           <p
             className={`${
               isActive ? "text-dark100_light900" : "text-light-900"

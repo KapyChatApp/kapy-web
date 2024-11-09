@@ -8,8 +8,14 @@ import { group, user } from "@/constants/object";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { segmentsGroup } from "@/constants/groups";
-import App from "next/app";
-import { StateType } from "@/types/mess-group";
+import { apiGroupInfo, dataChat, dataGroup } from "@/lib/dataBox";
+import { fetchUser, userData, UserInfo } from "@/lib/dataUser";
+import {
+  fetchMessages,
+  messageData,
+  RenderMessageSegment,
+  ResponseMessageDTO
+} from "@/lib/dataMessages";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,30 +33,87 @@ const RightMessage = ({
   setOpenMore
 }: RightMessageProps) => {
   const pathname = usePathname();
-  const id = pathname.split("/").pop();
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
 
-  //Messages
-  const userInfo = user.filter((info) => info.id === id);
-  //Groups
-  const groupInfo = group.filter((info) => info.id === id);
-  const online = group.filter((info) =>
-    info.members.filter((online) => online.isOnline)
-  );
+  //FetchDataChat Backend
+  const [adminId, setAdminId] = useState("");
+  const [adminInfo, setAdminInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userId, setUserId] = useState("");
+  const [messages, setMessages] = useState<RenderMessageSegment[]>([]);
+  const [messageGroup, setMessageGroup] = useState<RenderMessageSegment[]>([]);
+
+  //boxId
+  const boxId = pathname.split("/").pop();
+  const chatBox = dataChat.find((item) => item.id === boxId);
+  const groupBox = dataGroup.find((item) => item.id === boxId);
+  const groupInfo = apiGroupInfo.find((item) => item.id === boxId);
+
+  useEffect(() => {
+    const apiUserId = chatBox?.otherId;
+    if (apiUserId) {
+      setUserId(apiUserId);
+    }
+
+    const fetchData = async () => {
+      const apiAdminId = localStorage.getItem("adminId");
+      if (apiAdminId) {
+        setAdminId(apiAdminId);
+      }
+
+      try {
+        // Fetch Admin Info
+        if (adminId) {
+          const adminData = await fetchUser(adminId);
+          setAdminInfo(adminData);
+          console.log("Admin info:", adminData);
+        }
+
+        // Fetch User Info
+        if (userId) {
+          const userData = await fetchUser(userId);
+          setUserInfo(userData);
+          console.log("User Info:", userData);
+        }
+
+        // Fetch Segment Messages
+        if (boxId) {
+          const messageData = await fetchMessages(boxId);
+          setMessages(messageData);
+          console.log("Messages:", messages);
+        } else {
+          console.error("Error: Can't get boxId from pathname");
+        }
+
+        //Fetch Segment Group Messages
+        if (boxId) {
+          const messageData = await fetchMessages(boxId);
+          setMessageGroup(messageData);
+          console.log("Messages:", messageGroup);
+        } else {
+          console.error("Error: Can't get boxId of Group from pathname");
+        }
+      } catch (error) {
+        console.error("Error during data fetching:", error);
+      }
+    };
+
+    fetchData();
+  }, [adminId, userId, boxId]);
 
   //RightTop
   const top = isGroup
     ? {
-        ava: groupInfo[groupInfo.length - 1].ava,
-        name: groupInfo[groupInfo.length - 1].name,
-        membersGroup: groupInfo[groupInfo.length - 1].members.length,
-        onlineGroup: online.length,
+        ava: groupInfo ? groupInfo.ava : "/assets/ava/default.png",
+        name: groupInfo ? groupInfo.name : "Unknown name",
+        membersGroup: groupInfo ? groupInfo.members.length : 0,
+        onlineGroup: 0,
         openMore: openMore,
         setOpenMore: setOpenMore
       }
     : {
-        ava: userInfo[userInfo.length - 1].ava,
-        name: userInfo[userInfo.length - 1].name,
+        ava: userInfo ? userInfo.avatar : "/assets/ava/default.png",
+        name: userInfo ? userInfo.nickName : "Unknown name",
         membersGroup: 0,
         onlineGroup: 0,
         openMore: openMore,
@@ -59,17 +122,11 @@ const RightMessage = ({
 
   //filterSegment
   const filteredSegmentAdmin = isGroup
-    ? segmentsGroup.filter(
-        (item) => item.userId === "001" && item.groupId === id
-      )
-    : segmentsMess.filter(
-        (item) => item.userId === "001" && item.recipientId === id
-      );
+    ? messageGroup.filter((item) => item.infoCreateBy.id === adminId)
+    : messages.filter((item) => item.infoCreateBy.id === adminId);
   const filteredSegmentOther = isGroup
-    ? segmentsGroup.filter(
-        (item) => item.userId !== "001" && item.groupId === id
-      )
-    : segmentsMess.filter((item) => item.userId === id);
+    ? messageGroup.filter((item) => item.infoCreateBy.id !== adminId)
+    : messages.filter((item) => item.infoCreateBy.id !== adminId);
 
   //OpenMoreDisplay
   const display = {

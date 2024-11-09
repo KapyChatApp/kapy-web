@@ -30,8 +30,8 @@ const MessageBox: React.FC<Box> = ({
     isSeen
   } = box;
   const pathname = usePathname();
-  const isActive = pathname.includes(id) || pathname === `/${id}`;
-  const isGroup = /^\/groups\/\d+$/.test(pathname);
+  const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
+  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
   const [isClick, setClick] = useState(isSeen);
 
   const handleClickLink = () => {
@@ -46,7 +46,7 @@ const MessageBox: React.FC<Box> = ({
   return isGroup ? (
     <Link
       key=""
-      href={`/groups/${id}`}
+      href={`/group-chat/${id}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
@@ -128,7 +128,7 @@ const MessageBox: React.FC<Box> = ({
     </Link>
   ) : (
     <Link
-      href={`/${id}`}
+      href={`/chat/${id}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
