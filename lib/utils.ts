@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { formatDistanceToNow, format, isToday, isYesterday } from "date-fns";
+import { formatDistanceToNow, format, isValid } from "date-fns";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -102,26 +102,56 @@ export function formatTime(dateString: Date): string {
 }
 
 // Hàm định dạng thời gian
+const isToday = (date: Date) => {
+  const today = new Date();
+  return (
+    date.getDate() === today.getDate() &&
+    date.getMonth() === today.getMonth() &&
+    date.getFullYear() === today.getFullYear()
+  );
+};
+
+// Hàm kiểm tra nếu thời gian là ngày hôm qua
+const isYesterday = (date: Date) => {
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  return (
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear()
+  );
+};
+
 export const formatTimeMessageBox = (time: Date | string) => {
+  if (!time) {
+    throw new RangeError("Invalid time value: time is undefined or null");
+  }
   const date = new Date(time);
+  if (!isValid(date)) {
+    throw new RangeError("Invalid time value");
+  }
   const now = new Date();
   const currentYear = now.getFullYear(); // Lấy năm hiện tại
 
   // Tính khoảng thời gian giữa hiện tại và thời gian được tạo
   const timeDifference = now.getTime() - date.getTime();
-  const hoursDiff = Math.floor(timeDifference / (1000 * 60 * 60));
-  const daysDiff = Math.floor(hoursDiff / 24);
+  const secondsDiff = Math.floor(timeDifference / 1000); // Giây
+  const minutesDiff = Math.floor(secondsDiff / 60); // Phút
+  const hoursDiff = Math.floor(minutesDiff / 60); // Giờ
+  const daysDiff = Math.floor(hoursDiff / 24); // Ngày
 
   // Định dạng theo yêu cầu
-  if (hoursDiff < 1) {
-    const minutesDiff = Math.floor(timeDifference / (1000 * 60));
-    return `${minutesDiff}min`; // Ví dụ: 1p, 2p,...
+  if (secondsDiff < 60) {
+    return `${secondsDiff}s`; // Ví dụ: 30s
+  } else if (minutesDiff < 60) {
+    return `${minutesDiff}mins`; // Ví dụ: 2mins
   } else if (hoursDiff < 24) {
-    return `${hoursDiff}h`; // Ví dụ: 2h, 3h
+    return `${hoursDiff}h`; // Ví dụ: 2h
+  } else if (isYesterday(date)) {
+    return `Yesterday`; // Ví dụ: Hôm qua
   } else if (isToday(date)) {
     return format(date, "HH:mm"); // Ví dụ: 12:00 hoặc 00:01
-  } else if (isYesterday(date)) {
-    return `Yesterday`; // Ví dụ: Hôm qua 12:00
   } else {
     // Kiểm tra năm hiện tại
     if (date.getFullYear() === currentYear) {

@@ -11,13 +11,13 @@ import { SeeAllProps } from "@/types/mess-group";
 
 const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const idFromPathname = pathname.split("/").pop();
   const groupInfo = group.filter((info) => info.id === idFromPathname);
 
   const handleSeeAllMember = () => {
     setActiveComponent("member");
-    setItemSent(groupInfo[0].members);
+    setItemSent(groupInfo[0]?.members);
   };
   const handleSeeAllPhoto = () => {
     setActiveComponent("photo");
@@ -46,7 +46,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               <div className="flex flex-row w-fit items-end">
                 <p className="text-dark100_light900 paragraph-bold">Members</p>
                 <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                  {groupInfo[0].members.length}
+                  {groupInfo[0]?.members.length}
                 </p>
               </div>
               <div className="flex flex-grow items-center justify-end">
@@ -59,9 +59,9 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </div>
             </div>
             <div className="flex flex-col items-center w-full gap-[8px]">
-              {groupInfo[0].members.length > 0
+              {groupInfo[0]?.members.length > 0
                 ? // Sắp xếp members để leader đứng đầu
-                  groupInfo[0].members
+                  groupInfo[0]?.members
                     .sort((a, b) => (a.addedBy === "" ? -1 : 1)) // Sắp xếp người lãnh đạo lên đầu
                     .slice(0, 3) // Lấy tối đa 3 người
                     .map((item) => (

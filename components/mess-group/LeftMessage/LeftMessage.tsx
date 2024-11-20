@@ -8,25 +8,34 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
-import { dataChat, dataGroup, fetchMessageBox } from "@/lib/dataBox";
+import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
+import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
+  dataChat: MessageBoxContent[];
+  dataGroup: MessageBoxContent[];
 }
 
-const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
+const LeftMessage = ({
+  setClickBox,
+  setClickOtherRight,
+  dataChat,
+  dataGroup
+}: LeftMessageProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
-  useEffect(() => {
-    fetchMessageBox().then(() => {
-      console.log("Data Chat:", dataChat);
-      console.log("Data Group:", dataGroup);
-    });
-  }, []);
+  // useEffect(() => {
+  //   fetchMessageBox().then(() => {
+  //     console.log("Data Chat:", dataChat);
+  //     console.log("Data Group:", dataGroup);
+  //   });
+  // }, []);
 
   //SEARCH
+
   const { searchTerm, setSearchTerm, filteredBox } = isGroup
     ? useSearchMessageBox(dataGroup)
     : useSearchMessageBox(dataChat);

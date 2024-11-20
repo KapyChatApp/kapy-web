@@ -30,16 +30,16 @@ const MoreActions = ({
   const userInfo = user.filter((info) => info.id === idFromPathname);
   const groupInfo = group.filter((info) => info.id === idFromPathname);
 
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
   const top = {
-    ava: userInfo[userInfo.length - 1].ava,
-    name: userInfo[userInfo.length - 1].name
+    ava: userInfo[userInfo.length - 1]?.ava,
+    name: userInfo[userInfo.length - 1]?.name
   };
 
   const topGroup = {
-    ava: groupInfo[userInfo.length - 1].ava,
-    name: groupInfo[userInfo.length - 1].name
+    ava: groupInfo[userInfo.length - 1]?.ava,
+    name: groupInfo[userInfo.length - 1]?.name
   };
 
   return isGroup ? (

@@ -1,6 +1,8 @@
 "use client";
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
+import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
+import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
 import { useEffect, useState } from "react";
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -22,6 +24,16 @@ const page = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  //Fetch Data from Backend
+  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
+  const [dataGroup, setDataGroup] = useState<MessageBoxContent[]>([]);
+  const [error, setError] = useState<string>("");
+
+  useEffect(() => {
+    fetchMessageBox(setDataChat, setError);
+    fetchMessageBoxGroup(setDataGroup, setError);
+  }, []);
+
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>
@@ -41,6 +53,8 @@ const page = () => {
               <LeftMessage
                 setClickBox={setClickBox}
                 setClickOtherRight={setClickOtherRight}
+                dataChat={dataChat}
+                dataGroup={dataGroup}
               />
             </div>
           ))}
@@ -51,7 +65,7 @@ const page = () => {
               : "lg:w-[25.6608%] md:w-[27%] w-[30%]"
           }`}
         >
-          <LeftMessage />
+          <LeftMessage dataChat={dataChat} dataGroup={dataGroup} />
         </div>
         <div className="md:flex hidden h-full w-full bg-transparent ">
           <RightMessage

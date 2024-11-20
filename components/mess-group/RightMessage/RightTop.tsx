@@ -20,7 +20,7 @@ const RightTop: React.FC<rightTop> = ({
   const { ava, name, membersGroup, onlineGroup, openMore, setOpenMore } = top;
 
   const pathname = usePathname();
-  const isActiveGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
   const handleBack = () => {
     if (setClickBox) {
