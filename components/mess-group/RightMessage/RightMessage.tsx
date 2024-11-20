@@ -8,14 +8,13 @@ import { group, user } from "@/constants/object";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { segmentsGroup } from "@/constants/groups";
-import { apiGroupInfo, dataChat, dataGroup } from "@/lib/dataBox";
 import { fetchUser, userData, UserInfo } from "@/lib/dataUser";
 import {
   fetchMessages,
   messageData,
-  RenderMessageSegment,
   ResponseMessageDTO
 } from "@/lib/dataMessages";
+import { detailBox, detailDataBox, fetchDetailBox } from "@/lib/dataOneBox";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -33,87 +32,119 @@ const RightMessage = ({
   setOpenMore
 }: RightMessageProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
-  //FetchDataChat Backend
-  const [adminId, setAdminId] = useState("");
-  const [adminInfo, setAdminInfo] = useState<UserInfo | null>(null);
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [userId, setUserId] = useState("");
-  const [messages, setMessages] = useState<RenderMessageSegment[]>([]);
-  const [messageGroup, setMessageGroup] = useState<RenderMessageSegment[]>([]);
+  //FetchMessage Backend
+  const [recipientId, setRecipientId] = useState<string[] | undefined>(
+    undefined
+  );
+  const [detailBox, setDetailBox] = useState<detailBox>();
+  const [userInfo, setUserInfo] = useState<UserInfo[] | null>(null);
+  const [senderInfo, setSenderInfo] = useState<UserInfo>();
+  const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
+  const [messageGroup, setMessageGroup] = useState<ResponseMessageDTO[]>([]);
 
   //boxId
   const boxId = pathname.split("/").pop();
-  const chatBox = dataChat.find((item) => item.id === boxId);
-  const groupBox = dataGroup.find((item) => item.id === boxId);
-  const groupInfo = apiGroupInfo.find((item) => item.id === boxId);
+  const adminId = localStorage.getItem("adminId");
 
   useEffect(() => {
-    const apiUserId = chatBox?.otherId;
-    if (apiUserId) {
-      setUserId(apiUserId);
-    }
-
+    let isMounted = true; // Cờ kiểm soát để ngăn setState nếu component đã unmount
     const fetchData = async () => {
-      const apiAdminId = localStorage.getItem("adminId");
-      if (apiAdminId) {
-        setAdminId(apiAdminId);
+      //Get Deail MessageBox
+      if (boxId) {
+        try {
+          await fetchDetailBox(boxId);
+          if (detailDataBox && Array.isArray(detailDataBox.receiverIds)) {
+            setDetailBox(detailDataBox);
+            // Chắc chắn rằng receiverIds là mảng trước khi truy cập
+            setUserInfo(detailDataBox.receiverIds);
+            setSenderInfo(detailDataBox.senderId);
+            setRecipientId(detailDataBox.receiverIds.map((item) => item.id));
+          } else {
+            console.error(
+              "recieverIds is not an array or detailDataBox is undefined"
+            );
+          }
+        } catch (error) {
+          console.error("Error fetching detail box:", error);
+        }
       }
 
-      try {
-        // Fetch Admin Info
-        if (adminId) {
-          const adminData = await fetchUser(adminId);
-          setAdminInfo(adminData);
-          console.log("Admin info:", adminData);
-        }
-
-        // Fetch User Info
-        if (userId) {
-          const userData = await fetchUser(userId);
-          setUserInfo(userData);
-          console.log("User Info:", userData);
-        }
-
-        // Fetch Segment Messages
+      // Fetch Segment Group Messages
+      if (isGroup) {
         if (boxId) {
-          const messageData = await fetchMessages(boxId);
-          setMessages(messageData);
-          console.log("Messages:", messages);
-        } else {
-          console.error("Error: Can't get boxId from pathname");
-        }
-
-        //Fetch Segment Group Messages
-        if (boxId) {
-          const messageData = await fetchMessages(boxId);
-          setMessageGroup(messageData);
-          console.log("Messages:", messageGroup);
+          await fetchMessages(boxId);
+          if (isMounted) {
+            setMessageGroup(messageData);
+            //console.log("Messages in Group:", messageData);
+          }
         } else {
           console.error("Error: Can't get boxId of Group from pathname");
         }
-      } catch (error) {
-        console.error("Error during data fetching:", error);
+      } else {
+        // Fetch Admin Info
+        // if (apiAdminId) {
+        //   const adminData = await fetchUser(apiAdminId);
+        //   if (isMounted) {
+        //     setAdminInfo(adminData);
+        //     console.log("Admin info:", adminData);
+        //   }
+        // }
+
+        // Fetch User Info
+        // if (userId && !userInfo) {
+        //   if (isMounted) {
+        //     await fetchUser(userId);
+        //     setUserInfo(userData);
+        //   }
+        // }
+
+        // Fetch Segment Messages
+        if (boxId) {
+          await fetchMessages(boxId);
+          if (isMounted) {
+            setMessages(messageData);
+            //console.log("Messages in Chat:", messageData);
+          }
+        } else {
+          console.error("Error: Can't get boxId from pathname");
+        }
       }
     };
 
     fetchData();
-  }, [adminId, userId, boxId]);
 
+    // Cleanup function to avoid memory leaks and unnecessary fetches
+    return () => {
+      isMounted = false;
+    };
+  }, [boxId, isGroup]);
   //RightTop
+  let recieverInfo: UserInfo[] = [];
+  if (userInfo) {
+    recieverInfo = userInfo.filter((item) => item.id !== adminId);
+  }
   const top = isGroup
     ? {
-        ava: groupInfo ? groupInfo.ava : "/assets/ava/default.png",
-        name: groupInfo ? groupInfo.name : "Unknown name",
-        membersGroup: groupInfo ? groupInfo.members.length : 0,
+        ava: detailBox ? detailBox.groupAva : "/assets/ava/default.png",
+        name: detailBox ? detailBox.groupName : "Unknown name",
+        membersGroup: detailBox ? detailBox.receiverIds.length : 0,
         onlineGroup: 0,
         openMore: openMore,
         setOpenMore: setOpenMore
       }
     : {
-        ava: userInfo ? userInfo.avatar : "/assets/ava/default.png",
-        name: userInfo ? userInfo.nickName : "Unknown name",
+        ava:
+          recieverInfo.length > 0 && recieverInfo[0].avatar !== ""
+            ? recieverInfo[0].avatar
+            : "/assets/ava/default.png",
+
+        name:
+          recieverInfo.length > 0 && recieverInfo[0].nickName !== ""
+            ? recieverInfo[0].nickName || "Unknown name"
+            : "Unknown name",
+
         membersGroup: 0,
         onlineGroup: 0,
         openMore: openMore,
@@ -122,11 +153,11 @@ const RightMessage = ({
 
   //filterSegment
   const filteredSegmentAdmin = isGroup
-    ? messageGroup.filter((item) => item.infoCreateBy.id === adminId)
-    : messages.filter((item) => item.infoCreateBy.id === adminId);
+    ? messageGroup.filter((item) => item.createBy === adminId)
+    : messages.filter((item) => item.createBy === adminId);
   const filteredSegmentOther = isGroup
-    ? messageGroup.filter((item) => item.infoCreateBy.id !== adminId)
-    : messages.filter((item) => item.infoCreateBy.id !== adminId);
+    ? messageGroup.filter((item) => item.createBy !== adminId)
+    : messages.filter((item) => item.createBy !== adminId);
 
   //OpenMoreDisplay
   const display = {
@@ -185,9 +216,15 @@ const RightMessage = ({
           <RightMiddle
             filteredSegmentAdmin={filteredSegmentAdmin}
             filteredSegmentOther={filteredSegmentOther}
+            receiverInfo={isGroup ? (userInfo ? userInfo : []) : recieverInfo}
           />
 
-          <RightBottom />
+          <RightBottom
+            recipientIds={recipientId}
+            boxId={boxId}
+            setMessageSegment={isGroup ? setMessageGroup : setMessages}
+            senderInfo={senderInfo}
+          />
         </div>
       </div>
       <OpenMoreDisplay display={display} />

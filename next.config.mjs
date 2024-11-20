@@ -1,6 +1,11 @@
 import webpack from "webpack";
 
 const nextConfig = {
+  // Cấu hình cho việc hiển thị ảnh từ Cloudinary
+  images: {
+    domains: ["res.cloudinary.com"]
+  },
+
   webpack: (config, { isServer }) => {
     // Tắt caching
     config.cache = false;

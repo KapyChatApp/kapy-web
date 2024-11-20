@@ -25,6 +25,7 @@ let userData: UserInfo;
 export const fetchUser = async (userId: string): Promise<UserInfo | null> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) return null;
+  if (!userId) return null;
 
   try {
     const response = await axios.get(

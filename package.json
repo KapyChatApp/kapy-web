@@ -33,6 +33,7 @@
     "express": "^4.21.1",
     "lucide-react": "^0.441.0",
     "next": "^14.2.16",
+    "next-cloudinary": "^6.16.0",
     "pusher": "^5.2.0",
     "pusher-js": "^8.4.0-rc2",
     "react": "^18.3.1",
@@ -41,6 +42,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-emoji-picker": "^1.0.13",
+    "react-player": "^2.16.0",
     "sentiment": "^5.0.2",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7"

@@ -23,7 +23,7 @@ export const actionsButton: Actions[] = [
   },
   {
     icon: "weui:add-friends-filled",
-    label: "Add members",
+    label: "Add mems",
     click: "add"
   },
   {

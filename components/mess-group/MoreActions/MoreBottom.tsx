@@ -18,7 +18,7 @@ const MoreBottom: React.FC<ActiveComponentProps> = ({ setActiveComponent }) => {
   };
 
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const displayLabelButton = isGroup ? "Leave Group" : "Unfriend";
   return (
     <>

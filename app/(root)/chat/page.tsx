@@ -1,46 +1,50 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Sử dụng useRouter để điều hướng
-import { dataChat, fetchMessageBox } from "@/lib/dataBox";
+import { useRouter } from "next/navigation";
+import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
+import { MessageBoxProps } from "@/types/mess-group";
+import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
 
 export default function Page() {
-  const router = useRouter(); // Khởi tạo router từ Next.js
-  const [loading, setLoading] = useState(true); // Trạng thái loading để tránh render lại
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
+  const [dataGroup, setDataGroup] = useState<MessageBoxContent[]>([]);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
-    // Gọi hàm fetchMessageBox khi trang được tải
-    const fetchData = async () => {
-      await fetchMessageBox();
-    };
-    fetchData();
-
-    if (dataChat.length === 0) {
-      console.warn("Không có tin nhắn trong messChat.");
-      setLoading(false);
-      return;
-    }
-
-    // Tìm tin nhắn mới nhất từ dataChat
-    const latestMessage = dataChat.reduce((latest, current) => {
-      const latestTime = new Date(latest.time).getTime();
-      const currentTime = new Date(current.time).getTime();
-
-      return currentTime > latestTime ? current : latest;
-    }, dataChat[0]);
-
-    if (latestMessage && latestMessage.id) {
-      // Điều hướng đến trang chat của tin nhắn mới nhất
-      router.push(`/chat/${latestMessage.id}`);
-    } else {
-      console.warn("Không tìm thấy tin nhắn mới nhất hoặc thiếu `id`.");
-    }
-
+    fetchMessageBox(setDataChat, setError);
+    fetchMessageBoxGroup(setDataGroup, setError);
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    if (!loading && dataChat.length === 0) {
+      console.warn("No detail in messChat.");
+      return;
+    }
+
+    if (!loading && dataChat.length > 0) {
+      // Find the latest message based on time
+      const latestMessage = dataChat.reduce((latest, current) => {
+        const latestTime = new Date(latest.createAt).getTime();
+        const currentTime = new Date(current.createAt).getTime();
+        return currentTime > latestTime ? current : latest;
+      }, dataChat[0]);
+
+      console.log("latestsMess: ", latestMessage);
+
+      if (latestMessage && latestMessage.id) {
+        router.push(`/chat/${latestMessage.id}`);
+      } else {
+        console.warn("Dont find the latest message or id.");
+      }
+    }
+  }, [loading, dataChat, router]);
+
   if (loading) {
-    return <div>Loading...</div>; // Hiển thị loading khi đang xử lý
+    return <div>Loading...</div>;
   }
 
-  return null; // Không hiển thị giao diện sau khi điều hướng
+  return null;
 }
