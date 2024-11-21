@@ -1,9 +1,10 @@
 import axios from "axios";
 
 // Cập nhật interface để trả về đầy đủ thông tin của người dùng
-export interface UserInfo {
+export interface ResponseUserInfo {
   id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   nickName: string;
   avatar: string;
   email: string;
@@ -21,8 +22,10 @@ export interface UserInfo {
   blockedIds: string[];
   posts: string[];
 }
-let userData: UserInfo;
-export const fetchUser = async (userId: string): Promise<UserInfo | null> => {
+let userData: ResponseUserInfo;
+export const fetchUser = async (
+  userId: string
+): Promise<ResponseUserInfo | null> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) return null;
   if (!userId) return null;
@@ -43,7 +46,8 @@ export const fetchUser = async (userId: string): Promise<UserInfo | null> => {
     if (apiUserData) {
       userData = {
         id: apiUserData._id,
-        fullName: apiUserData.firstName + apiUserData.lastName,
+        firstName: apiUserData.firstName,
+        lastName: apiUserData.lastName,
         nickName:
           apiUserData.nickName || apiUserData.firstName + apiUserData.lastName,
         avatar: apiUserData.avatar || "/assets/ava/default.png",

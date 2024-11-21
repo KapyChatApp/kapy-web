@@ -4,7 +4,6 @@ import { formatTimeMessageBox } from "./utils";
 import { ResponseMessageDTO } from "./dataMessages";
 import { MessageBoxContent, ResponseMessageBoxDTO } from "./dataBox";
 
-// Hàm xử lý fetch dữ liệu MessageBox
 export const fetchMessageBoxGroup = async (
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
