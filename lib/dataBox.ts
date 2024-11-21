@@ -3,27 +3,7 @@ import axios from "axios";
 import { formatTimeMessageBox } from "./utils";
 import { ResponseMessageDTO } from "./dataMessages";
 
-// Các interface
-interface UserInfoBox {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  avatar: string;
-  phone: string;
-}
-
-interface MessageBoxDTO {
-  _id: string;
-  senderId: string | UserInfoBox;
-  receiverIds: UserInfoBox[];
-  groupName: string;
-  groupAva: string;
-  flag: boolean;
-  pin: boolean;
-  isSeen: boolean;
-  lastMessage: ResponseMessageDTO;
-}
-
+// Interface FE
 export interface MessageBoxContent {
   id: string;
   senderName: string;
@@ -40,12 +20,30 @@ export interface MessageBoxContent {
   isSeen: boolean;
 }
 
+//Interface Response
+interface UserInfoBox {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  phone: string;
+}
+interface MessageBoxDTO {
+  _id: string;
+  senderId: string | UserInfoBox;
+  receiverIds: UserInfoBox[];
+  groupName: string;
+  groupAva: string;
+  flag: boolean;
+  pin: boolean;
+  isSeen: boolean;
+  lastMessage: ResponseMessageDTO;
+}
 export interface ResponseMessageBoxDTO {
   box: MessageBoxDTO[];
   adminId: string;
 }
 
-// Hàm xử lý fetch dữ liệu MessageBox
 export const fetchMessageBox = async (
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
@@ -145,7 +143,7 @@ export const fetchMessageBox = async (
             content: content,
             createAt: formatTimeMessageBox(item.lastMessage?.createAt),
             pin: false,
-            isOnline: true,
+            isOnline: false,
             isSeen: isSeen
           };
         }

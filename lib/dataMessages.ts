@@ -1,49 +1,6 @@
 import { SegmentMessProps } from "@/types/mess-group";
 import axios from "axios";
-import { fetchUser, userData, UserInfo } from "./dataUser";
-import { userInfo } from "os";
-// export interface ImageContent {
-//   type: "image";
-//   url: string;
-//   altText?: string;
-// }
-// export interface LinkContent {
-//   type: "link";
-//   url: string;
-//   title?: string;
-// }
-// export interface FileContent {
-//   type: "file";
-//   fileName: string;
-//   fileUrl: string;
-//   fileType: string;
-// }
-// export interface VideoContent {
-//   type: "video";
-//   fileName: string;
-//   fileUrl: string;
-//   fileType: string;
-//   duration: number;
-// }
-// export interface VoiceContent {
-//   type: "voice";
-//   fileName: string;
-//   fileUrl: string;
-//   fileType: string;
-//   duration: number;
-// }
-// export interface PostContent {
-//   type: "post";
-//   userId: string;
-//   likedIds?: string[];
-//   shares?: string[];
-//   comments?: string[];
-//   content: string;
-// }
-// export interface IconContent {
-//   type: "icon";
-//   name: string;
-// }
+
 export interface FileContent {
   fileName: string;
   url: string;
@@ -56,9 +13,9 @@ export interface FileContent {
 }
 export interface GPSContent {
   type: "gps";
-  latitude: number; // Vĩ độ
-  longitude: number; // Kinh độ
-  description?: string; // Mô tả địa điểm (tuỳ chọn)
+  latitude: number;
+  longitude: number;
+  description?: string;
 }
 
 export interface ResponseMessageDTO {
@@ -70,6 +27,7 @@ export interface ResponseMessageDTO {
   createAt: string;
   createBy: string;
 }
+
 let messageData: ResponseMessageDTO[];
 export const fetchMessages = async (
   boxId: string
@@ -90,7 +48,6 @@ export const fetchMessages = async (
 
     const apiMessages: ResponseMessageDTO[] = response.data;
     if (apiMessages && Array.isArray(apiMessages)) {
-      // Lặp qua tất cả các tin nhắn và gọi API để lấy thông tin người gửi
       messageData = await Promise.all(
         apiMessages.map(async (msg) => {
           return {

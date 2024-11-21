@@ -4,6 +4,6 @@ export const pusherClient = new PusherClient(
   process.env.NEXT_PUBLIC_PUSHER_APP_KEY!,
   {
     cluster: process.env.PUSHER_APP_CLUSTER!,
-    authEndpoint: "http://localhost:3001/pusher/auth"
+    authEndpoint: process.env.BASE_URL + "pusher/auth"
   }
 );

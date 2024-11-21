@@ -8,8 +8,7 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
-import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
-import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
+import { MessageBoxContent } from "@/lib/dataBox";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;

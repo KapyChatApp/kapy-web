@@ -8,13 +8,13 @@ import { group, user } from "@/constants/object";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { segmentsGroup } from "@/constants/groups";
-import { fetchUser, userData, UserInfo } from "@/lib/dataUser";
+import { fetchUser, ResponseUserInfo, userData } from "@/lib/dataUser";
 import {
   fetchMessages,
   messageData,
   ResponseMessageDTO
 } from "@/lib/dataMessages";
-import { detailBox, detailDataBox, fetchDetailBox } from "@/lib/dataOneBox";
+import { DetailBox, detailDataBox, fetchDetailBox } from "@/lib/dataOneBox";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,9 +38,9 @@ const RightMessage = ({
   const [recipientId, setRecipientId] = useState<string[] | undefined>(
     undefined
   );
-  const [detailBox, setDetailBox] = useState<detailBox>();
-  const [userInfo, setUserInfo] = useState<UserInfo[] | null>(null);
-  const [senderInfo, setSenderInfo] = useState<UserInfo>();
+  const [detailBox, setDetailBox] = useState<DetailBox>();
+  const [userInfo, setUserInfo] = useState<ResponseUserInfo[] | null>(null);
+  const [senderInfo, setSenderInfo] = useState<ResponseUserInfo>();
   const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
   const [messageGroup, setMessageGroup] = useState<ResponseMessageDTO[]>([]);
 
@@ -121,7 +121,7 @@ const RightMessage = ({
     };
   }, [boxId, isGroup]);
   //RightTop
-  let recieverInfo: UserInfo[] = [];
+  let recieverInfo: ResponseUserInfo[] = [];
   if (userInfo) {
     recieverInfo = userInfo.filter((item) => item.id !== adminId);
   }
@@ -141,8 +141,10 @@ const RightMessage = ({
             : "/assets/ava/default.png",
 
         name:
-          recieverInfo.length > 0 && recieverInfo[0].nickName !== ""
-            ? recieverInfo[0].nickName || "Unknown name"
+          recieverInfo.length > 0 &&
+          recieverInfo[0].firstName !== "" &&
+          recieverInfo[0].lastName !== ""
+            ? recieverInfo[0].firstName + " " + recieverInfo[0].lastName
             : "Unknown name",
 
         membersGroup: 0,

@@ -3,12 +3,12 @@ import axios from "axios";
 import { MessageBoxProps } from "@/types/mess-group";
 import { formatTimeMessageBox } from "./utils";
 import { Group } from "@/types/object";
-import { UserInfo } from "./dataUser";
+import { ResponseUserInfo } from "./dataUser";
 
-export interface detailBox {
+export interface DetailBox {
   id: string;
-  senderId: UserInfo;
-  receiverIds: UserInfo[]; // Giả sử recieverIds là mảng
+  senderId: ResponseUserInfo;
+  receiverIds: ResponseUserInfo[];
   groupName: string;
   groupAva: string;
   flag: boolean;
@@ -17,7 +17,7 @@ export interface detailBox {
   createBy: string;
 }
 
-let detailDataBox: detailBox | null = null; // Khởi tạo null để tránh lỗi undefined
+let detailDataBox: DetailBox | null = null;
 let apiDataBox: any;
 
 export const fetchDetailBox = async (boxId: string) => {
@@ -37,9 +37,10 @@ export const fetchDetailBox = async (boxId: string) => {
 
     apiDataBox = responseChat.data;
 
-    const senderInfo: UserInfo = {
+    const senderInfo: ResponseUserInfo = {
       id: apiDataBox.box.box.senderId._id,
-      fullName: apiDataBox.box.box.senderId.fullName,
+      firstName: apiDataBox.box.box.senderId.firstName,
+      lastName: apiDataBox.box.box.senderId.lastName,
       nickName: apiDataBox.box.box.senderId.nickName,
       avatar: apiDataBox.box.box.senderId.avatar,
       email: apiDataBox.box.box.senderId.email,
@@ -58,12 +59,13 @@ export const fetchDetailBox = async (boxId: string) => {
       posts: apiDataBox.box.box.senderId.posts
     };
 
-    const recieverInfo: UserInfo[] = Array.isArray(
+    const recieverInfo: ResponseUserInfo[] = Array.isArray(
       apiDataBox.box.box.receiverIds
     )
       ? apiDataBox.box.box.receiverIds.map((receiver: any) => ({
           id: receiver._id,
-          fullName: receiver.fullName,
+          firstName: receiver.firstName,
+          lastName: receiver.lastName,
           nickName: receiver.nickName,
           avatar: receiver.avatar,
           email: receiver.email,

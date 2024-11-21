@@ -4,7 +4,6 @@ import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import MessageInput from "../MessageInput";
 import { Button } from "../../ui/button";
-import { UserInfo } from "@/lib/dataUser";
 import {
   FileContent,
   GPSContent,
@@ -13,19 +12,21 @@ import {
 import axios from "axios";
 import { pusherClient } from "@/lib/pusher";
 import { usePathname } from "next/navigation";
+import { ResponseUserInfo } from "@/lib/dataUser";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
   boxId: string | undefined;
   setMessageSegment: React.Dispatch<React.SetStateAction<ResponseMessageDTO[]>>;
-  senderInfo: UserInfo | undefined;
+  senderInfo: ResponseUserInfo | undefined;
 }
 const tempSenderInfo = {
   id: "",
-  fullName: "Default User",
+  firstName: "Default",
+  lastName: " User",
   nickName: "defaultNick",
   avatar: "defaultAvatarUrl"
-} as UserInfo;
+} as ResponseUserInfo;
 const RightBottom = ({
   recipientIds,
   boxId,
@@ -107,15 +108,14 @@ const RightBottom = ({
           type: file.type.split("/")[0]
         };
 
-        const newMessageSegment = {
+        const newMessageSegment: ResponseMessageDTO = {
           id: "",
           flag: true,
           readedId: apiAdminId ? [apiAdminId] : [],
           contentId: [fileContent],
           text: [],
           createAt: new Date().toISOString(),
-          createBy: apiAdminId ? apiAdminId : "",
-          infoCreateBy: senderInfo ? senderInfo : tempSenderInfo
+          createBy: apiAdminId ? apiAdminId : ""
         };
         console.log(newMessageSegment);
 
@@ -164,18 +164,15 @@ const RightBottom = ({
     }
   };
   const handleSend = async () => {
-    const newMessageSegment = {
+    const newMessageSegment: ResponseMessageDTO = {
       id: "",
       flag: true,
       readedId: apiAdminId ? [apiAdminId] : [],
       contentId: [],
       text: [messageContent],
       createAt: new Date().toISOString(),
-      createBy: apiAdminId ? apiAdminId : "",
-      infoCreateBy: senderInfo ? senderInfo : tempSenderInfo
+      createBy: apiAdminId ? apiAdminId : ""
     };
-
-    console.log("Detail of message:", newMessageSegment);
 
     // Tạo đối tượng SegmentMessageDTO
     const recipientId = recipientIds ? recipientIds : [];
@@ -208,11 +205,7 @@ const RightBottom = ({
           }
         }
       );
-
-      // Thêm tin nhắn mới vào mảng
-      setMessageSegment((prevSegments) => [...prevSegments, newMessageSegment]);
       setMessageContent("");
-      console.log("Send successfully");
     } catch (error) {
       console.error("Error sending message: ", error);
     }
@@ -233,12 +226,12 @@ const RightBottom = ({
   //   };
   // });
   useEffect(() => {
-    // Hàm xử lý sự kiện
-    const handleNewMessage = (data: string) => {
+    const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
+
+      setMessageSegment((prevSegments) => [...prevSegments, data]);
     };
 
-    // Subscribe vào kênh riêng
     pusherClient.subscribe(`private-${boxId}`);
 
     // Bind sự kiện với handler
