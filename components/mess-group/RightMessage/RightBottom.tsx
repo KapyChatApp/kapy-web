@@ -38,6 +38,9 @@ const RightBottom = ({
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
   const apiAdminId = localStorage.getItem("adminId");
+  const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
+    { tempUrl: string; cloudinaryUrl: string }[]
+  >([]);
 
   const handleInputChange = (value: string) => {
     setMessageContent(value); // Cập nhật giá trị khi input thay đổi
@@ -47,123 +50,21 @@ const RightBottom = ({
       fileInputRef.current.click();
     }
   };
+  //   pusherClient.subscribe(`private-${boxId}`);
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
+  //   pusherClient.bind("new-message", (data: string) => {
+  //     console.log("Success fully: ", data);
+  //   });
 
-      const crypto = require("crypto");
-      const axios = require("axios");
+  //   return () => {
+  //     pusherClient.unsubscribe(`private-${boxId}`);
+  //     pusherClient.unbind("new-message", (data: string) => {
+  //       console.log("Success fully: ", data);
+  //     });
+  //   };
+  // });
 
-      // Thông tin API Cloudinary
-      const apiSecret = "V7HGA8m4YIWxSOC2oRRggDwBsvg"; // Thay bằng API Secret của bạn
-      const apiKey = "539923817936375"; // Thay bằng API Key của bạn
-      const cloudName = "dqiscnurh"; // Thay bằng Cloud Name của bạn
-      const uploadPreset = "Avatar"; // Preset của bạn
-
-      // Lấy timestamp (số)
-      const timestamp = Math.floor(Date.now() / 1000); // Tạo timestamp
-
-      // Tạo chuỗi chữ ký đúng
-      const signatureString = `timestamp=${timestamp}&upload_preset=${uploadPreset}`;
-
-      // Tạo chữ ký
-      const signature = crypto
-        .createHash("sha1")
-        .update(signatureString + apiSecret)
-        .digest("hex");
-
-      // Tạo FormData để gửi tệp
-      const formImage = new FormData();
-      formImage.append("file", file); // file là đối tượng file bạn muốn upload
-      formImage.append("upload_preset", uploadPreset);
-      formImage.append("timestamp", timestamp.toString());
-      formImage.append("signature", signature);
-      formImage.append("api_key", apiKey);
-
-      try {
-        // Gửi yêu cầu POST tới Cloudinary
-        const uploadResponse = await axios.post(
-          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
-          formImage,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data" // Đảm bảo loại nội dung là multipart/form-data
-            }
-          }
-        );
-
-        // Lấy URL của ảnh đã upload
-        const uploadedFileUrl = uploadResponse.data.secure_url;
-
-        const fileContent: FileContent = {
-          fileName: file.name,
-          url: uploadedFileUrl,
-          publicId: uploadResponse.data.public_id,
-          bytes: file.size.toString(),
-          width: "0", // Thay đổi nếu cần
-          height: "0", // Thay đổi nếu cần
-          format: file.type.split("/")[1], // Lấy phần đuôi format từ type
-          type: file.type.split("/")[0]
-        };
-
-        const newMessageSegment: ResponseMessageDTO = {
-          id: "",
-          flag: true,
-          readedId: apiAdminId ? [apiAdminId] : [],
-          contentId: [fileContent],
-          text: [],
-          createAt: new Date().toISOString(),
-          createBy: apiAdminId ? apiAdminId : ""
-        };
-        console.log(newMessageSegment);
-
-        // Tạo đối tượng RequestSendMessageDTO
-        const recipientId = recipientIds ? recipientIds : [];
-        const messageData = {
-          boxId: boxId,
-          content: fileContent
-        };
-
-        if (!messageData.boxId || recipientId.length === 0) {
-          console.error("Missing required fields in message data");
-          return;
-        }
-
-        // Gửi request đến API để gửi tin nhắn với file đã chọn
-        const formData = new FormData();
-        formData.append("boxId", messageData.boxId);
-        formData.append("content", JSON.stringify(messageData.content));
-        formData.append("file", file);
-
-        try {
-          const storedToken = localStorage.getItem("token");
-          if (!storedToken) return;
-          const response = await axios.post(
-            process.env.BASE_URL + "message/send",
-            formData,
-            {
-              headers: {
-                Authorization: `${storedToken}`
-              }
-            }
-          );
-          console.log("Response from API: ", response.data);
-
-          setMessageSegment((prevSegments) => [
-            ...prevSegments,
-            newMessageSegment
-          ]);
-        } catch (error) {
-          console.error("Error sending message: ", error);
-        }
-      } catch (error) {
-        console.error("Error uploading file or sending message: ", error);
-      }
-    }
-  };
-  const handleSend = async () => {
+  const handleSendTextMessage = async () => {
     const newMessageSegment: ResponseMessageDTO = {
       id: "",
       flag: true,
@@ -187,44 +88,94 @@ const RightBottom = ({
     }
 
     // Gửi request đến API để gửi tin nhắn với file đã chọn
-    const formData = new FormData();
-    formData.append("boxId", messageData.boxId);
-    formData.append("content", JSON.stringify(messageData.content));
+    if (messageContent !== "") {
+      const formData = new FormData();
+      formData.append("boxId", messageData.boxId);
+      formData.append("content", JSON.stringify(messageData.content));
 
-    // Gửi API
-    try {
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) return;
+      // Gửi API
+      try {
+        const storedToken = localStorage.getItem("token");
+        if (!storedToken) return;
 
-      const response = await axios.post(
-        process.env.BASE_URL + "message/send",
-        formData,
-        {
-          headers: {
-            Authorization: `${storedToken}`
+        const response = await axios.post(
+          process.env.BASE_URL + "message/send",
+          formData,
+          {
+            headers: {
+              Authorization: `${storedToken}`
+            }
           }
-        }
-      );
-      setMessageContent("");
-    } catch (error) {
-      console.error("Error sending message: ", error);
+        );
+        setMessageContent("");
+      } catch (error) {
+        console.error("Error sending message: ", error);
+      }
     }
   };
 
-  // useEffect(() => {
-  //   pusherClient.subscribe(`private-${boxId}`);
+  const handleSendMultipleFiles = async (files: File[]) => {
+    if (!files.length || !boxId) return;
 
-  //   pusherClient.bind("new-message", (data: string) => {
-  //     console.log("Success fully: ", data);
-  //   });
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) return;
 
-  //   return () => {
-  //     pusherClient.unsubscribe(`private-${boxId}`);
-  //     pusherClient.unbind("new-message", (data: string) => {
-  //       console.log("Success fully: ", data);
-  //     });
-  //   };
-  // });
+    try {
+      // Tạo danh sách fileContent và message tạm thời để hiển thị trước
+      const tempMessages: ResponseMessageDTO[] = files.map((file) => ({
+        id: "",
+        flag: true,
+        readedId: [apiAdminId || ""],
+        contentId: [
+          {
+            fileName: file.name,
+            url: URL.createObjectURL(file), // Preview URL tạm thời
+            publicId: "",
+            bytes: file.size.toString(),
+            width: "0",
+            height: "0",
+            format: file.type.split("/")[1],
+            type: file.type.split("/")[0]
+          }
+        ],
+        text: [],
+        createAt: new Date().toISOString(),
+        createBy: apiAdminId || ""
+      }));
+
+      // Hiển thị tạm thời các tin nhắn
+      setMessageSegment((prev) => [...prev, ...tempMessages]);
+
+      // Gửi từng file lên server
+      for (const file of files) {
+        const fileContent: FileContent = {
+          fileName: file.name,
+          url: "",
+          publicId: "", // Cloudinary Public ID
+          bytes: file.size.toString(),
+          width: "0",
+          height: "0",
+          format: file.type.split("/")[1],
+          type: file.type.split("/")[0]
+        };
+
+        const formData = new FormData();
+        formData.append("boxId", boxId);
+        formData.append("content", JSON.stringify(fileContent));
+        formData.append("file", file);
+
+        await axios.post(`${process.env.BASE_URL}message/send`, formData, {
+          headers: {
+            Authorization: storedToken,
+            "Content-Type": "multipart/form-data"
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error sending files:", error);
+    }
+  };
+
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
@@ -243,6 +194,28 @@ const RightBottom = ({
       pusherClient.unbind("new-message", handleNewMessage);
     };
   }, [boxId]);
+
+  useEffect(() => {
+    if (temporaryToCloudinaryMap.length === 0) return;
+
+    setMessageSegment((prev: any) =>
+      prev.map((msg: any) => {
+        const mapEntry = temporaryToCloudinaryMap.find(
+          (entry) => msg.contentId[0].url === entry.tempUrl
+        );
+        return mapEntry
+          ? {
+              ...msg,
+              contentId: [{ ...msg.contentId[0], url: mapEntry.cloudinaryUrl }]
+            }
+          : msg;
+      })
+    );
+
+    // Sau khi cập nhật xong, loại bỏ các URL đã xử lý
+    setTemporaryToCloudinaryMap([]);
+  }, [temporaryToCloudinaryMap]);
+
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">
       <div className="flex flex-row lg:gap-4 gap-3 items-center justify-center">
@@ -275,13 +248,18 @@ const RightBottom = ({
         type="file"
         ref={fileInputRef}
         style={{ display: "none" }}
-        onChange={handleFileChange}
+        multiple
+        onChange={(e) => {
+          if (e.target.files) {
+            handleSendMultipleFiles(Array.from(e.target.files));
+          }
+        }}
       />
-      {selectedFile && (
+      {/* {selectedFile && (
         <div className="ml-4 text-sm text-gray-700">
           File đã chọn: {selectedFile.name}
         </div>
-      )}
+      )} */}
       <div className="flex flex-col lg:ml-[24px] ml-2 w-[80.5%] ">
         <MessageInput
           onMessageChange={handleInputChange}
@@ -293,7 +271,7 @@ const RightBottom = ({
       <div className="flex items-center justify-start w-fit lg:ml-[16px] ml-1">
         <div
           className="flex items-center w-6 h-6 xl:w-[28px] xl:h-[28px] justify-start"
-          onClick={handleSend}
+          onClick={handleSendTextMessage}
         >
           <Icon
             icon="mynaui:send-solid"

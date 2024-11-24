@@ -38,31 +38,31 @@ export const fetchDetailBox = async (boxId: string) => {
     apiDataBox = responseChat.data;
 
     const senderInfo: ResponseUserInfo = {
-      id: apiDataBox.box.box.senderId._id,
-      firstName: apiDataBox.box.box.senderId.firstName,
-      lastName: apiDataBox.box.box.senderId.lastName,
-      nickName: apiDataBox.box.box.senderId.nickName,
-      avatar: apiDataBox.box.box.senderId.avatar,
-      email: apiDataBox.box.box.senderId.email,
-      phoneNumber: apiDataBox.box.box.senderId.phoneNumber,
-      address: apiDataBox.box.box.senderId.address,
-      job: apiDataBox.box.box.senderId.job,
-      hobbies: apiDataBox.box.box.senderId.hobbies,
-      bio: apiDataBox.box.box.senderId.bio,
-      birthDay: apiDataBox.box.box.senderId.birthDay,
-      attendDate: apiDataBox.box.box.senderId.attendDate,
-      relationShip: apiDataBox.box.box.senderId.relationShip,
-      flag: apiDataBox.box.box.senderId.flag,
-      friendIds: apiDataBox.box.box.senderId.friendIds,
-      bestFriendIds: apiDataBox.box.box.senderId.bestFriendIds,
-      blockedIds: apiDataBox.box.box.senderId.blockedIds,
-      posts: apiDataBox.box.box.senderId.posts
+      id: apiDataBox.box.senderId._id,
+      firstName: apiDataBox.box.senderId.firstName,
+      lastName: apiDataBox.box.senderId.lastName,
+      nickName: apiDataBox.box.senderId.nickName,
+      avatar: apiDataBox.box.senderId.avatar,
+      email: apiDataBox.box.senderId.email,
+      phoneNumber: apiDataBox.box.senderId.phoneNumber,
+      address: apiDataBox.box.senderId.address,
+      job: apiDataBox.box.senderId.job,
+      hobbies: apiDataBox.box.senderId.hobbies,
+      bio: apiDataBox.box.senderId.bio,
+      birthDay: apiDataBox.box.senderId.birthDay,
+      attendDate: apiDataBox.box.senderId.attendDate,
+      relationShip: apiDataBox.box.senderId.relationShip,
+      flag: apiDataBox.box.senderId.flag,
+      friendIds: apiDataBox.box.senderId.friendIds,
+      bestFriendIds: apiDataBox.box.senderId.bestFriendIds,
+      blockedIds: apiDataBox.box.senderId.blockedIds,
+      posts: apiDataBox.box.senderId.posts
     };
 
     const recieverInfo: ResponseUserInfo[] = Array.isArray(
-      apiDataBox.box.box.receiverIds
+      apiDataBox.box.receiverIds
     )
-      ? apiDataBox.box.box.receiverIds.map((receiver: any) => ({
+      ? apiDataBox.box.receiverIds.map((receiver: any) => ({
           id: receiver._id,
           firstName: receiver.firstName,
           lastName: receiver.lastName,
@@ -87,15 +87,15 @@ export const fetchDetailBox = async (boxId: string) => {
 
     // Cập nhật lại detailDataBox với dữ liệu trả về từ API
     detailDataBox = {
-      id: apiDataBox.box.box._id,
+      id: apiDataBox.box._id,
       senderId: senderInfo,
       receiverIds: recieverInfo,
-      groupName: apiDataBox.box.box.groupName,
-      groupAva: apiDataBox.box.box.groupAva,
-      flag: apiDataBox.box.box.flag,
-      pin: apiDataBox.box.box.pin,
-      createAt: apiDataBox.box.box.createAt,
-      createBy: apiDataBox.box.box.createBy
+      groupName: apiDataBox.box.groupName,
+      groupAva: apiDataBox.box.groupAva,
+      flag: apiDataBox.box.flag,
+      pin: apiDataBox.box.pin,
+      createAt: apiDataBox.box.createAt,
+      createBy: apiDataBox.box.createBy
     };
   } catch (err: any) {
     console.error("Error fetching messages:", err);

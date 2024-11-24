@@ -31,7 +31,6 @@ const page = () => {
 
   useEffect(() => {
     fetchMessageBox(setDataChat, setError);
-    fetchMessageBoxGroup(setDataGroup, setError);
   }, []);
 
   return (
