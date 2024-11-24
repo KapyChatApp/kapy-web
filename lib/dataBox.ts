@@ -18,9 +18,10 @@ export interface MessageBoxContent {
   pin: boolean;
   isOnline: boolean;
   isSeen: boolean;
+  lastMessage: ResponseMessageDTO;
 }
 
-//Interface Response
+// Interface Response
 interface UserInfoBox {
   _id: string;
   firstName: string;
@@ -69,89 +70,122 @@ export const fetchMessageBox = async (
     localStorage.setItem("adminId", apiDataChat.adminId);
 
     // Xử lý dữ liệu từ response để tạo ra dataChat
-    const updatedDataChat = apiDataChat.box
+    const updatedDataChat: MessageBoxContent[] = apiDataChat.box
       .map((item) => {
-        if (item.lastMessage.readedId) {
-          const isSeen = item.lastMessage.readedId.some(
-            (reader: any) => reader._id === apiDataChat.adminId
-          );
+        let isSeen = false;
 
-          let content = item.lastMessage.text[item.lastMessage.text.length - 1];
-          let detailContent = "";
+        let content = item.lastMessage.text[item.lastMessage.text.length - 1];
+        let detailContent = "";
 
-          if (item.lastMessage.contentId?.length > 0) {
-            const contentType = item.lastMessage.contentId[0].type;
-            detailContent =
-              contentType === "Image"
-                ? "Sent a photo"
-                : contentType === "Video"
-                ? "Sent a video"
-                : contentType === "Audio"
-                ? "Sent an audio"
-                : contentType === "Other"
-                ? "Sent a file"
-                : "";
-            content = detailContent;
-          }
-          const sender = item.receiverIds.find(
-            (sender) => sender._id === item.lastMessage.createBy
-          );
-          let senderInfo;
-          if (sender) {
-            senderInfo = {
-              id: sender._id,
-              name: sender.firstName + " " + sender.lastName,
-              phone: sender.phone,
-              avatar: sender.avatar
-            };
-          } else {
-            senderInfo = {
-              id: "",
-              name: "Unknown",
-              phone: "",
-              avatar: "/assets/ava/default.png"
-            };
-          }
+        if (!content) {
+          const contentType =
+            item.lastMessage.contentId[item.lastMessage.contentId.length - 1]
+              .type;
+          detailContent =
+            contentType === "Image"
+              ? "Sent a photo"
+              : contentType === "Video"
+              ? "Sent a video"
+              : contentType === "Audio"
+              ? "Sent an audio"
+              : contentType === "Other"
+              ? "Sent a file"
+              : "";
+          content = detailContent;
+        }
 
-          const receiver = item.receiverIds.find(
-            (receiver) => receiver._id !== apiDataChat.adminId
-          );
-          let receiverInfo;
-          if (receiver) {
-            receiverInfo = {
-              id: receiver._id,
-              name: receiver.firstName + " " + receiver.lastName,
-              phone: receiver.phone,
-              avatar: receiver.avatar
-            };
-          } else {
-            receiverInfo = {
-              id: "",
-              name: "Unknown",
-              phone: "",
-              avatar: "/assets/ava/default.png"
-            };
-          }
-
-          return {
-            id: item._id,
-            senderName:
-              item.lastMessage.createBy === apiDataChat.adminId
-                ? "You"
-                : senderInfo.name,
-            receiverInfo: receiverInfo,
-            content: content,
-            createAt: formatTimeMessageBox(item.lastMessage?.createAt),
-            pin: false,
-            isOnline: false,
-            isSeen: isSeen
+        const sender = item.receiverIds.find(
+          (sender) => sender._id === item.lastMessage.createBy
+        );
+        let senderInfo;
+        if (sender) {
+          senderInfo = {
+            id: sender._id,
+            name: sender.firstName + " " + sender.lastName,
+            phone: sender.phone,
+            avatar: sender.avatar
+          };
+        } else {
+          senderInfo = {
+            id: "",
+            name: "Unknown",
+            phone: "",
+            avatar: "/assets/ava/default.png"
           };
         }
-        return null;
+
+        const receiver = item.receiverIds.find(
+          (receiver) => receiver._id !== apiDataChat.adminId
+        );
+        let receiverInfo;
+        if (receiver) {
+          receiverInfo = {
+            id: receiver._id,
+            name: receiver.firstName + " " + receiver.lastName,
+            phone: receiver.phone,
+            avatar: receiver.avatar
+          };
+        } else {
+          receiverInfo = {
+            id: "",
+            name: "Unknown",
+            phone: "",
+            avatar: "/assets/ava/default.png"
+          };
+        }
+
+        return {
+          id: item._id,
+          senderName:
+            item.lastMessage.createBy === apiDataChat.adminId
+              ? "You"
+              : senderInfo.name,
+          receiverInfo: receiverInfo,
+          content: content,
+          createAt: formatTimeMessageBox(item.lastMessage?.createAt),
+          pin: false,
+          isOnline: false,
+          isSeen: isSeen
+        };
       })
       .filter((item): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
 
-    setDataChat(updatedDataChat);
+    // Lấy danh sách ID của các hộp chat để gửi API check-mark-read
+    const messageIdsToCheck = updatedDataChat.map((item) => item.id);
+
+    // Gửi yêu cầu API check-mark-read với các ID này
+    const checkReadResponse = await axios.post(
+      `${process.env.BASE_URL}message/check-mark-read`,
+      {
+        boxIds: messageIdsToCheck
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${storedToken}`
+        }
+      }
+    );
+
+    // Kiểm tra kết quả API và cập nhật lại isSeen trong updatedDataChat
+    if (checkReadResponse.status === 200) {
+      const checkResults = checkReadResponse.data;
+      const updatedSeenDataChat = updatedDataChat.map((item) => {
+        const result = checkResults.find(
+          (result: { boxId: string }) => result.boxId === item.id
+        );
+        if (result && result.success) {
+          return {
+            ...item,
+            isSeen: true // Cập nhật trạng thái đã xem
+          };
+        }
+        return item;
+      });
+
+      // Cập nhật state với dữ liệu đã được cập nhật
+      setDataChat(updatedSeenDataChat);
+    }
   } catch (err: any) {
     setError(err.message);
     console.error("Error fetching messages:", err);

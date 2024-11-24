@@ -46,7 +46,7 @@ export const fetchMessages = async (
       }
     );
 
-    const apiMessages: ResponseMessageDTO[] = response.data;
+    const apiMessages: ResponseMessageDTO[] = response.data.messages;
     if (apiMessages && Array.isArray(apiMessages)) {
       messageData = await Promise.all(
         apiMessages.map(async (msg) => {

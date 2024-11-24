@@ -2,21 +2,26 @@
 import { MessageBoxContent } from "@/lib/dataBox";
 import { MessageBoxProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface Box {
   box: MessageBoxContent;
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
+  seenStatus: boolean; // Trạng thái đã đọc
+  onMarkAsRead: () => void;
 }
 
 const MessageBox: React.FC<Box> = ({
   box,
   setClickBox,
-  setClickOtherRight
+  setClickOtherRight,
+  seenStatus,
+  onMarkAsRead
 }) => {
   const {
     id,
@@ -31,16 +36,21 @@ const MessageBox: React.FC<Box> = ({
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const [isClick, setClick] = useState(isSeen);
 
   const handleClickLink = () => {
     if (setClickBox) {
       setClickBox(true); //Click box for responsive
-      if (isClick === false) {
-        setClick(true); //Set click seeen
-      }
+    }
+    if (!seenStatus && isActive) {
+      onMarkAsRead(); // Gọi hàm đánh dấu đã đọc
     }
   };
+
+  // useEffect(() => {
+  //   if (isActive) {
+  //     onMarkAsRead();
+  //   }
+  // });
 
   return (
     <Link
@@ -78,7 +88,7 @@ const MessageBox: React.FC<Box> = ({
                 </p>
               </div>
               <div className="flex items-center w-full min-w-0">
-                {isClick || isActive ? (
+                {seenStatus ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
                     {senderName}:
                   </p>
@@ -88,7 +98,7 @@ const MessageBox: React.FC<Box> = ({
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {isClick || isActive ? (
+                  {seenStatus ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
                     <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">

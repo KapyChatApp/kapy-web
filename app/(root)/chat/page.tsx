@@ -9,12 +9,10 @@ export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
-  const [dataGroup, setDataGroup] = useState<MessageBoxContent[]>([]);
   const [error, setError] = useState<string>("");
 
   useEffect(() => {
     fetchMessageBox(setDataChat, setError);
-    fetchMessageBoxGroup(setDataGroup, setError);
     setLoading(false);
   }, []);
 
@@ -31,8 +29,6 @@ export default function Page() {
         const currentTime = new Date(current.createAt).getTime();
         return currentTime > latestTime ? current : latest;
       }, dataChat[0]);
-
-      console.log("latestsMess: ", latestMessage);
 
       if (latestMessage && latestMessage.id) {
         router.push(`/chat/${latestMessage.id}`);
