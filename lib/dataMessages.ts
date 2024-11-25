@@ -71,4 +71,3 @@ export const fetchMessages = async (
     throw new Error("Failed to fetch messages");
   }
 };
-export { messageData };

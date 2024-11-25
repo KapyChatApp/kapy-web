@@ -7,6 +7,7 @@ import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
 import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
 import { useParams, useSearchParams } from "next/navigation";
+import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -30,7 +31,8 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, messagesByBox, setMessagesByBox } = useChatContext();
+  const { dataChat, setMessagesByBox, setDetailByBox, detailByBox } =
+    useChatContext();
   useEffect(() => {
     const fetchMessagesForBoxes = async () => {
       const messagesMap: Record<string, ResponseMessageDTO[]> = {};
@@ -46,6 +48,36 @@ const page = () => {
     fetchMessagesForBoxes();
   }, []);
 
+  //Fetch Detail Box Chat from Backend
+  useEffect(() => {
+    const fetchDataForBoxes = async () => {
+      const detailBoxMap: Record<string, DetailBox> = {};
+
+      if (dataChat.length === 0) {
+        console.log("dataChat is empty");
+        return;
+      }
+
+      for (const box of dataChat) {
+        const detail = await fetchDetailBox(box.id);
+
+        if (detail) {
+          detailBoxMap[box.id] = detail;
+        } else {
+          console.log(`No detail for box: ${box.id}`);
+        }
+      }
+
+      // Only set if there is data
+      if (Object.keys(detailBoxMap).length > 0) {
+        setDetailByBox(detailBoxMap);
+      } else {
+        console.log("No details to set in detailBox");
+      }
+    };
+
+    fetchDataForBoxes();
+  }, [dataChat, setDetailByBox]);
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>

@@ -15,7 +15,6 @@ export default function Page() {
     const fetchData = async () => {
       try {
         const fetchedData = await fetchMessageBoxGroup(setDataChat, setError);
-        console.log("Fetched data: ", fetchedData);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
@@ -34,19 +33,7 @@ export default function Page() {
     }
 
     if (!loading && dataChat.length > 0) {
-      // Tìm tin nhắn mới nhất từ groupData
-      const latestMessage = dataChat.reduce((latest, current) => {
-        const latestTime = new Date(latest.createAt).getTime();
-        const currentTime = new Date(current.createAt).getTime();
-        return currentTime > latestTime ? current : latest;
-      }, dataChat[0]);
-
-      if (latestMessage && latestMessage.id) {
-        // Điều hướng đến trang chat của tin nhắn mới nhất
-        router.push(`/group-chat/${latestMessage.id}`);
-      } else {
-        console.warn("Không tìm thấy tin nhắn mới nhất hoặc thiếu `id`.");
-      }
+      router.push(`/group-chat/${dataChat[0].id}`);
     }
   }, [loading, dataChat, router]);
 
