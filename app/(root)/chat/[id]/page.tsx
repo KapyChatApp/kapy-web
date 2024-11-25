@@ -1,9 +1,11 @@
 "use client";
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
-import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
-import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
+import { fetchMessageBox } from "@/lib/dataBox";
 import { useEffect, useState } from "react";
+import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
+import { useChatContext } from "@/context/ChatContext";
+import { useParams, useSearchParams } from "next/navigation";
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
   const [isClickOtherRight, setClickOtherRight] = useState(false);
@@ -24,14 +26,46 @@ const page = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  //Fetch Data from Backend
-  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
-  const [dataGroup, setDataGroup] = useState<MessageBoxContent[]>([]);
-  const [error, setError] = useState<string>("");
-
+  //Fetch Box Chat from Backend
+  const { dataChat, messagesByBox, setMessagesByBox } = useChatContext();
   useEffect(() => {
-    fetchMessageBox(setDataChat, setError);
+    const fetchMessagesForBoxes = async () => {
+      const messagesMap: Record<string, ResponseMessageDTO[]> = {};
+
+      for (const box of dataChat) {
+        const boxMessages = await fetchMessages(box.id);
+        messagesMap[box.id] = boxMessages;
+      }
+
+      setMessagesByBox(messagesMap);
+    };
+
+    fetchMessagesForBoxes();
   }, []);
+  // const [error, setError] = useState<string>("");
+
+  // useEffect(() => {
+  //   fetchMessageBox(setDataChat, setError);
+  // }, []);
+
+  // Handle routing and data fetching
+  //const { id } = useParams();
+  // useEffect(() => {
+  //   const fetchChatMessages = async (boxId: string) => {
+  //     try {
+  //       const messageData = await fetchMessages(boxId);
+  //       setMessages(messageData);
+  //     } catch (error) {
+  //       console.error("Error getting messages in box chat:", error);
+  //     }
+  //   };
+
+  //   if (id) {
+  //     fetchChatMessages(id as string);
+  //   } else {
+  //     console.error("Error: Can't get boxId from pathname");
+  //   }
+  // }, []);
 
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
@@ -52,8 +86,6 @@ const page = () => {
               <LeftMessage
                 setClickBox={setClickBox}
                 setClickOtherRight={setClickOtherRight}
-                dataChat={dataChat}
-                dataGroup={dataGroup}
               />
             </div>
           ))}
@@ -64,7 +96,7 @@ const page = () => {
               : "lg:w-[25.6608%] md:w-[27%] w-[30%]"
           }`}
         >
-          <LeftMessage dataChat={dataChat} dataGroup={dataGroup} />
+          <LeftMessage />
         </div>
         <div className="md:flex hidden h-full w-full bg-transparent ">
           <RightMessage

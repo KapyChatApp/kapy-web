@@ -2,7 +2,7 @@
 import {
   FileContent,
   GPSContent,
-  RenderMessageSegment
+  ResponseMessageDTO
 } from "@/lib/dataMessages";
 import ReactPlayer from "react-player";
 import Image from "next/image";
@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 interface SegmentMessage {
-  segments: RenderMessageSegment;
+  segments: ResponseMessageDTO;
   index: number;
   length: number;
 }
@@ -135,7 +135,11 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
     >
       {/* Hiển thị thời gian khi hover */}
       {isHovered && (
-        <div className="absolute left-[-70px] w-fit top-1 bg-dark-700 text-dark100_light900 text-xs p-1 rounded-md mb-2">
+        <div
+          className={`absolute ${
+            isActive ? "right-[-74px]" : "left-[-76px]"
+          }  w-fit center bg-dark-700 text-dark100_light900 text-[12px] opacity-80 p-1 rounded-md `}
+        >
           {messageTime}
         </div>
       )}

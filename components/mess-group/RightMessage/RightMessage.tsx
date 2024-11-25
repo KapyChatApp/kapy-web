@@ -15,6 +15,8 @@ import {
   ResponseMessageDTO
 } from "@/lib/dataMessages";
 import { DetailBox, detailDataBox, fetchDetailBox } from "@/lib/dataOneBox";
+import { useChatContext } from "@/context/ChatContext";
+import { UserInfoBox } from "@/lib/dataBox";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,6 +33,7 @@ const RightMessage = ({
   openMore,
   setOpenMore
 }: RightMessageProps) => {
+  const { messagesByBox } = useChatContext();
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
@@ -39,17 +42,16 @@ const RightMessage = ({
     undefined
   );
   const [detailBox, setDetailBox] = useState<DetailBox>();
-  const [userInfo, setUserInfo] = useState<ResponseUserInfo[] | null>(null);
-  const [senderInfo, setSenderInfo] = useState<ResponseUserInfo>();
-  const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
-  const [messageGroup, setMessageGroup] = useState<ResponseMessageDTO[]>([]);
+  const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[] | null>(
+    null
+  );
+  const [senderInfo, setSenderInfo] = useState<UserInfoBox>();
 
   //boxId
   const boxId = pathname.split("/").pop();
   const adminId = localStorage.getItem("adminId");
 
   useEffect(() => {
-    let isMounted = true; // Cờ kiểm soát để ngăn setState nếu component đã unmount
     const fetchData = async () => {
       //Get Deail MessageBox
       if (boxId) {
@@ -58,7 +60,7 @@ const RightMessage = ({
           if (detailDataBox && Array.isArray(detailDataBox.receiverIds)) {
             setDetailBox(detailDataBox);
             // Chắc chắn rằng receiverIds là mảng trước khi truy cập
-            setUserInfo(detailDataBox.receiverIds);
+            setRecipientInfo(detailDataBox.receiverIds);
             setSenderInfo(detailDataBox.senderId);
             setRecipientId(detailDataBox.receiverIds.map((item) => item.id));
           } else {
@@ -70,60 +72,15 @@ const RightMessage = ({
           console.error("Error fetching detail box:", error);
         }
       }
-
-      // Fetch Segment Group Messages
-      if (isGroup) {
-        if (boxId) {
-          await fetchMessages(boxId);
-          if (isMounted) {
-            setMessageGroup(messageData);
-            //console.log("Messages in Group:", messageData);
-          }
-        } else {
-          console.error("Error: Can't get boxId of Group from pathname");
-        }
-      } else {
-        // Fetch Admin Info
-        // if (apiAdminId) {
-        //   const adminData = await fetchUser(apiAdminId);
-        //   if (isMounted) {
-        //     setAdminInfo(adminData);
-        //     console.log("Admin info:", adminData);
-        //   }
-        // }
-
-        // Fetch User Info
-        // if (userId && !userInfo) {
-        //   if (isMounted) {
-        //     await fetchUser(userId);
-        //     setUserInfo(userData);
-        //   }
-        // }
-
-        // Fetch Segment Messages
-        if (boxId) {
-          await fetchMessages(boxId);
-          if (isMounted) {
-            setMessages(messageData);
-            //console.log("Messages in Chat:", messageData);
-          }
-        } else {
-          console.error("Error: Can't get boxId from pathname");
-        }
-      }
     };
 
     fetchData();
+  }, []);
 
-    // Cleanup function to avoid memory leaks and unnecessary fetches
-    return () => {
-      isMounted = false;
-    };
-  }, [boxId, isGroup]);
   //RightTop
-  let recieverInfo: ResponseUserInfo[] = [];
-  if (userInfo) {
-    recieverInfo = userInfo.filter((item) => item.id !== adminId);
+  let recieverInfo: UserInfoBox[] = [];
+  if (recipientInfo) {
+    recieverInfo = recipientInfo.filter((item) => item.id !== adminId);
   }
   const top = isGroup
     ? {
@@ -154,12 +111,16 @@ const RightMessage = ({
       };
 
   //filterSegment
-  const filteredSegmentAdmin = isGroup
-    ? messageGroup.filter((item) => item.createBy === adminId)
-    : messages.filter((item) => item.createBy === adminId);
-  const filteredSegmentOther = isGroup
-    ? messageGroup.filter((item) => item.createBy !== adminId)
-    : messages.filter((item) => item.createBy !== adminId);
+  let message: ResponseMessageDTO[] = [];
+  if (boxId && messagesByBox && messagesByBox[boxId]) {
+    message = messagesByBox[boxId];
+  }
+  const filteredSegmentAdmin = message.filter(
+    (item) => item.createBy === adminId
+  );
+  const filteredSegmentOther = message.filter(
+    (item) => item.createBy !== adminId
+  );
 
   //OpenMoreDisplay
   const display = {
@@ -218,15 +179,12 @@ const RightMessage = ({
           <RightMiddle
             filteredSegmentAdmin={filteredSegmentAdmin}
             filteredSegmentOther={filteredSegmentOther}
-            receiverInfo={isGroup ? (userInfo ? userInfo : []) : recieverInfo}
+            receiverInfo={
+              isGroup ? (recipientInfo ? recipientInfo : []) : recieverInfo
+            }
           />
 
-          <RightBottom
-            recipientIds={recipientId}
-            boxId={boxId}
-            setMessageSegment={isGroup ? setMessageGroup : setMessages}
-            senderInfo={senderInfo}
-          />
+          <RightBottom recipientIds={recipientId} senderInfo={senderInfo} />
         </div>
       </div>
       <OpenMoreDisplay display={display} />

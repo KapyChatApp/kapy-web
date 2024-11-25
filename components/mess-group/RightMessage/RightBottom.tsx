@@ -13,12 +13,12 @@ import axios from "axios";
 import { pusherClient } from "@/lib/pusher";
 import { usePathname } from "next/navigation";
 import { ResponseUserInfo } from "@/lib/dataUser";
+import { useChatContext } from "@/context/ChatContext";
+import { UserInfoBox } from "@/lib/dataBox";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
-  boxId: string | undefined;
-  setMessageSegment: React.Dispatch<React.SetStateAction<ResponseMessageDTO[]>>;
-  senderInfo: ResponseUserInfo | undefined;
+  senderInfo: UserInfoBox | undefined;
 }
 const tempSenderInfo = {
   id: "",
@@ -27,13 +27,11 @@ const tempSenderInfo = {
   nickName: "defaultNick",
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
-const RightBottom = ({
-  recipientIds,
-  boxId,
-  setMessageSegment,
-  senderInfo
-}: BottomProps) => {
+const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
+  const { dataChat, setMessages, messagesByBox, setMessagesByBox } =
+    useChatContext();
   const pathname = usePathname();
+  const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
@@ -50,19 +48,6 @@ const RightBottom = ({
       fileInputRef.current.click();
     }
   };
-  //   pusherClient.subscribe(`private-${boxId}`);
-
-  //   pusherClient.bind("new-message", (data: string) => {
-  //     console.log("Success fully: ", data);
-  //   });
-
-  //   return () => {
-  //     pusherClient.unsubscribe(`private-${boxId}`);
-  //     pusherClient.unbind("new-message", (data: string) => {
-  //       console.log("Success fully: ", data);
-  //     });
-  //   };
-  // });
 
   const handleSendTextMessage = async () => {
     const newMessageSegment: ResponseMessageDTO = {
@@ -144,7 +129,10 @@ const RightBottom = ({
       }));
 
       // Hiển thị tạm thời các tin nhắn
-      setMessageSegment((prev) => [...prev, ...tempMessages]);
+      setMessagesByBox((prev) => ({
+        ...prev,
+        [boxId]: [...(prev[boxId] || []), ...tempMessages]
+      }));
 
       // Gửi từng file lên server
       for (const file of files) {
@@ -180,7 +168,12 @@ const RightBottom = ({
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
 
-      setMessageSegment((prevSegments) => [...prevSegments, data]);
+      if (boxId) {
+        setMessagesByBox((prev) => ({
+          ...prev, // Giữ lại các dữ liệu của các boxId cũ
+          [boxId]: [...(prev[boxId] || []), data]
+        }));
+      }
     };
 
     pusherClient.subscribe(`private-${boxId}`);
@@ -198,7 +191,7 @@ const RightBottom = ({
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
 
-    setMessageSegment((prev: any) =>
+    setMessagesByBox((prev: any) =>
       prev.map((msg: any) => {
         const mapEntry = temporaryToCloudinaryMap.find(
           (entry) => msg.contentId[0].url === entry.tempUrl

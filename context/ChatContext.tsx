@@ -1,0 +1,54 @@
+"use client";
+import { MessageBoxContent } from "@/lib/dataBox";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { createContext, useContext, useState } from "react";
+
+// Tạo kiểu cho context
+interface ChatContextType {
+  dataChat: MessageBoxContent[];
+  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>;
+  messages: ResponseMessageDTO[];
+  setMessages: React.Dispatch<React.SetStateAction<ResponseMessageDTO[]>>;
+  messagesByBox: Record<string, ResponseMessageDTO[]>; // Thêm messagesByBox
+  setMessagesByBox: React.Dispatch<
+    React.SetStateAction<Record<string, ResponseMessageDTO[]>>
+  >; // Thêm setMessagesByBox
+}
+
+// Tạo context
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
+
+// Provider component
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
+  children
+}) => {
+  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
+  const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
+  const [messagesByBox, setMessagesByBox] = useState<
+    Record<string, ResponseMessageDTO[]>
+  >({}); // Khởi tạo messagesByBox
+
+  return (
+    <ChatContext.Provider
+      value={{
+        dataChat,
+        setDataChat,
+        messages,
+        setMessages,
+        messagesByBox,
+        setMessagesByBox
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
+  );
+};
+
+// Hook để sử dụng context
+export const useChatContext = (): ChatContextType => {
+  const context = useContext(ChatContext);
+  if (!context) {
+    throw new Error("useChatContext must be used within a ChatProvider");
+  }
+  return context;
+};

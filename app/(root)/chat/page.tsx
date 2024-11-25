@@ -4,16 +4,29 @@ import { useRouter } from "next/navigation";
 import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
 import { MessageBoxProps } from "@/types/mess-group";
 import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
+import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
+import { useChatContext } from "@/context/ChatContext";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
   const [error, setError] = useState<string>("");
+  const { dataChat, setDataChat } = useChatContext();
 
   useEffect(() => {
-    fetchMessageBox(setDataChat, setError);
-    setLoading(false);
+    const fetchData = async () => {
+      try {
+        await fetchMessageBox(setDataChat, setError);
+        console.log("dataChat after fetch: ", dataChat);
+      } catch (err) {
+        setError("Failed to fetch data.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   useEffect(() => {

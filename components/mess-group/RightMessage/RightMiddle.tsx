@@ -5,12 +5,13 @@ import Image from "next/image";
 import { SegmentMessProps } from "@/types/mess-group";
 import { formatTime } from "@/lib/utils";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { UserInfo } from "@/lib/dataUser";
+import { ResponseUserInfo } from "@/lib/dataUser";
+import { UserInfoBox } from "@/lib/dataBox";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
   filteredSegmentOther: ResponseMessageDTO[];
-  receiverInfo: UserInfo[];
+  receiverInfo: UserInfoBox[];
 }
 
 const RightMiddle = ({
