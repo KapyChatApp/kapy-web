@@ -4,11 +4,12 @@ import { MessageBoxProps } from "@/types/mess-group";
 import { formatTimeMessageBox } from "./utils";
 import { Group } from "@/types/object";
 import { ResponseUserInfo } from "./dataUser";
+import { UserInfoBox } from "./dataBox";
 
 export interface DetailBox {
   id: string;
-  senderId: ResponseUserInfo;
-  receiverIds: ResponseUserInfo[];
+  senderId: UserInfoBox;
+  receiverIds: UserInfoBox[];
   groupName: string;
   groupAva: string;
   flag: boolean;
@@ -37,29 +38,16 @@ export const fetchDetailBox = async (boxId: string) => {
 
     apiDataBox = responseChat.data;
 
-    const senderInfo: ResponseUserInfo = {
+    const senderInfo: UserInfoBox = {
       id: apiDataBox.box.senderId._id,
       firstName: apiDataBox.box.senderId.firstName,
       lastName: apiDataBox.box.senderId.lastName,
       nickName: apiDataBox.box.senderId.nickName,
       avatar: apiDataBox.box.senderId.avatar,
-      email: apiDataBox.box.senderId.email,
-      phoneNumber: apiDataBox.box.senderId.phoneNumber,
-      address: apiDataBox.box.senderId.address,
-      job: apiDataBox.box.senderId.job,
-      hobbies: apiDataBox.box.senderId.hobbies,
-      bio: apiDataBox.box.senderId.bio,
-      birthDay: apiDataBox.box.senderId.birthDay,
-      attendDate: apiDataBox.box.senderId.attendDate,
-      relationShip: apiDataBox.box.senderId.relationShip,
-      flag: apiDataBox.box.senderId.flag,
-      friendIds: apiDataBox.box.senderId.friendIds,
-      bestFriendIds: apiDataBox.box.senderId.bestFriendIds,
-      blockedIds: apiDataBox.box.senderId.blockedIds,
-      posts: apiDataBox.box.senderId.posts
+      phone: apiDataBox.box.senderId.phoneNumber
     };
 
-    const recieverInfo: ResponseUserInfo[] = Array.isArray(
+    const recieverInfo: UserInfoBox[] = Array.isArray(
       apiDataBox.box.receiverIds
     )
       ? apiDataBox.box.receiverIds.map((receiver: any) => ({
@@ -68,20 +56,7 @@ export const fetchDetailBox = async (boxId: string) => {
           lastName: receiver.lastName,
           nickName: receiver.nickName,
           avatar: receiver.avatar,
-          email: receiver.email,
-          phoneNumber: receiver.phoneNumber,
-          address: receiver.address,
-          job: receiver.job,
-          hobbies: receiver.hobbies,
-          bio: receiver.bio,
-          birthDay: receiver.birthDay,
-          attendDate: receiver.attendDate,
-          relationShip: receiver.relationShip,
-          flag: receiver.flag,
-          friendIds: receiver.friendIds,
-          bestFriendIds: receiver.bestFriendIds,
-          blockedIds: receiver.blockedIds,
-          posts: receiver.posts
+          phone: receiver.phoneNumber
         }))
       : [];
 

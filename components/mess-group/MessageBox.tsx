@@ -1,5 +1,6 @@
 "use client";
 import { MessageBoxContent } from "@/lib/dataBox";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { MessageBoxProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
@@ -14,6 +15,8 @@ interface Box {
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
   seenStatus: boolean; // Trạng thái đã đọc
   onMarkAsRead: () => void;
+  content: string;
+  senderName: string;
 }
 
 const MessageBox: React.FC<Box> = ({
@@ -21,18 +24,11 @@ const MessageBox: React.FC<Box> = ({
   setClickBox,
   setClickOtherRight,
   seenStatus,
-  onMarkAsRead
+  onMarkAsRead,
+  content,
+  senderName
 }) => {
-  const {
-    id,
-    senderName,
-    receiverInfo,
-    content,
-    createAt,
-    pin,
-    isOnline,
-    isSeen
-  } = box;
+  const { id, receiverInfo, createAt, pin, isOnline, isSeen } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
@@ -45,12 +41,6 @@ const MessageBox: React.FC<Box> = ({
       onMarkAsRead(); // Gọi hàm đánh dấu đã đọc
     }
   };
-
-  // useEffect(() => {
-  //   if (isActive) {
-  //     onMarkAsRead();
-  //   }
-  // });
 
   return (
     <Link
@@ -90,11 +80,11 @@ const MessageBox: React.FC<Box> = ({
               <div className="flex items-center w-full min-w-0">
                 {seenStatus ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
-                    {senderName}:
+                    {senderName}
                   </p>
                 ) : (
                   <p className="small-bold text-dark100_light900 text-ellipsis whitespace-nowrap">
-                    {senderName}:
+                    {senderName}
                   </p>
                 )}
                 <div className="flex min-w-0 ">

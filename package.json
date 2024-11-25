@@ -42,10 +42,12 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.3.1",
     "react-emoji-picker": "^1.0.13",
+    "react-photo-view": "^1.2.6",
     "react-player": "^2.16.0",
     "sentiment": "^5.0.2",
     "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "yet-another-react-lightbox": "^3.21.7"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",

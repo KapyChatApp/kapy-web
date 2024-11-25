@@ -8,32 +8,85 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
-import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
+import { fetchMessageBox, MessageBoxContent, UserInfoBox } from "@/lib/dataBox";
 import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
 import axios from "axios";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { useChatContext } from "@/context/ChatContext";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
-  dataChat: MessageBoxContent[];
-  dataGroup: MessageBoxContent[];
 }
 
-const LeftMessage = ({
-  setClickBox,
-  setClickOtherRight,
-  dataChat,
-  dataGroup
-}: LeftMessageProps) => {
+const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const [seenStatus, setSeenStatus] = useState<Record<string, boolean>>({});
+  const { dataChat, messages, setMessages, messagesByBox } = useChatContext();
 
-  const searchGroup = useSearchMessageBox(dataGroup);
   const searchChat = useSearchMessageBox(dataChat);
   const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
-    return isGroup ? searchGroup : searchChat;
-  }, [isGroup, searchGroup, searchChat]);
+    return searchChat;
+  }, [searchChat]);
+
+  const contentWithSendername = (boxId: string, senderName: string) => {
+    // Tính toán content cho box hiện tại
+    let message: ResponseMessageDTO[] = [];
+    let contentCurrent: string = "";
+    let detailContent: string = "";
+    if (messagesByBox && messagesByBox[boxId]) {
+      message = messagesByBox[boxId];
+    }
+    if (
+      message.length > 0 &&
+      message[message.length - 1].contentId &&
+      message[message.length - 1].contentId.length > 0
+    ) {
+      const contentType =
+        message[message.length - 1].contentId[
+          message[message.length - 1].contentId.length - 1
+        ].type;
+      detailContent =
+        contentType === "Image"
+          ? "Sent a photo"
+          : contentType === "Video"
+          ? "Sent a video"
+          : contentType === "Audio"
+          ? "Sent an audio"
+          : contentType === "Other"
+          ? "Sent a file"
+          : "";
+      contentCurrent = detailContent;
+    }
+    if (
+      message.length > 0 &&
+      message[message.length - 1].text &&
+      message[message.length - 1].text.length > 0
+    ) {
+      contentCurrent =
+        message[message.length - 1].text[
+          message[message.length - 1].text.length - 1
+        ];
+    }
+
+    // Tính toán senderName cho box hiện tại
+    const adminId = localStorage.getItem("adminId");
+    let senderNameCurrent: string = "";
+    if (message.length > 0) {
+      const lastMessage = message[message.length - 1];
+      if (adminId) {
+        senderNameCurrent =
+          lastMessage.createBy === adminId
+            ? "You:"
+            : isGroup
+            ? senderName + ":"
+            : "";
+      }
+    }
+
+    return { contentCurrent, senderNameCurrent };
+  };
 
   // Hàm kiểm tra trạng thái đã đọc, tự động lấy danh sách boxIds
   const fetchSeenStatus = async () => {
@@ -45,14 +98,10 @@ const LeftMessage = ({
       }
 
       // Lấy danh sách boxIds từ filteredBox
-      const dataBoxId = isGroup
-        ? dataGroup.map((box) => box.id)
-        : dataChat.map((box) => box.id);
+      const dataBoxId = dataChat.map((box) => box.id);
 
       const updatedSeenStatus = dataBoxId.reduce((acc: any, item: any) => {
-        const box = isGroup
-          ? dataGroup.find((box) => box.id === item)
-          : dataChat.find((box) => box.id === item);
+        const box = dataChat.find((box) => box.id === item);
         acc[item] = box ? box.isSeen : false;
         return acc;
       }, {} as Record<string, boolean>);
@@ -62,7 +111,7 @@ const LeftMessage = ({
       console.error("Error fetching seen statuses:", error);
     }
   };
-  const box = isGroup ? dataGroup : dataChat;
+  const box = dataChat;
   useEffect(() => {
     if (box.length > 0) {
       fetchSeenStatus();
@@ -136,15 +185,21 @@ const LeftMessage = ({
 
         <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll">
           {filteredBox.length > 0
-            ? filteredBox.map((item) => (
-                <MessageBox
-                  box={item}
-                  setClickBox={setClickBox}
-                  setClickOtherRight={setClickOtherRight}
-                  seenStatus={!!seenStatus[item.id]}
-                  onMarkAsRead={() => handleMarkAsRead(item.id)}
-                />
-              ))
+            ? filteredBox.map((item) => {
+                const { contentCurrent, senderNameCurrent } =
+                  contentWithSendername(item.id, item.senderName);
+                return (
+                  <MessageBox
+                    box={item}
+                    setClickBox={setClickBox}
+                    setClickOtherRight={setClickOtherRight}
+                    seenStatus={!!seenStatus[item.id]}
+                    onMarkAsRead={() => handleMarkAsRead(item.id)}
+                    content={contentCurrent}
+                    senderName={senderNameCurrent}
+                  />
+                );
+              })
             : null}
         </div>
 

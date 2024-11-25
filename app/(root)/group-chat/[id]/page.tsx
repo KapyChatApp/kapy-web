@@ -1,9 +1,12 @@
 "use client";
+
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import { useEffect, useState } from "react";
-import { fetchMessageBox, MessageBoxContent } from "@/lib/dataBox";
 import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
+import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
+import { useChatContext } from "@/context/ChatContext";
+import { useParams, useSearchParams } from "next/navigation";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -26,14 +29,21 @@ const page = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  //Fetch Data from Backend
-  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
-  const [dataGroup, setDataGroup] = useState<MessageBoxContent[]>([]);
-  const [error, setError] = useState<string>("");
-
+  //Fetch Box Chat from Backend
+  const { dataChat, messagesByBox, setMessagesByBox } = useChatContext();
   useEffect(() => {
-    fetchMessageBox(setDataChat, setError);
-    fetchMessageBoxGroup(setDataGroup, setError);
+    const fetchMessagesForBoxes = async () => {
+      const messagesMap: Record<string, ResponseMessageDTO[]> = {};
+
+      for (const box of dataChat) {
+        const boxMessages = await fetchMessages(box.id);
+        messagesMap[box.id] = boxMessages;
+      }
+
+      setMessagesByBox(messagesMap);
+    };
+
+    fetchMessagesForBoxes();
   }, []);
 
   return (
@@ -55,8 +65,6 @@ const page = () => {
               <LeftMessage
                 setClickBox={setClickBox}
                 setClickOtherRight={setClickOtherRight}
-                dataChat={dataChat}
-                dataGroup={dataGroup}
               />
             </div>
           ))}
@@ -65,7 +73,7 @@ const page = () => {
             isMdScreen && openMore ? "w-[70%]" : "lg:w-[25.6608%]  w-[30%]"
           }`}
         >
-          <LeftMessage dataChat={dataChat} dataGroup={dataGroup} />
+          <LeftMessage />
         </div>
         <div className="md:flex hidden h-full w-full bg-transparent ">
           <RightMessage

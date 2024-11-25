@@ -26,19 +26,30 @@ export const fetchMessageBoxGroup = async (
     );
 
     const apiDataChat: ResponseMessageBoxDTO = responseChat.data;
+    console.log(apiDataChat);
     // Xử lý dữ liệu từ response để tạo ra dataChat
     const updatedDataChat: MessageBoxContent[] = apiDataChat.box
       .map((item: any) => {
-        if (item.lastMessage.readedId) {
-          const isSeen = item.lastMessage.readedId.some(
-            (reader: any) => reader._id === apiDataChat.adminId
-          );
+        let isSeen = false;
+        let content = ""; // Mặc định là rỗng nếu không có message
+        let detailContent = "";
 
-          let content = item.lastMessage.text[item.lastMessage.text.length - 1];
-          let detailContent = "";
-
-          if (item.lastMessage.contentId?.length > 0) {
-            const contentType = item.lastMessage.contentId[0].type;
+        // Kiểm tra xem có messageIds hay không
+        if (
+          item.lastMessage &&
+          item.lastMessage.text &&
+          item.lastMessage.text.length > 0
+        ) {
+          content = item.lastMessage.text[item.lastMessage.text.length - 1];
+        } else {
+          if (
+            item.lastMessage &&
+            item.lastMessage.contentId &&
+            item.lastMessage.contentId.length > 0
+          ) {
+            const contentType =
+              item.lastMessage.contentId[item.lastMessage.contentId.length - 1]
+                .type;
             detailContent =
               contentType === "Image"
                 ? "Sent a photo"
@@ -51,46 +62,60 @@ export const fetchMessageBoxGroup = async (
                 : "";
             content = detailContent;
           }
-          const sender = item.receiverIds.find(
-            (sender: any) => sender._id === item.lastMessage.createBy
-          );
-          let senderInfo;
-          if (sender) {
-            senderInfo = {
-              id: sender._id,
-              name: sender.firstName + " " + sender.lastName,
-              phone: sender.phone,
-              avatar: sender.avatar
-            };
-          } else {
-            senderInfo = {
-              id: "",
-              name: "Unknown",
-              phone: "",
-              avatar: "/assets/ava/default.png"
-            };
-          }
-
+        }
+        if (content === "") {
           return {
             id: item._id,
-            senderName:
-              item.lastMessage.createBy === apiDataChat.adminId
-                ? "You"
-                : senderInfo.name,
+            senderName: "",
             receiverInfo: {
               id: item._id,
               name: item.groupName,
               phone: item.groupName,
               avatar: item.groupAva
             },
-            content: content,
-            createAt: formatTimeMessageBox(item.lastMessage?.createAt),
+            content: "",
+            createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
             pin: false,
-            isOnline: true,
+            isOnline: false,
             isSeen: isSeen
           };
         }
-        return null;
+        const sender = item.receiverIds.find(
+          (sender: any) => sender._id === item.lastMessage.createBy
+        );
+        let senderInfo;
+        if (sender) {
+          senderInfo = {
+            id: sender._id,
+            name: sender.firstName + " " + sender.lastName,
+            phone: sender.phone,
+            avatar: sender.avatar
+          };
+        } else {
+          senderInfo = {
+            id: "",
+            name: "Unknown",
+            phone: "",
+            avatar: "/assets/ava/default.png"
+          };
+        }
+
+        return {
+          id: item._id,
+          senderName:
+            item.lastMessage.createBy === apiDataChat.adminId ? "You" : "",
+          receiverInfo: {
+            id: item._id,
+            name: item.groupName,
+            phone: item.groupName,
+            avatar: item.groupAva
+          },
+          content: content,
+          createAt: formatTimeMessageBox(item.lastMessage?.createAt),
+          pin: false,
+          isOnline: true,
+          isSeen: isSeen
+        };
       })
       .filter((item: any): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
 

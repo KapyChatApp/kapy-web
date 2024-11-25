@@ -4,6 +4,14 @@ import { formatTimeMessageBox } from "./utils";
 import { ResponseMessageDTO } from "./dataMessages";
 
 // Interface FE
+export interface UserInfoBox {
+  id: string;
+  firstName: string;
+  lastName: string;
+  nickName: string;
+  avatar: string;
+  phone: string;
+}
 export interface MessageBoxContent {
   id: string;
   senderName: string;
@@ -22,17 +30,18 @@ export interface MessageBoxContent {
 }
 
 // Interface Response
-interface UserInfoBox {
+interface ResponseUserInfoBox {
   _id: string;
   firstName: string;
   lastName: string;
+  nickName: string;
   avatar: string;
   phone: string;
 }
 interface MessageBoxDTO {
   _id: string;
-  senderId: string | UserInfoBox;
-  receiverIds: UserInfoBox[];
+  senderId: string | ResponseUserInfoBox;
+  receiverIds: ResponseUserInfoBox[];
   groupName: string;
   groupAva: string;
   flag: boolean;
@@ -73,47 +82,38 @@ export const fetchMessageBox = async (
     const updatedDataChat: MessageBoxContent[] = apiDataChat.box
       .map((item) => {
         let isSeen = false;
-
-        let content = item.lastMessage.text[item.lastMessage.text.length - 1];
+        let content = ""; // Mặc định là rỗng nếu không có message
         let detailContent = "";
 
-        if (!content) {
-          const contentType =
-            item.lastMessage.contentId[item.lastMessage.contentId.length - 1]
-              .type;
-          detailContent =
-            contentType === "Image"
-              ? "Sent a photo"
-              : contentType === "Video"
-              ? "Sent a video"
-              : contentType === "Audio"
-              ? "Sent an audio"
-              : contentType === "Other"
-              ? "Sent a file"
-              : "";
-          content = detailContent;
-        }
-
-        const sender = item.receiverIds.find(
-          (sender) => sender._id === item.lastMessage.createBy
-        );
-        let senderInfo;
-        if (sender) {
-          senderInfo = {
-            id: sender._id,
-            name: sender.firstName + " " + sender.lastName,
-            phone: sender.phone,
-            avatar: sender.avatar
-          };
+        // Kiểm tra xem có messageIds hay không
+        if (
+          item.lastMessage &&
+          item.lastMessage.text &&
+          item.lastMessage.text.length > 0
+        ) {
+          content = item.lastMessage.text[item.lastMessage.text.length - 1];
         } else {
-          senderInfo = {
-            id: "",
-            name: "Unknown",
-            phone: "",
-            avatar: "/assets/ava/default.png"
-          };
+          if (
+            item.lastMessage &&
+            item.lastMessage.contentId &&
+            item.lastMessage.contentId.length > 0
+          ) {
+            const contentType =
+              item.lastMessage.contentId[item.lastMessage.contentId.length - 1]
+                .type;
+            detailContent =
+              contentType === "Image"
+                ? "Sent a photo"
+                : contentType === "Video"
+                ? "Sent a video"
+                : contentType === "Audio"
+                ? "Sent an audio"
+                : contentType === "Other"
+                ? "Sent a file"
+                : "";
+            content = detailContent;
+          }
         }
-
         const receiver = item.receiverIds.find(
           (receiver) => receiver._id !== apiDataChat.adminId
         );
@@ -133,13 +133,43 @@ export const fetchMessageBox = async (
             avatar: "/assets/ava/default.png"
           };
         }
-
+        // Nếu messageIds trống, trả về đối tượng với content rỗng
+        if (content === "") {
+          return {
+            id: item._id,
+            senderName: "",
+            receiverInfo: receiverInfo,
+            content: "",
+            createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
+            pin: false,
+            isOnline: false,
+            isSeen: isSeen
+          };
+        }
+        // Tìm sender và receiver
+        const sender = item.receiverIds.find(
+          (sender) => sender._id === item.lastMessage.createBy
+        );
+        let senderInfo;
+        if (sender) {
+          senderInfo = {
+            id: sender._id,
+            name: sender.firstName + " " + sender.lastName,
+            phone: sender.phone,
+            avatar: sender.avatar
+          };
+        } else {
+          senderInfo = {
+            id: "",
+            name: "Unknown",
+            phone: "",
+            avatar: "/assets/ava/default.png"
+          };
+        }
         return {
           id: item._id,
           senderName:
-            item.lastMessage.createBy === apiDataChat.adminId
-              ? "You"
-              : senderInfo.name,
+            item.lastMessage.createBy === apiDataChat.adminId ? "You:" : "",
           receiverInfo: receiverInfo,
           content: content,
           createAt: formatTimeMessageBox(item.lastMessage?.createAt),
