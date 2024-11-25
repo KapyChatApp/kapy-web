@@ -1,20 +1,11 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { segmentsMess } from "@/constants/messenger";
 import RightTop from "./RightTop";
 import RightBottom from "./RightBottom";
-import { group, user } from "@/constants/object";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
-import { segmentsGroup } from "@/constants/groups";
-import { fetchUser, ResponseUserInfo, userData } from "@/lib/dataUser";
-import {
-  fetchMessages,
-  messageData,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
-import { DetailBox, detailDataBox, fetchDetailBox } from "@/lib/dataOneBox";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
 import { UserInfoBox } from "@/lib/dataBox";
 
@@ -38,77 +29,77 @@ const RightMessage = ({
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
   //FetchMessage Backend
-  const [recipientId, setRecipientId] = useState<string[] | undefined>(
-    undefined
-  );
-  const [detailBox, setDetailBox] = useState<DetailBox>();
-  const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[] | null>(
-    null
-  );
+  const [recipientId, setRecipientId] = useState<string[]>();
+  const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[]>();
   const [senderInfo, setSenderInfo] = useState<UserInfoBox>();
+  const { detailByBox, setDetailByBox } = useChatContext();
 
   //boxId
   const boxId = pathname.split("/").pop();
   const adminId = localStorage.getItem("adminId");
 
   useEffect(() => {
-    const fetchData = async () => {
-      //Get Deail MessageBox
-      if (boxId) {
-        try {
-          await fetchDetailBox(boxId);
-          if (detailDataBox && Array.isArray(detailDataBox.receiverIds)) {
-            setDetailBox(detailDataBox);
-            // Chắc chắn rằng receiverIds là mảng trước khi truy cập
-            setRecipientInfo(detailDataBox.receiverIds);
-            setSenderInfo(detailDataBox.senderId);
-            setRecipientId(detailDataBox.receiverIds.map((item) => item.id));
-          } else {
-            console.error(
-              "recieverIds is not an array or detailDataBox is undefined"
-            );
-          }
-        } catch (error) {
-          console.error("Error fetching detail box:", error);
-        }
-      }
-    };
-
-    fetchData();
-  }, []);
+    if (boxId && detailByBox && detailByBox[boxId]) {
+      const detailDataBox = detailByBox[boxId];
+      setRecipientInfo(detailDataBox.receiverIds);
+      setSenderInfo(detailDataBox.senderId);
+      setRecipientId(detailDataBox.receiverIds.map((item: any) => item.id));
+    }
+  }, [detailByBox]);
 
   //RightTop
   let recieverInfo: UserInfoBox[] = [];
   if (recipientInfo) {
     recieverInfo = recipientInfo.filter((item) => item.id !== adminId);
   }
-  const top = isGroup
-    ? {
-        ava: detailBox ? detailBox.groupAva : "/assets/ava/default.png",
-        name: detailBox ? detailBox.groupName : "Unknown name",
-        membersGroup: detailBox ? detailBox.receiverIds.length : 0,
-        onlineGroup: 0,
-        openMore: openMore,
-        setOpenMore: setOpenMore
-      }
-    : {
-        ava:
-          recieverInfo.length > 0 && recieverInfo[0].avatar !== ""
-            ? recieverInfo[0].avatar
-            : "/assets/ava/default.png",
+  let top: any;
+  if (boxId && detailByBox && detailByBox[boxId]) {
+    top = isGroup
+      ? {
+          ava: detailByBox[boxId].groupAva,
+          name: detailByBox[boxId].groupName,
+          membersGroup: detailByBox[boxId].receiverIds.length,
+          onlineGroup: 0,
+          openMore: openMore,
+          setOpenMore: setOpenMore
+        }
+      : {
+          ava:
+            recieverInfo.length > 0 && recieverInfo[0].avatar !== ""
+              ? recieverInfo[0].avatar
+              : "/assets/ava/default.png",
 
-        name:
-          recieverInfo.length > 0 &&
-          recieverInfo[0].firstName !== "" &&
-          recieverInfo[0].lastName !== ""
-            ? recieverInfo[0].firstName + " " + recieverInfo[0].lastName
-            : "Unknown name",
+          name:
+            recieverInfo.length > 0 &&
+            recieverInfo[0].firstName !== "" &&
+            recieverInfo[0].lastName !== ""
+              ? recieverInfo[0].firstName + " " + recieverInfo[0].lastName
+              : "Unknown name",
 
-        membersGroup: 0,
-        onlineGroup: 0,
-        openMore: openMore,
-        setOpenMore: setOpenMore
-      };
+          membersGroup: 0,
+          onlineGroup: 0,
+          openMore: openMore,
+          setOpenMore: setOpenMore
+        };
+  } else {
+    top = isGroup
+      ? {
+          ava: "/assets/ava/default.png",
+          name: "Unknown name",
+          membersGroup: 0,
+          onlineGroup: 0,
+          openMore: openMore,
+          setOpenMore: setOpenMore
+        }
+      : {
+          ava: "/assets/ava/default.png",
+          name: "Unknown name",
+          membersGroup: 0,
+          onlineGroup: 0,
+          openMore: openMore,
+          setOpenMore: setOpenMore
+        };
+  }
 
   //filterSegment
   let message: ResponseMessageDTO[] = [];

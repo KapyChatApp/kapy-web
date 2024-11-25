@@ -18,12 +18,31 @@ export interface DetailBox {
   createBy: string;
 }
 
-let detailDataBox: DetailBox | null = null;
+let detailDataBox: DetailBox = {
+  id: "",
+  senderId: {
+    id: "",
+    firstName: "",
+    lastName: "",
+    nickName: "",
+    avatar: "",
+    phone: ""
+  },
+  receiverIds: [
+    { id: "", firstName: "", lastName: "", nickName: "", avatar: "", phone: "" }
+  ],
+  groupName: "",
+  groupAva: "",
+  flag: false,
+  pin: false,
+  createAt: "",
+  createBy: ""
+};
 let apiDataBox: any;
 
 export const fetchDetailBox = async (boxId: string) => {
   const storedToken = localStorage.getItem("token");
-  if (!storedToken) return;
+  if (!storedToken) return detailDataBox;
 
   try {
     const responseChat = await axios.get(
@@ -72,16 +91,9 @@ export const fetchDetailBox = async (boxId: string) => {
       createAt: apiDataBox.box.createAt,
       createBy: apiDataBox.box.createBy
     };
+    return detailDataBox;
   } catch (err: any) {
     console.error("Error fetching messages:", err);
-    setError(err.message);
+    return detailDataBox;
   }
 };
-
-// Hàm để xử lý lỗi
-function setError(message: any) {
-  console.error(message);
-}
-
-// Dữ liệu trả về
-export { detailDataBox, apiDataBox };

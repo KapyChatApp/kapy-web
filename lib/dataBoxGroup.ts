@@ -26,9 +26,18 @@ export const fetchMessageBoxGroup = async (
     );
 
     const apiDataChat: ResponseMessageBoxDTO = responseChat.data;
-    console.log(apiDataChat);
+    const sortedApiDataChat = apiDataChat.box.sort((a: any, b: any) => {
+      if (a.lastMessage && b.lastMessage) {
+        const timeA = new Date(a.lastMessage.createAt || 0).getTime();
+        const timeB = new Date(b.lastMessage.createAt || 0).getTime();
+        return timeB - timeA;
+      }
+      if (!a.lastMessage) return 1;
+      if (!b.lastMessage) return -1;
+      return 0;
+    });
     // Xử lý dữ liệu từ response để tạo ra dataChat
-    const updatedDataChat: MessageBoxContent[] = apiDataChat.box
+    const updatedDataChat: MessageBoxContent[] = sortedApiDataChat
       .map((item: any) => {
         let isSeen = false;
         let content = ""; // Mặc định là rỗng nếu không có message

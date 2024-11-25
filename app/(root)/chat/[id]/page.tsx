@@ -1,11 +1,10 @@
 "use client";
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
-import { fetchMessageBox } from "@/lib/dataBox";
 import { useEffect, useState } from "react";
 import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { useParams, useSearchParams } from "next/navigation";
+import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
   const [isClickOtherRight, setClickOtherRight] = useState(false);
@@ -27,7 +26,8 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, messagesByBox, setMessagesByBox } = useChatContext();
+  const { dataChat, setMessagesByBox, setDetailByBox, detailByBox } =
+    useChatContext();
   useEffect(() => {
     const fetchMessagesForBoxes = async () => {
       const messagesMap: Record<string, ResponseMessageDTO[]> = {};
@@ -42,31 +42,66 @@ const page = () => {
 
     fetchMessagesForBoxes();
   }, []);
-  // const [error, setError] = useState<string>("");
 
-  // useEffect(() => {
-  //   fetchMessageBox(setDataChat, setError);
-  // }, []);
+  //Fetch Detail Box Chat from Backend
+  useEffect(() => {
+    const fetchDataForBoxes = async () => {
+      const detailBoxMap: Record<string, DetailBox> = {};
 
-  // Handle routing and data fetching
-  //const { id } = useParams();
-  // useEffect(() => {
-  //   const fetchChatMessages = async (boxId: string) => {
-  //     try {
-  //       const messageData = await fetchMessages(boxId);
-  //       setMessages(messageData);
-  //     } catch (error) {
-  //       console.error("Error getting messages in box chat:", error);
-  //     }
-  //   };
+      if (dataChat.length === 0) {
+        console.log("dataChat is empty");
+        return;
+      }
 
-  //   if (id) {
-  //     fetchChatMessages(id as string);
-  //   } else {
-  //     console.error("Error: Can't get boxId from pathname");
-  //   }
-  // }, []);
+      for (const box of dataChat) {
+        const detail = await fetchDetailBox(box.id);
 
+        if (detail) {
+          detailBoxMap[box.id] = detail;
+        } else {
+          console.log(`No detail for box: ${box.id}`);
+        }
+      }
+
+      // Only set if there is data
+      if (Object.keys(detailBoxMap).length > 0) {
+        setDetailByBox(detailBoxMap);
+      } else {
+        console.log("No details to set in detailBox");
+      }
+    };
+
+    fetchDataForBoxes();
+  }, [dataChat, setDetailByBox]);
+  useEffect(() => {
+    const fetchDataForBoxes = async () => {
+      const detailBoxMap: Record<string, DetailBox> = {};
+
+      if (dataChat.length === 0) {
+        console.log("dataChat is empty");
+        return;
+      }
+
+      for (const box of dataChat) {
+        const detail = await fetchDetailBox(box.id);
+
+        if (detail) {
+          detailBoxMap[box.id] = detail;
+        } else {
+          console.log(`No detail for box: ${box.id}`);
+        }
+      }
+
+      // Only set if there is data
+      if (Object.keys(detailBoxMap).length > 0) {
+        setDetailByBox(detailBoxMap);
+      } else {
+        console.log("No details to set in detailBox");
+      }
+    };
+
+    fetchDataForBoxes();
+  }, [dataChat, setDetailByBox]);
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>

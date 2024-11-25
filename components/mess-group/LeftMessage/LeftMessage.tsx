@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import GlobalSearch from "../../shared/search/globalSearch";
-import { box } from "@/constants/messenger";
 import MessageBox from "../MessageBox";
 import useSearchMessageBox from "@/hooks/use-search-message-box";
 import { usePathname } from "next/navigation";
@@ -8,8 +7,6 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
-import { fetchMessageBox, MessageBoxContent, UserInfoBox } from "@/lib/dataBox";
-import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
 import axios from "axios";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";

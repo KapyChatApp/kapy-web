@@ -1,6 +1,7 @@
 "use client";
 import { MessageBoxContent } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { DetailBox } from "@/lib/dataOneBox";
 import { createContext, useContext, useState } from "react";
 
 // Tạo kiểu cho context
@@ -9,10 +10,12 @@ interface ChatContextType {
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>;
   messages: ResponseMessageDTO[];
   setMessages: React.Dispatch<React.SetStateAction<ResponseMessageDTO[]>>;
-  messagesByBox: Record<string, ResponseMessageDTO[]>; // Thêm messagesByBox
+  messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
-  >; // Thêm setMessagesByBox
+  >;
+  detailByBox: Record<string, any>;
+  setDetailByBox: React.Dispatch<React.SetStateAction<Record<string, any>>>;
 }
 
 // Tạo context
@@ -26,7 +29,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
-  >({}); // Khởi tạo messagesByBox
+  >({});
+  const [detailByBox, setDetailByBox] = useState<Record<string, any>>({});
 
   return (
     <ChatContext.Provider
@@ -36,7 +40,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         messages,
         setMessages,
         messagesByBox,
-        setMessagesByBox
+        setMessagesByBox,
+        detailByBox,
+        setDetailByBox
       }}
     >
       {children}

@@ -17,7 +17,6 @@ export default function Page() {
     const fetchData = async () => {
       try {
         await fetchMessageBox(setDataChat, setError);
-        console.log("dataChat after fetch: ", dataChat);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
@@ -36,18 +35,7 @@ export default function Page() {
     }
 
     if (!loading && dataChat.length > 0) {
-      // Find the latest message based on time
-      const latestMessage = dataChat.reduce((latest, current) => {
-        const latestTime = new Date(latest.createAt).getTime();
-        const currentTime = new Date(current.createAt).getTime();
-        return currentTime > latestTime ? current : latest;
-      }, dataChat[0]);
-
-      if (latestMessage && latestMessage.id) {
-        router.push(`/chat/${latestMessage.id}`);
-      } else {
-        console.warn("Dont find the latest message or id.");
-      }
+      router.push(`/chat/${dataChat[0].id}`);
     }
   }, [loading, dataChat, router]);
 
