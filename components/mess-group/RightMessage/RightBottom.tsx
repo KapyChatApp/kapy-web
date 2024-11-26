@@ -41,7 +41,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
   >([]);
 
   const handleInputChange = (value: string) => {
-    setMessageContent(value); // Cập nhật giá trị khi input thay đổi
+    setMessageContent(value);
   };
   const handleIconClick = () => {
     if (fileInputRef.current) {
@@ -169,10 +169,17 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       console.log("Successfully received message: ", data);
 
       if (boxId) {
-        setMessagesByBox((prev) => ({
-          ...prev, // Giữ lại các dữ liệu của các boxId cũ
-          [boxId]: [...(prev[boxId] || []), data]
-        }));
+        setMessagesByBox((prev) => {
+          const currentMessages = prev[boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (!currentMessages.some((msg) => msg.id === data.id)) {
+            return {
+              ...prev,
+              [boxId]: [...currentMessages, data]
+            };
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
       }
     };
 
@@ -184,7 +191,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     // Cleanup khi component bị unmount hoặc boxId thay đổi
     return () => {
       pusherClient.unsubscribe(`private-${boxId}`);
-      pusherClient.unbind("new-message", handleNewMessage);
+      pusherClient.unbind("new-message");
     };
   }, [boxId]);
 

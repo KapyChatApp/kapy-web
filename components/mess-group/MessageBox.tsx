@@ -72,12 +72,12 @@ const MessageBox: React.FC<Box> = ({
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
-              <div className="flex items-center w-full min-w-0">
-                <p className="lg:paragraph-regular body-regular text-dark100_light900 overflow-hidden text-ellipsis whitespace-nowrap">
+              <div className="flex items-center justify-start w-full min-w-0">
+                <p className="lg:paragraph-15-regular body-regular text-dark100_light900 overflow-hidden text-ellipsis whitespace-nowrap">
                   {receiverInfo.name}
                 </p>
               </div>
-              <div className="flex items-center w-full min-w-0">
+              <div className="flex items-center justify-start w-full min-w-0">
                 {seenStatus ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
                     {senderName}

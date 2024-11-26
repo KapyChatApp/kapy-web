@@ -26,7 +26,7 @@ export default function Page() {
     };
 
     fetchData();
-  }, []);
+  }, [setDataChat]);
 
   useEffect(() => {
     if (!loading && dataChat.length === 0) {
