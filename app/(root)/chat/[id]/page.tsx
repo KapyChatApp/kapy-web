@@ -73,35 +73,6 @@ const page = () => {
 
     fetchDataForBoxes();
   }, [dataChat, setDetailByBox]);
-  useEffect(() => {
-    const fetchDataForBoxes = async () => {
-      const detailBoxMap: Record<string, DetailBox> = {};
-
-      if (dataChat.length === 0) {
-        console.log("dataChat is empty");
-        return;
-      }
-
-      for (const box of dataChat) {
-        const detail = await fetchDetailBox(box.id);
-
-        if (detail) {
-          detailBoxMap[box.id] = detail;
-        } else {
-          console.log(`No detail for box: ${box.id}`);
-        }
-      }
-
-      // Only set if there is data
-      if (Object.keys(detailBoxMap).length > 0) {
-        setDetailByBox(detailBoxMap);
-      } else {
-        console.log("No details to set in detailBox");
-      }
-    };
-
-    fetchDataForBoxes();
-  }, [dataChat, setDetailByBox]);
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>
@@ -126,9 +97,7 @@ const page = () => {
           ))}
         <div
           className={`md:flex hidden h-full  ${
-            isMdScreen && openMore
-              ? "w-[70%]"
-              : "lg:w-[25.6608%] md:w-[27%] w-[30%]"
+            isMdScreen && openMore ? "w-[70%]" : "lg:w-[28%] md:w-[27%] w-[30%]"
           }`}
         >
           <LeftMessage />

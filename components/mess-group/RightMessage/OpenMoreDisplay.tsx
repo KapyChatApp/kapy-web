@@ -116,12 +116,12 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
   ) : openMore ? (
     activeComponent ? (
       <div
-        className={`md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[30%] md:w-[50%] w-[40%] h-full`}
+        className={`md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[25%] md:w-[50%] w-[40%] h-full`}
       >
         {renderComponent()}
       </div>
     ) : (
-      <div className="md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[30%] md:w-[50%] w-[40%] h-full">
+      <div className="md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[25%] md:w-[50%] w-[40%] h-full">
         <MoreActions
           propsAll={propsAll}
           openMore={openMore}

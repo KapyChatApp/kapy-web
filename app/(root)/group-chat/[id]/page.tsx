@@ -46,7 +46,7 @@ const page = () => {
     };
 
     fetchMessagesForBoxes();
-  }, []);
+  }, [dataChat]);
 
   //Fetch Detail Box Chat from Backend
   useEffect(() => {
