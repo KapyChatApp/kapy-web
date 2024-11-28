@@ -10,6 +10,7 @@ import { CldImage } from "next-cloudinary";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import Link from "next/link";
+import { FileSegment } from "../ui/file-segment";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -22,6 +23,8 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   const adminId = localStorage.getItem("adminId");
   const isActive = createBy !== adminId;
   const isFileContent = contentId.length > 0 && text.length === 0;
+  const isOtherContent =
+    isFileContent && contentId[contentId.length - 1].type === "Other";
   const [isHovered, setIsHovered] = useState(false);
 
   //Render Content
@@ -35,40 +38,72 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
       if (isActive) {
         if (index === 0) {
           return isFileContent
-            ? "rounded-t-[8px] rounded-br-[8px] rounded-bl-[4px] bg-transparent p-0"
+            ? `${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 p-3 rounded-t-[18px] rounded-br-[18px] rounded-bl-[4px]"
+                  : "bg-transparent p-0 rounded-t-[8px] rounded-br-[8px] rounded-bl-[4px] "
+              }`
             : "rounded-t-[18px] rounded-br-[18px] rounded-bl-[4px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Đầu tiên
         } else if (index === length - 1) {
           return isFileContent
-            ? "rounded-b-[8px] rounded-tr-[8px] rounded-tl-[4px] bg-transparent p-0"
+            ? `${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 p-3 rounded-b-[18px] rounded-tr-[18px] rounded-tl-[4px]"
+                  : "bg-transparent p-0 rounded-b-[8px] rounded-tr-[8px] rounded-tl-[4px] "
+              } `
             : "rounded-b-[18px] rounded-tr-[18px] rounded-tl-[4px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Cuối cùng
         } else {
           return isFileContent
-            ? "rounded-s-1 rounded-e-[8px] bg-transparent p-0"
+            ? ` ${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-s-1 rounded-e-[18px]"
+                  : "bg-transparent p-0 rounded-s-1 rounded-e-[8px]"
+              }`
             : "rounded-s-1 rounded-e-[18px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Ở giữa
         }
       } else {
         if (index === 0) {
           return isFileContent
-            ? "rounded-t-[8px] rounded-br-[4px] rounded-bl-[8px] bg-transparent p-0"
+            ? ` ${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-t-[18px] rounded-br-[4px] rounded-bl-[18px]"
+                  : "bg-transparent p-0 rounded-t-[8px] rounded-br-[4px] rounded-bl-[8px]"
+              }`
             : "rounded-t-[18px] rounded-br-[4px] rounded-bl-[18px] bg-primary-500 px-3 py-1"; // Đầu tiên
         } else if (index === length - 1) {
           return isFileContent
-            ? "rounded-b-[8px] rounded-tr-[4px] rounded-tl-[8px] bg-transparent p-0"
+            ? ` ${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity  p-3 rounded-b-[18px] rounded-tr-[4px]"
+                  : "bg-transparent p-0 rounded-b-[8px] rounded-tr-[4px] rounded-tl-[8px]"
+              }`
             : "rounded-b-[18px] rounded-tr-[4px] rounded-tl-[18px] bg-primary-500 px-3 py-1"; // Cuối cùng
         } else {
           return isFileContent
-            ? "rounded-s-[8px] rounded-e-[4px] bg-transparent p-0"
+            ? `${
+                isOtherContent
+                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-s-[18px] rounded-e-[4px]"
+                  : "bg-transparent p-0 rounded-s-[8px] rounded-e-[4px] "
+              } p-0`
             : "rounded-s-[18px] rounded-e-[4px] bg-primary-500 px-3 py-1"; // Ở giữa
         }
       }
     } else {
       if (isActive) {
         return isFileContent
-          ? "bg-transparent p-0 rounded-[8px]"
+          ? `${
+              isOtherContent
+                ? "background-light700_dark200 bg-opacity-50 p-3 rounded-[18px]"
+                : "bg-transparent p-0 rounded-[8px]"
+            }`
           : "bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1 rounded-[18px]";
       }
       return isFileContent
-        ? "bg-transparent p-0 rounded-[8px]"
+        ? `${
+            isOtherContent
+              ? "background-light700_dark200 bg-opacity-50 p-3 rounded-[18px]"
+              : "bg-transparent p-0 rounded-[8px]"
+          }`
         : "bg-primary-500 px-3 py-1 rounded-[18px]";
     }
   };
@@ -108,17 +143,10 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
     } else if (lastContent.type === "Other") {
       const otherFileContent = lastContent as FileContent;
       renderedContent = (
-        <Link
-          href={otherFileContent.url}
-          download
-          className="text-accent-blue hover:underline"
-          onClick={(e) => {
-            e.preventDefault();
-            console.log("Error loading file", e);
-          }}
-        >
-          {otherFileContent.fileName}
-        </Link>
+        <FileSegment
+          fileName={otherFileContent.fileName}
+          url={otherFileContent.url}
+        />
       );
     }
   } else {

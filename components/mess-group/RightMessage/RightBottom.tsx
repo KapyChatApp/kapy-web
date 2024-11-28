@@ -10,11 +10,11 @@ import {
   ResponseMessageDTO
 } from "@/lib/dataMessages";
 import axios from "axios";
-import { pusherClient } from "@/lib/pusher";
 import { usePathname } from "next/navigation";
 import { ResponseUserInfo } from "@/lib/dataUser";
 import { useChatContext } from "@/context/ChatContext";
 import { UserInfoBox } from "@/lib/dataBox";
+import { getPusherClient } from "@/lib/pusher";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -28,8 +28,7 @@ const tempSenderInfo = {
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
 const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
-  const { dataChat, setMessages, messagesByBox, setMessagesByBox } =
-    useChatContext();
+  const { setMessagesByBox } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -56,6 +55,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       readedId: apiAdminId ? [apiAdminId] : [],
       contentId: [],
       text: [messageContent],
+      boxId: boxId ? boxId : "",
       createAt: new Date().toISOString(),
       createBy: apiAdminId ? apiAdminId : ""
     };
@@ -124,6 +124,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
           }
         ],
         text: [],
+        boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
         createBy: apiAdminId || ""
       }));
@@ -148,6 +149,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         };
 
         const formData = new FormData();
+        console.log(file);
         formData.append("boxId", boxId);
         formData.append("content", JSON.stringify(fileContent));
         formData.append("file", file);
@@ -167,33 +169,30 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
-
-      if (boxId) {
-        setMessagesByBox((prev) => {
-          const currentMessages = prev[boxId] || [];
-          // Chỉ cập nhật nếu tin nhắn thực sự mới
-          if (!currentMessages.some((msg) => msg.id === data.id)) {
-            return {
-              ...prev,
-              [boxId]: [...currentMessages, data]
-            };
-          }
-          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
-        });
-      }
+      setMessagesByBox((prev) => {
+        const currentMessages = prev[data.boxId] || [];
+        // Chỉ cập nhật nếu tin nhắn thực sự mới
+        if (!currentMessages.some((msg) => msg.id === data.id)) {
+          return {
+            ...prev,
+            [data.boxId]: [...currentMessages, data]
+          };
+        }
+        return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+      });
     };
-
+    const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
 
     // Bind sự kiện với handler
     pusherClient.bind("new-message", handleNewMessage);
 
     // Cleanup khi component bị unmount hoặc boxId thay đổi
-    return () => {
-      pusherClient.unsubscribe(`private-${boxId}`);
-      pusherClient.unbind("new-message");
-    };
-  }, [boxId]);
+    // return () => {
+    //   pusherClient.unsubscribe(`private-${boxId}`);
+    //   pusherClient.unbind("new-message", handleNewMessage);
+    // };
+  }, [boxId, setMessagesByBox]);
 
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;

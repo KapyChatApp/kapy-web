@@ -8,6 +8,9 @@ import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
 import { useParams, useSearchParams } from "next/navigation";
 import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
+import { isCurrentPageBoxId } from "@/lib/utils";
+import { markMessageAsRead } from "@/lib/read-mark";
+import { getPusherClient } from "@/lib/pusher";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -31,8 +34,16 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, setMessagesByBox, setDetailByBox, detailByBox } =
-    useChatContext();
+  const {
+    dataChat,
+    setMessagesByBox,
+    setDetailByBox,
+    detailByBox,
+    readStatusByBox,
+    setReadStatusByBox
+  } = useChatContext();
+
+  // Fetch messages
   useEffect(() => {
     const fetchMessagesForBoxes = async () => {
       const messagesMap: Record<string, ResponseMessageDTO[]> = {};
@@ -48,11 +59,19 @@ const page = () => {
     fetchMessagesForBoxes();
   }, [dataChat]);
 
+  //Subcribe channel in pusher
+  useEffect(() => {
+    for (const box of dataChat) {
+      const pusherClient = getPusherClient();
+      pusherClient.subscribe(`private-${box.id}`);
+    }
+  }, [dataChat]);
+
   //Fetch Detail Box Chat from Backend
+  const detailBoxMap: Record<string, DetailBox> = {};
+  const readStatusMap: Record<string, boolean> = {};
   useEffect(() => {
     const fetchDataForBoxes = async () => {
-      const detailBoxMap: Record<string, DetailBox> = {};
-
       if (dataChat.length === 0) {
         console.log("dataChat is empty");
         return;
@@ -63,6 +82,12 @@ const page = () => {
 
         if (detail) {
           detailBoxMap[box.id] = detail;
+          if (isCurrentPageBoxId(box.id)) {
+            const readMess = await markMessageAsRead(box.id);
+            readStatusMap[box.id] = readMess;
+          } else {
+            readStatusMap[box.id] = detail.readStatus;
+          }
         } else {
           console.log(`No detail for box: ${box.id}`);
         }
@@ -71,6 +96,7 @@ const page = () => {
       // Only set if there is data
       if (Object.keys(detailBoxMap).length > 0) {
         setDetailByBox(detailBoxMap);
+        setReadStatusByBox(readStatusMap);
       } else {
         console.log("No details to set in detailBox");
       }
@@ -78,6 +104,7 @@ const page = () => {
 
     fetchDataForBoxes();
   }, [dataChat, setDetailByBox]);
+
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>

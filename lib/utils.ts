@@ -161,3 +161,10 @@ export const formatTimeMessageBox = (time: Date | string) => {
     }
   }
 };
+
+export const isCurrentPageBoxId = (boxId: string) => {
+  if (typeof window === "undefined") return false;
+  const currentPath = window.location.pathname;
+  const currentId = currentPath.split("/").pop();
+  return currentId === boxId;
+};

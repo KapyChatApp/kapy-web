@@ -10,6 +10,7 @@ import CreateGroup from "./CreateGroup";
 import axios from "axios";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
+import { formatTimeMessageBox } from "@/lib/utils";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,8 +20,8 @@ export interface LeftMessageProps {
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const [seenStatus, setSeenStatus] = useState<Record<string, boolean>>({});
-  const { dataChat, messages, setMessages, messagesByBox } = useChatContext();
+  const { dataChat, messagesByBox, detailByBox, latestMessages } =
+    useChatContext();
 
   const searchChat = useSearchMessageBox(dataChat);
   const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
@@ -32,6 +33,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     let message: ResponseMessageDTO[] = [];
     let contentCurrent: string = "";
     let detailContent: string = "";
+    let createAtCurrent: string = "";
     if (messagesByBox && messagesByBox[boxId]) {
       message = messagesByBox[boxId];
     }
@@ -66,6 +68,11 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           message[message.length - 1].text.length - 1
         ];
     }
+    if (message.length > 0) {
+      createAtCurrent = formatTimeMessageBox(
+        message[message.length - 1].createAt
+      );
+    }
 
     // Tính toán senderName cho box hiện tại
     const adminId = localStorage.getItem("adminId");
@@ -82,69 +89,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
       }
     }
 
-    return { contentCurrent, senderNameCurrent };
+    return { contentCurrent, senderNameCurrent, createAtCurrent };
   };
-
-  // Hàm kiểm tra trạng thái đã đọc, tự động lấy danh sách boxIds
-  const fetchSeenStatus = async () => {
-    try {
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) {
-        console.error("Token is missing");
-        return;
-      }
-
-      // Lấy danh sách boxIds từ filteredBox
-      const dataBoxId = dataChat.map((box) => box.id);
-
-      const updatedSeenStatus = dataBoxId.reduce((acc: any, item: any) => {
-        const box = dataChat.find((box) => box.id === item);
-        acc[item] = box ? box.isSeen : false;
-        return acc;
-      }, {} as Record<string, boolean>);
-      // Cập nhật trạng thái seenStatus
-      setSeenStatus(updatedSeenStatus);
-    } catch (error) {
-      console.error("Error fetching seen statuses:", error);
-    }
-  };
-  const box = dataChat;
-  useEffect(() => {
-    if (box.length > 0) {
-      fetchSeenStatus();
-    }
-  }, [box.length]);
-
-  //Hàm thực hiện đánh dấu đã xem tin nhắn
-  const handleMarkAsRead = async (boxId: string) => {
-    try {
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) {
-        console.error("Token is missing");
-        return;
-      }
-
-      await axios.post(
-        `${process.env.BASE_URL}message/mark-read`,
-        { boxId: boxId },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `${storedToken}`
-          }
-        }
-      );
-
-      // Cập nhật giao diện ngay lập tức
-      setSeenStatus((prev) => ({
-        ...prev,
-        [boxId]: true
-      }));
-    } catch (error) {
-      console.error(`Error marking box ${boxId} as read:`, error);
-    }
-  };
-
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
   const handleCreated = () => {
@@ -155,7 +101,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const [boxCreated, setBoxCreated] = useState(boxGroup);
   const handleAddGroup = () => {
     const newGroup = {
-      id: (parseInt(boxCreated[box.length - 1].id) + 1).toString(),
+      id: (parseInt(boxCreated[dataChat.length - 1].id) + 1).toString(),
       otherId: (boxCreated.length + 1).toString(),
       otherName: `New Group ${boxCreated.length + 1}`,
       ava: "/assets/images/icon.png",
@@ -183,17 +129,32 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll">
           {filteredBox.length > 0
             ? filteredBox.map((item) => {
-                const { contentCurrent, senderNameCurrent } =
+                const { contentCurrent, senderNameCurrent, createAtCurrent } =
                   contentWithSendername(item.id, item.senderName);
+                let senderName = "";
+                let content = "";
+                let createAt = "";
+                if (
+                  latestMessages &&
+                  latestMessages[item.id] &&
+                  item.id === latestMessages[item.id].boxId
+                ) {
+                  senderName = latestMessages[item.id].senderName;
+                  content = latestMessages[item.id].content;
+                  createAt = latestMessages[item.id].createAt;
+                } else {
+                  senderName = senderNameCurrent;
+                  content = contentCurrent;
+                  createAt = createAtCurrent;
+                }
                 return (
                   <MessageBox
                     box={item}
                     setClickBox={setClickBox}
                     setClickOtherRight={setClickOtherRight}
-                    seenStatus={!!seenStatus[item.id]}
-                    onMarkAsRead={() => handleMarkAsRead(item.id)}
-                    content={contentCurrent}
-                    senderName={senderNameCurrent}
+                    content={content}
+                    senderName={senderName}
+                    createAt={createAt}
                   />
                 );
               })

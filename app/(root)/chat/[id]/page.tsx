@@ -3,8 +3,14 @@ import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
 import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
-import { useChatContext } from "@/context/ChatContext";
+import { LatestMessage, useChatContext } from "@/context/ChatContext";
 import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
+import { getPusherClient } from "@/lib/pusher";
+import { useRouter } from "next/navigation";
+import { markMessageAsRead } from "@/lib/read-mark";
+import { MessageBoxContent } from "@/lib/dataBox";
+import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
+
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
   const [isClickOtherRight, setClickOtherRight] = useState(false);
@@ -12,6 +18,7 @@ const page = () => {
   //Click open more responsive
   const [isMdScreen, setIsMdScreen] = useState(false);
   const [openMore, setOpenMore] = useState(false);
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 768 && window.innerWidth < 878) {
@@ -26,8 +33,17 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, setMessagesByBox, setDetailByBox, detailByBox } =
-    useChatContext();
+  const {
+    dataChat,
+    setMessagesByBox,
+    setDetailByBox,
+    setReadStatusByBox,
+    setLatestMessages,
+    detailByBox,
+    readStatusByBox
+  } = useChatContext();
+
+  //Fetch messages
   useEffect(() => {
     const fetchMessagesForBoxes = async () => {
       const messagesMap: Record<string, ResponseMessageDTO[]> = {};
@@ -43,11 +59,19 @@ const page = () => {
     fetchMessagesForBoxes();
   }, []);
 
+  //Subcribe channel in pusher
+  useEffect(() => {
+    for (const box of dataChat) {
+      const pusherClient = getPusherClient();
+      pusherClient.subscribe(`private-${box.id}`);
+    }
+  }, [dataChat]);
+
   //Fetch Detail Box Chat from Backend
+  const detailBoxMap: Record<string, DetailBox> = {};
+  const readStatusMap: Record<string, boolean> = {};
   useEffect(() => {
     const fetchDataForBoxes = async () => {
-      const detailBoxMap: Record<string, DetailBox> = {};
-
       if (dataChat.length === 0) {
         console.log("dataChat is empty");
         return;
@@ -58,6 +82,12 @@ const page = () => {
 
         if (detail) {
           detailBoxMap[box.id] = detail;
+          if (isCurrentPageBoxId(box.id)) {
+            const readMess = await markMessageAsRead(box.id);
+            readStatusMap[box.id] = readMess;
+          } else {
+            readStatusMap[box.id] = detail.readStatus;
+          }
         } else {
           console.log(`No detail for box: ${box.id}`);
         }
@@ -66,13 +96,15 @@ const page = () => {
       // Only set if there is data
       if (Object.keys(detailBoxMap).length > 0) {
         setDetailByBox(detailBoxMap);
+        setReadStatusByBox(readStatusMap);
       } else {
         console.log("No details to set in detailBox");
       }
     };
 
     fetchDataForBoxes();
-  }, [dataChat, setDetailByBox]);
+  }, [dataChat, setDetailByBox, setReadStatusByBox]);
+
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">
       <div className={`flex flex-row w-full`}>

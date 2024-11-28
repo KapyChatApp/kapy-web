@@ -16,6 +16,7 @@ export interface DetailBox {
   pin: boolean;
   createAt: string;
   createBy: string;
+  readStatus: boolean;
 }
 
 let detailDataBox: DetailBox = {
@@ -36,7 +37,8 @@ let detailDataBox: DetailBox = {
   flag: false,
   pin: false,
   createAt: "",
-  createBy: ""
+  createBy: "",
+  readStatus: false
 };
 let apiDataBox: any;
 
@@ -89,7 +91,8 @@ export const fetchDetailBox = async (boxId: string) => {
       flag: apiDataBox.box.flag,
       pin: apiDataBox.box.pin,
       createAt: apiDataBox.box.createAt,
-      createBy: apiDataBox.box.createBy
+      createBy: apiDataBox.box.createBy,
+      readStatus: apiDataBox.box.readStatus
     };
     return detailDataBox;
   } catch (err: any) {

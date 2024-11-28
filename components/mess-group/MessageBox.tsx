@@ -1,4 +1,5 @@
 "use client";
+import { useChatContext } from "@/context/ChatContext";
 import { MessageBoxContent } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { MessageBoxProps } from "@/types/mess-group";
@@ -13,32 +14,28 @@ interface Box {
   box: MessageBoxContent;
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
-  seenStatus: boolean; // Trạng thái đã đọc
-  onMarkAsRead: () => void;
   content: string;
   senderName: string;
+  createAt: string;
 }
 
 const MessageBox: React.FC<Box> = ({
   box,
   setClickBox,
   setClickOtherRight,
-  seenStatus,
-  onMarkAsRead,
+  senderName,
   content,
-  senderName
+  createAt
 }) => {
-  const { id, receiverInfo, createAt, pin, isOnline, isSeen } = box;
+  const { id, receiverInfo, pin, isOnline, readStatus } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const { readStatusByBox } = useChatContext();
 
   const handleClickLink = () => {
     if (setClickBox) {
       setClickBox(true); //Click box for responsive
-    }
-    if (!seenStatus && isActive) {
-      onMarkAsRead(); // Gọi hàm đánh dấu đã đọc
     }
   };
 
@@ -78,7 +75,7 @@ const MessageBox: React.FC<Box> = ({
                 </p>
               </div>
               <div className="flex items-center justify-start w-full min-w-0">
-                {seenStatus ? (
+                {readStatusByBox[id] ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
                     {senderName}
                   </p>
@@ -88,12 +85,10 @@ const MessageBox: React.FC<Box> = ({
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {seenStatus ? (
+                  {readStatusByBox[id] ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
-                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
-                      {content}
-                    </p>
+                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   )}
                 </div>
               </div>
