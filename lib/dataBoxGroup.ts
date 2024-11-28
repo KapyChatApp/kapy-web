@@ -39,7 +39,6 @@ export const fetchMessageBoxGroup = async (
     // Xử lý dữ liệu từ response để tạo ra dataChat
     const updatedDataChat: MessageBoxContent[] = sortedApiDataChat
       .map((item: any) => {
-        let isSeen = false;
         let content = ""; // Mặc định là rỗng nếu không có message
         let detailContent = "";
 
@@ -86,7 +85,7 @@ export const fetchMessageBoxGroup = async (
             createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
             pin: false,
             isOnline: false,
-            isSeen: isSeen
+            readStatus: item.readStatus
           };
         }
         const sender = item.receiverIds.find(
@@ -123,45 +122,12 @@ export const fetchMessageBoxGroup = async (
           createAt: formatTimeMessageBox(item.lastMessage?.createAt),
           pin: false,
           isOnline: true,
-          isSeen: isSeen
+          readStatus: item.readStatus
         };
       })
       .filter((item: any): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
 
-    // Lấy danh sách ID của các hộp chat để gửi API check-mark-read
-    const messageIdsToCheck = updatedDataChat.map((item) => item.id);
-
-    // Gửi yêu cầu API check-mark-read với các ID này
-    const checkReadResponse = await axios.post(
-      `${process.env.BASE_URL}message/check-mark-read`,
-      {
-        boxIds: messageIdsToCheck
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${storedToken}`
-        }
-      }
-    );
-
-    // Kiểm tra kết quả API và cập nhật lại isSeen trong updatedDataChat
-    if (checkReadResponse.status === 200) {
-      const checkResults = checkReadResponse.data;
-      const updatedSeenDataChat = updatedDataChat.map((item) => {
-        const result = checkResults.find(
-          (result: { boxId: string }) => result.boxId === item.id
-        );
-        if (result && result.success) {
-          return {
-            ...item,
-            isSeen: true // Cập nhật trạng thái đã xem
-          };
-        }
-        return item;
-      });
-      setDataChat(updatedSeenDataChat);
-    }
+    setDataChat(updatedDataChat);
   } catch (err: any) {
     setError(err.message);
     console.error("Error fetching messages:", err);

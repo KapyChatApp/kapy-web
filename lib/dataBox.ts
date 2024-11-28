@@ -25,8 +25,8 @@ export interface MessageBoxContent {
   createAt: string;
   pin: boolean;
   isOnline: boolean;
-  isSeen: boolean;
   lastMessage: ResponseMessageDTO;
+  readStatus: boolean;
 }
 
 // Interface Response
@@ -46,8 +46,8 @@ interface MessageBoxDTO {
   groupAva: string;
   flag: boolean;
   pin: boolean;
-  isSeen: boolean;
   lastMessage: ResponseMessageDTO;
+  readStatus: boolean;
 }
 export interface ResponseMessageBoxDTO {
   box: MessageBoxDTO[];
@@ -92,7 +92,6 @@ export const fetchMessageBox = async (
     // Xử lý dữ liệu từ response để tạo ra dataChat
     const updatedDataChat: MessageBoxContent[] = sortedApiDataChat
       .map((item) => {
-        let isSeen = false;
         let content = ""; // Mặc định là rỗng nếu không có message
         let detailContent = "";
 
@@ -154,7 +153,7 @@ export const fetchMessageBox = async (
             createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
             pin: false,
             isOnline: false,
-            isSeen: isSeen
+            readStatus: item.readStatus
           };
         }
         // Tìm sender và receiver
@@ -186,47 +185,12 @@ export const fetchMessageBox = async (
           createAt: formatTimeMessageBox(item.lastMessage?.createAt),
           pin: false,
           isOnline: false,
-          isSeen: isSeen
+          readStatus: item.readStatus
         };
       })
       .filter((item): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
 
-    // Lấy danh sách ID của các hộp chat để gửi API check-mark-read
-    const messageIdsToCheck = updatedDataChat.map((item) => item.id);
-
-    // Gửi yêu cầu API check-mark-read với các ID này
-    const checkReadResponse = await axios.post(
-      `${process.env.BASE_URL}message/check-mark-read`,
-      {
-        boxIds: messageIdsToCheck
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `${storedToken}`
-        }
-      }
-    );
-
-    // Kiểm tra kết quả API và cập nhật lại isSeen trong updatedDataChat
-    if (checkReadResponse.status === 200) {
-      const checkResults = checkReadResponse.data;
-      const updatedSeenDataChat = updatedDataChat.map((item) => {
-        const result = checkResults.find(
-          (result: { boxId: string }) => result.boxId === item.id
-        );
-        if (result && result.success) {
-          return {
-            ...item,
-            isSeen: true // Cập nhật trạng thái đã xem
-          };
-        }
-        return item;
-      });
-
-      // Cập nhật state với dữ liệu đã được cập nhật
-      setDataChat(updatedSeenDataChat);
-    }
+    setDataChat(updatedDataChat);
   } catch (err: any) {
     setError(err.message);
     console.error("Error fetching messages:", err);

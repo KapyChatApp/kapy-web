@@ -100,7 +100,6 @@ const RightMessage = ({
           setOpenMore: setOpenMore
         };
   }
-
   //filterSegment
   let message: ResponseMessageDTO[] = [];
   if (boxId && messagesByBox && messagesByBox[boxId]) {

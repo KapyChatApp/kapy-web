@@ -3,19 +3,33 @@ import { MessageBoxContent } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { DetailBox } from "@/lib/dataOneBox";
 import { createContext, useContext, useState } from "react";
+export interface LatestMessage {
+  senderName: string;
+  content: string;
+  createAt: string;
+  boxId: string;
+}
 
 // Tạo kiểu cho context
 interface ChatContextType {
+  readStatusByBox: Record<string, boolean>;
+  setReadStatusByBox: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
   dataChat: MessageBoxContent[];
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>;
-  messages: ResponseMessageDTO[];
-  setMessages: React.Dispatch<React.SetStateAction<ResponseMessageDTO[]>>;
+  latestMessages: Record<string, LatestMessage>;
+  setLatestMessages: React.Dispatch<
+    React.SetStateAction<Record<string, LatestMessage>>
+  >;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
   >;
-  detailByBox: Record<string, any>;
-  setDetailByBox: React.Dispatch<React.SetStateAction<Record<string, any>>>;
+  detailByBox: Record<string, DetailBox>;
+  setDetailByBox: React.Dispatch<
+    React.SetStateAction<Record<string, DetailBox>>
+  >;
 }
 
 // Tạo context
@@ -26,21 +40,28 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
-  const [messages, setMessages] = useState<ResponseMessageDTO[]>([]);
+  const [latestMessages, setLatestMessages] = useState<
+    Record<string, LatestMessage>
+  >({});
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
   >({});
-  const [detailByBox, setDetailByBox] = useState<Record<string, any>>({});
+  const [readStatusByBox, setReadStatusByBox] = useState<
+    Record<string, boolean>
+  >({});
+  const [detailByBox, setDetailByBox] = useState<Record<string, DetailBox>>({});
 
   return (
     <ChatContext.Provider
       value={{
         dataChat,
         setDataChat,
-        messages,
-        setMessages,
+        latestMessages,
+        setLatestMessages,
         messagesByBox,
         setMessagesByBox,
+        readStatusByBox,
+        setReadStatusByBox,
         detailByBox,
         setDetailByBox
       }}

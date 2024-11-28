@@ -24,6 +24,7 @@ export interface ResponseMessageDTO {
   readedId: string[];
   contentId: FileContent[] | GPSContent[];
   text: string[];
+  boxId: string;
   createAt: string;
   createBy: string;
 }
@@ -56,6 +57,7 @@ export const fetchMessages = async (
             readedId: msg.readedId || [],
             contentId: msg.contentId || [],
             text: msg.text,
+            boxId: msg.boxId,
             createAt: msg.createAt || "",
             createBy: msg.createBy
           };
