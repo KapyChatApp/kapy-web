@@ -7,6 +7,9 @@ import { formatTime } from "@/lib/utils";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { ResponseUserInfo } from "@/lib/dataUser";
 import { UserInfoBox } from "@/lib/dataBox";
+import TextSegment from "./Segment/TextSegment";
+import OtherSegment from "./Segment/OtherSegment";
+import MediaSegment from "./Segment/MediaSegment";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
@@ -142,14 +145,45 @@ const RightMiddle = ({
                           : "items-start"
                       }`}
                     >
-                      {group.map((item, itemIndex) => (
-                        <SegmentMess
-                          key={itemIndex}
-                          segments={item}
-                          index={itemIndex}
-                          length={group.length}
-                        />
-                      ))}
+                      {group.map((item, itemIndex) => {
+                        if (item.text.length > 0) {
+                          return (
+                            <TextSegment
+                              key={itemIndex}
+                              segments={item}
+                              index={itemIndex}
+                              length={group.length}
+                            />
+                          );
+                        }
+                        if (
+                          item.text.length === 0 &&
+                          item.contentId.length > 0
+                        ) {
+                          const content =
+                            item.contentId[item.contentId.length - 1];
+                          if (content.type === "Other") {
+                            return (
+                              <OtherSegment
+                                key={itemIndex}
+                                segments={item}
+                                index={itemIndex}
+                                length={group.length}
+                              />
+                            );
+                          } else {
+                            return (
+                              <MediaSegment
+                                key={itemIndex}
+                                segments={item}
+                                index={itemIndex}
+                                length={group.length}
+                              />
+                            );
+                          }
+                        }
+                        return <div></div>;
+                      })}
                     </div>
                   </div>
                 </div>
