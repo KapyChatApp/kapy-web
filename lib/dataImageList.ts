@@ -1,7 +1,7 @@
 import axios from "axios";
 import { FileContent } from "./dataMessages";
 
-export const getImageList = async (boxId: string): Promise<string[]> => {
+export const getImageList = async (boxId: string): Promise<FileContent[]> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) throw new Error("Authentication token not found");
 
@@ -15,9 +15,9 @@ export const getImageList = async (boxId: string): Promise<string[]> => {
         }
       }
     );
-    const apiData: FileContent = response.data;
+    const apiData: FileContent[] = response.data;
     if (apiData && Array.isArray(apiData)) {
-      const imageList = apiData.map((item) => item.url);
+      const imageList = apiData;
       return imageList;
     } else {
       throw new Error("Invalid data format");

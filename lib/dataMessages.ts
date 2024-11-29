@@ -1,4 +1,3 @@
-import { SegmentMessProps } from "@/types/mess-group";
 import axios from "axios";
 
 export interface FileContent {

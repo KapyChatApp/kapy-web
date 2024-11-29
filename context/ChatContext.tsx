@@ -1,6 +1,6 @@
 "use client";
 import { MessageBoxContent } from "@/lib/dataBox";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import { DetailBox } from "@/lib/dataOneBox";
 import { createContext, useContext, useState } from "react";
 export interface LatestMessage {
@@ -18,6 +18,8 @@ interface ChatContextType {
   >;
   dataChat: MessageBoxContent[];
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>;
+  imageList: FileContent[];
+  setImageList: React.Dispatch<React.SetStateAction<FileContent[]>>;
   latestMessages: Record<string, LatestMessage>;
   setLatestMessages: React.Dispatch<
     React.SetStateAction<Record<string, LatestMessage>>
@@ -40,6 +42,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
+  const [imageList, setImageList] = useState<FileContent[]>([]);
   const [latestMessages, setLatestMessages] = useState<
     Record<string, LatestMessage>
   >({});
@@ -56,6 +59,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         dataChat,
         setDataChat,
+        imageList,
+        setImageList,
         latestMessages,
         setLatestMessages,
         messagesByBox,

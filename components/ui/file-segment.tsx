@@ -67,7 +67,7 @@ const FileSegment: React.FC<FileSegmentProps> = ({
       {/* Hiển thị tên file */}
       <div
         onClick={handleDownload}
-        className="text-dark300_light800 flex-wrap md:text-[14px] text-[13px] font-semibold cursor-pointer text-decoration-none hover:text-decoration-none hover:no-underline"
+        className="text-dark300_light800 flex-wrap md:text-[14px] text-[12px] font-semibold cursor-pointer text-decoration-none hover:text-decoration-none hover:no-underline"
       >
         {fileName}
       </div>

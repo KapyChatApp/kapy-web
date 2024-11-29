@@ -11,7 +11,6 @@ import SeeAllLink from "../MoreActions/SeeAll/SeeAllLink";
 import SeeAllVideo from "../MoreActions/SeeAll/SeeAllVideo";
 import { MememberGroup } from "@/types/object";
 import { Files, Links, Photo, Video } from "@/types/media";
-import { SeeAllProps, StateType } from "@/types/mess-group";
 
 interface OpenMoreDisplayProps {
   openMore: boolean;
@@ -33,7 +32,7 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
     [] as MememberGroup[] | Photo[] | Video[] | Files[] | Links[]
   );
 
-  const propsAll: SeeAllProps = {
+  const propsAll = {
     setActiveComponent: setActiveComponent,
     setItemSent: setItemSent,
     itemSent: itemSent
