@@ -15,6 +15,7 @@ import { ResponseUserInfo } from "@/lib/dataUser";
 import { useChatContext } from "@/context/ChatContext";
 import { UserInfoBox } from "@/lib/dataBox";
 import { getPusherClient } from "@/lib/pusher";
+import { getFileFormat } from "@/lib/utils";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -119,7 +120,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
             bytes: file.size.toString(),
             width: "0",
             height: "0",
-            format: file.type.split("/")[1],
+            format: getFileFormat(file.type, file.name),
             type: file.type.split("/")[0]
           }
         ],
@@ -127,12 +128,6 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
         createBy: apiAdminId || ""
-      }));
-
-      // Hiển thị tạm thời các tin nhắn
-      setMessagesByBox((prev) => ({
-        ...prev,
-        [boxId]: [...(prev[boxId] || []), ...tempMessages]
       }));
 
       // Gửi từng file lên server
@@ -144,7 +139,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
           bytes: file.size.toString(),
           width: "0",
           height: "0",
-          format: file.type.split("/")[1],
+          format: getFileFormat(file.type, file.name),
           type: file.type.split("/")[0]
         };
 

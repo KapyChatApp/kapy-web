@@ -22,7 +22,7 @@ export interface ResponseMessageDTO {
   id: string;
   flag: boolean;
   readedId: string[];
-  contentId: FileContent[] | GPSContent[];
+  contentId: FileContent[];
   text: string[];
   boxId: string;
   createAt: string;
