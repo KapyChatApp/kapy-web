@@ -1,15 +1,6 @@
 "use client";
-import {
-  FileContent,
-  GPSContent,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
-import ReactPlayer from "react-player";
-import Image from "next/image";
-import { CldImage } from "next-cloudinary";
-import { usePathname } from "next/navigation";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
 import React, { useState } from "react";
-import Link from "next/link";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;

@@ -1,16 +1,11 @@
 "use client";
-import {
-  FileContent,
-  GPSContent,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
-import ReactPlayer from "react-player";
-import Image from "next/image";
-import { CldImage } from "next-cloudinary";
-import { usePathname } from "next/navigation";
+import { ResponseMessageDTO } from "@/lib/dataMessages";
 import React, { useState } from "react";
-import Link from "next/link";
-import { FileSegment } from "../ui/file-segment";
+import ImageSegment from "./RightMessage/Segment/ImageSegment";
+import TextSegment from "./RightMessage/Segment/TextSegment";
+import VideoSegment from "./RightMessage/Segment/VideoSegment";
+import AudioSegment from "./RightMessage/Segment/AudioSegment";
+import OtherSegment from "./RightMessage/Segment/OtherSegment";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -22,136 +17,17 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   const { createBy, contentId, text, createAt } = segments;
   const adminId = localStorage.getItem("adminId");
   const isActive = createBy !== adminId;
-  const isFileContent = contentId.length > 0 && text.length === 0;
-  const isOtherContent =
-    isFileContent && contentId[contentId.length - 1].type === "Other";
   const [isHovered, setIsHovered] = useState(false);
 
   //Render Content
-  let renderedContent;
   const lastContent = contentId[contentId.length - 1]; // Lấy phần tử cuối cùng trong contentId
   const textContent = text[text.length - 1];
-
-  //Rounded content
-  const getContainerClasses = () => {
-    if (length > 1) {
-      if (isActive) {
-        if (index === 0) {
-          return isFileContent
-            ? `${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 p-3 rounded-t-[18px] rounded-br-[18px] rounded-bl-[4px]"
-                  : "bg-transparent p-0 rounded-t-[8px] rounded-br-[8px] rounded-bl-[4px] "
-              }`
-            : "rounded-t-[18px] rounded-br-[18px] rounded-bl-[4px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Đầu tiên
-        } else if (index === length - 1) {
-          return isFileContent
-            ? `${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 p-3 rounded-b-[18px] rounded-tr-[18px] rounded-tl-[4px]"
-                  : "bg-transparent p-0 rounded-b-[8px] rounded-tr-[8px] rounded-tl-[4px] "
-              } `
-            : "rounded-b-[18px] rounded-tr-[18px] rounded-tl-[4px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Cuối cùng
-        } else {
-          return isFileContent
-            ? ` ${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-s-1 rounded-e-[18px]"
-                  : "bg-transparent p-0 rounded-s-1 rounded-e-[8px]"
-              }`
-            : "rounded-s-1 rounded-e-[18px] bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1"; // Ở giữa
-        }
-      } else {
-        if (index === 0) {
-          return isFileContent
-            ? ` ${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-t-[18px] rounded-br-[4px] rounded-bl-[18px]"
-                  : "bg-transparent p-0 rounded-t-[8px] rounded-br-[4px] rounded-bl-[8px]"
-              }`
-            : "rounded-t-[18px] rounded-br-[4px] rounded-bl-[18px] bg-primary-500 px-3 py-1"; // Đầu tiên
-        } else if (index === length - 1) {
-          return isFileContent
-            ? ` ${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity  p-3 rounded-b-[18px] rounded-tr-[4px]"
-                  : "bg-transparent p-0 rounded-b-[8px] rounded-tr-[4px] rounded-tl-[8px]"
-              }`
-            : "rounded-b-[18px] rounded-tr-[4px] rounded-tl-[18px] bg-primary-500 px-3 py-1"; // Cuối cùng
-        } else {
-          return isFileContent
-            ? `${
-                isOtherContent
-                  ? "background-light700_dark200 bg-opacity-50 dark:bg-opacity p-3 rounded-s-[18px] rounded-e-[4px]"
-                  : "bg-transparent p-0 rounded-s-[8px] rounded-e-[4px] "
-              } p-0`
-            : "rounded-s-[18px] rounded-e-[4px] bg-primary-500 px-3 py-1"; // Ở giữa
-        }
-      }
-    } else {
-      if (isActive) {
-        return isFileContent
-          ? `${
-              isOtherContent
-                ? "background-light700_dark200 bg-opacity-50 p-3 rounded-[18px]"
-                : "bg-transparent p-0 rounded-[8px]"
-            }`
-          : "bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-1 rounded-[18px]";
-      }
-      return isFileContent
-        ? `${
-            isOtherContent
-              ? "background-light700_dark200 bg-opacity-50 p-3 rounded-[18px]"
-              : "bg-transparent p-0 rounded-[8px]"
-          }`
-        : "bg-primary-500 px-3 py-1 rounded-[18px]";
-    }
-  };
-
-  if (text.length > 0 && contentId.length === 0) {
-    renderedContent = textContent;
-  } else if (contentId.length > 0 && text.length === 0) {
-    if (lastContent.type === "Image") {
-      const imageContent = lastContent as FileContent;
-      renderedContent = (
-        <Image
-          src={imageContent.url}
-          alt={imageContent.fileName}
-          width={200}
-          height={200}
-          className={`${getContainerClasses()} max-w-full h-auto `}
-        />
-      );
-    } else if (lastContent.type === "Video") {
-      const videoContent = lastContent as FileContent;
-      renderedContent = (
-        <ReactPlayer
-          url={videoContent.url}
-          controls
-          width="100%"
-          height="auto"
-        />
-      );
-    } else if (lastContent.type === "Audio") {
-      const audioContent = lastContent as FileContent;
-      renderedContent = (
-        <audio controls>
-          <source src={audioContent.url} type={audioContent.format} />
-          Your browser does not support the audio element.
-        </audio>
-      );
-    } else if (lastContent.type === "Other") {
-      const otherFileContent = lastContent as FileContent;
-      renderedContent = (
-        <FileSegment
-          fileName={otherFileContent.fileName}
-          url={otherFileContent.url}
-        />
-      );
-    }
-  } else {
-    console.log("Content type is not supported.");
-  }
+  const textSegment = text.length > 0;
+  const contentSegment = contentId.length > 0 && text.length === 0;
+  const imageSegment = contentSegment && lastContent.type === "Image";
+  const audioSegment = contentSegment && lastContent.type === "Audio";
+  const videoSegment = contentSegment && lastContent.type === "Video";
+  const otherSegment = contentSegment && lastContent.type === "Other";
 
   const messageTime = new Date(createAt).toLocaleTimeString();
 
@@ -171,22 +47,22 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
           {messageTime}
         </div>
       )}
-      <div
-        className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
-      >
-        {/* Chỉ hiển thị đoạn văn bản nếu nội dung không phải là hình ảnh */}
-        {text.length > 0 ? (
-          <p
-            className={`${
-              isActive ? "text-dark100_light900" : "text-light-900"
-            } flex-wrap md:text-[14px] text-[13px] font-[320px]`}
-          >
-            {renderedContent}
-          </p>
-        ) : (
-          renderedContent // Hiển thị hình ảnh nếu nó là một hình ảnh
-        )}
-      </div>
+
+      {textSegment && (
+        <TextSegment segments={segments} index={index} length={length} />
+      )}
+      {imageSegment && (
+        <ImageSegment segments={segments} index={index} length={length} />
+      )}
+      {videoSegment && (
+        <VideoSegment segments={segments} index={index} length={length} />
+      )}
+      {audioSegment && (
+        <AudioSegment segments={segments} index={index} length={length} />
+      )}
+      {otherSegment && (
+        <OtherSegment segments={segments} index={index} length={length} />
+      )}
     </div>
   );
 };

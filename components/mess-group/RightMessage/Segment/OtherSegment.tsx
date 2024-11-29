@@ -1,15 +1,6 @@
 "use client";
-import {
-  FileContent,
-  GPSContent,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
-import ReactPlayer from "react-player";
-import Image from "next/image";
-import { CldImage } from "next-cloudinary";
-import { usePathname } from "next/navigation";
+import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import React, { useState } from "react";
-import Link from "next/link";
 import { FileSegment } from "@/components/ui/file-segment";
 
 interface SegmentMessage {
@@ -60,32 +51,11 @@ const OtherSegment: React.FC<SegmentMessage> = ({
     }
   };
 
-  const messageTime = new Date(createAt).toLocaleTimeString();
-
   return (
     <div
-      className={`flex flex-row items-center justify-start w-fit gap-2 h-full  relative cursor-pointer`}
-      onMouseEnter={() => setIsHovered(true)} // Khi hover vào
-      onMouseLeave={() => setIsHovered(false)} // Khi rời khỏi
+      className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
     >
-      {/* Hiển thị thời gian khi hover */}
-      {isHovered && (
-        <div
-          className={`absolute ${
-            isActive ? "right-[-74px]" : "left-[-76px]"
-          }  w-fit center bg-dark-700 text-dark100_light900 text-[12px] opacity-80 p-1 rounded-md `}
-        >
-          {messageTime}
-        </div>
-      )}
-      <div
-        className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
-      >
-        <FileSegment
-          fileName={lastContent.fileName}
-          url={otherFileContent.url}
-        />
-      </div>
+      <FileSegment fileName={lastContent.fileName} url={otherFileContent.url} />
     </div>
   );
 };

@@ -2,14 +2,17 @@
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
-import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
-import { LatestMessage, useChatContext } from "@/context/ChatContext";
+import {
+  fetchMessages,
+  FileContent,
+  ResponseMessageDTO
+} from "@/lib/dataMessages";
+import { useChatContext } from "@/context/ChatContext";
 import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 import { getPusherClient } from "@/lib/pusher";
-import { useRouter } from "next/navigation";
 import { markMessageAsRead } from "@/lib/read-mark";
-import { MessageBoxContent } from "@/lib/dataBox";
-import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
+import { isCurrentPageBoxId } from "@/lib/utils";
+import { getImageList } from "@/lib/dataImageList";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -38,9 +41,8 @@ const page = () => {
     setMessagesByBox,
     setDetailByBox,
     setReadStatusByBox,
-    setLatestMessages,
-    detailByBox,
-    readStatusByBox
+    setImageList,
+    imageList
   } = useChatContext();
 
   //Fetch messages
@@ -57,6 +59,20 @@ const page = () => {
     };
 
     fetchMessagesForBoxes();
+  }, []);
+
+  //Fetch image
+  useEffect(() => {
+    const fetchImageList = async () => {
+      for (const box of dataChat) {
+        if (isCurrentPageBoxId(box.id)) {
+          const list: FileContent[] = await getImageList(box.id);
+          setImageList(list);
+        }
+      }
+    };
+
+    fetchImageList();
   }, []);
 
   //Subcribe channel in pusher
