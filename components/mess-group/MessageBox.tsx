@@ -2,7 +2,6 @@
 import { useChatContext } from "@/context/ChatContext";
 import { MessageBoxContent } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { MessageBoxProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import Image from "next/image";
