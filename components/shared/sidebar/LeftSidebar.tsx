@@ -285,7 +285,7 @@ const Leftsidebar = () => {
                             side="right"
                             className="hover:boder-none ml-[13px] min-w-[218px] rounded-lg shadow-lg p-1 dark:bg-dark-200 bg-light-900 gap-2 justify-start items-center"
                           >
-                            <MenubarItem className="hover:background-light700_dark400 hover:rounded-lg hover:border-none hover:">
+                            <MenubarItem className="hover:background-light700_dark400 hover:rounded-lg hover:border-none">
                               <Button
                                 className="flex flex-row p-[8px] border-none shadow-none w-full justify-between items-center hover:border-none"
                                 onClick={handleButtonVietNamClick}

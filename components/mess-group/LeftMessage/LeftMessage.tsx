@@ -37,15 +37,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     if (messagesByBox && messagesByBox[boxId]) {
       message = messagesByBox[boxId];
     }
-    if (
-      message.length > 0 &&
-      message[message.length - 1].contentId &&
-      message[message.length - 1].contentId.length > 0
-    ) {
-      const contentType =
-        message[message.length - 1].contentId[
-          message[message.length - 1].contentId.length - 1
-        ].type;
+    if (message.length > 0 && message[message.length - 1].contentId) {
+      const contentType = message[message.length - 1].contentId.type;
       detailContent =
         contentType === "Image"
           ? "Sent a photo"
@@ -58,15 +51,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           : "";
       contentCurrent = detailContent;
     }
-    if (
-      message.length > 0 &&
-      message[message.length - 1].text &&
-      message[message.length - 1].text.length > 0
-    ) {
-      contentCurrent =
-        message[message.length - 1].text[
-          message[message.length - 1].text.length - 1
-        ];
+    if (message.length > 0 && message[message.length - 1].text !== "") {
+      contentCurrent = message[message.length - 1].text;
     }
     if (message.length > 0) {
       createAtCurrent = formatTimeMessageBox(
@@ -137,8 +123,10 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
                 if (
                   latestMessages &&
                   latestMessages[item.id] &&
-                  item.id === latestMessages[item.id].boxId
+                  item.id === latestMessages[item.id].boxId &&
+                  latestMessages[item.id].content
                 ) {
+                  console.log(latestMessages[item.id]);
                   senderName = latestMessages[item.id].senderName;
                   content = latestMessages[item.id].content;
                   createAt = latestMessages[item.id].createAt;

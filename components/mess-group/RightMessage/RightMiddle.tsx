@@ -1,10 +1,13 @@
 "use client";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SegmentMess from "../SegmentMess";
 import Image from "next/image";
 import { formatTime } from "@/lib/utils";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { UserInfoBox } from "@/lib/dataBox";
+
+import { Icon } from "@iconify/react/dist/iconify.js";
+import MenubarSegment from "@/components/mess-group/RightMessage/Segment/menubar-segment";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
@@ -17,7 +20,7 @@ const RightMiddle = ({
   filteredSegmentOther,
   receiverInfo
 }: RightMiddleProps) => {
-  const adminId = localStorage.getItem("adminId");
+  const [adminId, setAdminId] = useState<string>();
 
   const combinedSegments = [
     ...filteredSegmentAdmin,
@@ -63,6 +66,10 @@ const RightMiddle = ({
   });
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      setAdminId(adminId);
+    }
     // Cuộn đến đáy khi component được render
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop =
@@ -141,12 +148,43 @@ const RightMiddle = ({
                       }`}
                     >
                       {group.map((item, itemIndex) => (
-                        <SegmentMess
+                        <div
                           key={itemIndex}
-                          segments={item}
-                          index={itemIndex}
-                          length={group.length}
-                        />
+                          className="relative group h-full flex flex-row gap-2 items-center justify-start" // Thêm lớp để nhóm hover
+                        >
+                          {item.createBy === adminId && item.flag === true && (
+                            <MenubarSegment
+                              createAt={new Date(
+                                item.createAt
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true // Định dạng AM/PM
+                              })}
+                              admin={adminId}
+                              messageId={item.id}
+                              boxId={item.boxId}
+                            />
+                          )}
+                          <SegmentMess
+                            segments={item}
+                            index={itemIndex}
+                            length={group.length}
+                          />
+                          {item.createBy !== adminId && item.flag === true && (
+                            <MenubarSegment
+                              createAt={new Date(
+                                item.createAt
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                                hour12: true // Định dạng AM/PM
+                              })}
+                              messageId={item.id}
+                              boxId={item.boxId}
+                            />
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>

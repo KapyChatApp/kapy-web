@@ -20,7 +20,7 @@ const OtherSegment: React.FC<SegmentMessage> = ({
   const [isHovered, setIsHovered] = useState(false);
 
   //Render Content
-  const lastContent = contentId[contentId.length - 1];
+  const lastContent = contentId;
   const otherFileContent = lastContent as FileContent;
 
   //Rounded content

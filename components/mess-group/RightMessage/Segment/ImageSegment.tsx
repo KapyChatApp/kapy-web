@@ -33,7 +33,7 @@ const ImageSegment: React.FC<SegmentMessage> = ({
   }, []);
 
   //Render Content
-  const lastContent = contentId[contentId.length - 1];
+  const lastContent = contentId;
   const imageContent = lastContent as FileContent;
 
   //Rounded content

@@ -16,6 +16,7 @@ export const getImageList = async (boxId: string): Promise<FileContent[]> => {
       }
     );
     const apiData: FileContent[] = response.data;
+
     if (apiData && Array.isArray(apiData)) {
       const imageList = apiData;
       return imageList;
