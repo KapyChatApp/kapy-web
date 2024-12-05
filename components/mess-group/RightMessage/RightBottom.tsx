@@ -32,7 +32,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const apiAdminId = localStorage.getItem("adminId");
+  const [apiAdminId, setAdminId] = useState<string>();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -87,8 +87,17 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       id: "",
       flag: true,
       readedId: apiAdminId ? [apiAdminId] : [],
-      contentId: [],
-      text: [messageContent],
+      contentId: {
+        fileName: "",
+        url: "",
+        publicId: "",
+        bytes: "",
+        width: "",
+        height: "",
+        format: "",
+        type: ""
+      },
+      text: messageContent,
       boxId: boxId ? boxId : "",
       createAt: new Date().toISOString(),
       createBy: apiAdminId ? apiAdminId : ""
@@ -145,19 +154,17 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         id: "",
         flag: true,
         readedId: [apiAdminId || ""],
-        contentId: [
-          {
-            fileName: file.name,
-            url: URL.createObjectURL(file), // Preview URL tạm thời
-            publicId: "",
-            bytes: file.size.toString(),
-            width: "0",
-            height: "0",
-            format: getFileFormat(file.type, file.name),
-            type: file.type.split("/")[0]
-          }
-        ],
-        text: [],
+        contentId: {
+          fileName: file.name,
+          url: URL.createObjectURL(file), // Preview URL tạm thời
+          publicId: "",
+          bytes: file.size.toString(),
+          width: "0",
+          height: "0",
+          format: getFileFormat(file.type, file.name),
+          type: file.type.split("/")[0]
+        },
+        text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
         createBy: apiAdminId || ""
@@ -206,19 +213,17 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         id: "",
         flag: true,
         readedId: [apiAdminId || ""],
-        contentId: [
-          {
-            fileName: record.name,
-            url: URL.createObjectURL(record), // Preview URL tạm thời
-            publicId: "",
-            bytes: record.size.toString(),
-            width: "0",
-            height: "0",
-            format: getFileFormat(record.type, record.name),
-            type: record.type.split("/")[0]
-          }
-        ],
-        text: [],
+        contentId: {
+          fileName: record.name,
+          url: URL.createObjectURL(record), // Preview URL tạm thời
+          publicId: "",
+          bytes: record.size.toString(),
+          width: "0",
+          height: "0",
+          format: getFileFormat(record.type, record.name),
+          type: record.type.split("/")[0]
+        },
+        text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
         createBy: apiAdminId || ""
@@ -309,6 +314,13 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     // Sau khi cập nhật xong, loại bỏ các URL đã xử lý
     setTemporaryToCloudinaryMap([]);
   }, [temporaryToCloudinaryMap]);
+
+  useEffect(() => {
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      setAdminId(adminId);
+    }
+  });
 
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">

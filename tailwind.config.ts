@@ -124,5 +124,10 @@ module.exports = {
       }
     }
   },
+  variants: {
+    extend: {
+      opacity: ["group-hover"] // Thêm group-hover vào đây
+    }
+  },
   plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")]
 };

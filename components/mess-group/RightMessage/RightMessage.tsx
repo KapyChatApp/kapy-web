@@ -8,6 +8,7 @@ import OpenMoreDisplay from "./OpenMoreDisplay";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
 import { UserInfoBox } from "@/lib/dataBox";
+import { admin } from "@/constants/object";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -30,15 +31,19 @@ const RightMessage = ({
 
   //FetchMessage Backend
   const [recipientId, setRecipientId] = useState<string[]>();
+  const [adminId, setAdminId] = useState<string>();
   const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[]>();
   const [senderInfo, setSenderInfo] = useState<UserInfoBox>();
   const { detailByBox, setDetailByBox } = useChatContext();
 
   //boxId
   const boxId = pathname.split("/").pop();
-  const adminId = localStorage.getItem("adminId");
 
   useEffect(() => {
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      setAdminId(adminId);
+    }
     if (boxId && detailByBox && detailByBox[boxId]) {
       const detailDataBox = detailByBox[boxId];
       setRecipientInfo(detailDataBox.receiverIds);

@@ -1,9 +1,4 @@
-import { useEffect, useState } from "react";
 import axios from "axios";
-import { MessageBoxProps } from "@/types/mess-group";
-import { formatTimeMessageBox } from "./utils";
-import { Group } from "@/types/object";
-import { ResponseUserInfo } from "./dataUser";
 import { UserInfoBox } from "./dataBox";
 
 export interface DetailBox {

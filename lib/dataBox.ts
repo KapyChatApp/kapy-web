@@ -77,6 +77,7 @@ export const fetchMessageBox = async (
 
     const apiDataChat: ResponseMessageBoxDTO = responseChat.data;
     localStorage.setItem("adminId", apiDataChat.adminId);
+    console.log(apiDataChat);
 
     const sortedApiDataChat = apiDataChat.box.sort((a: any, b: any) => {
       if (a.lastMessage && b.lastMessage) {
@@ -96,21 +97,11 @@ export const fetchMessageBox = async (
         let detailContent = "";
 
         // Kiểm tra xem có messageIds hay không
-        if (
-          item.lastMessage &&
-          item.lastMessage.text &&
-          item.lastMessage.text.length > 0
-        ) {
-          content = item.lastMessage.text[item.lastMessage.text.length - 1];
+        if (item.lastMessage && item.lastMessage.text !== "") {
+          content = item.lastMessage.text;
         } else {
-          if (
-            item.lastMessage &&
-            item.lastMessage.contentId &&
-            item.lastMessage.contentId.length > 0
-          ) {
-            const contentType =
-              item.lastMessage.contentId[item.lastMessage.contentId.length - 1]
-                .type;
+          if (item.lastMessage && item.lastMessage.contentId) {
+            const contentType = item.lastMessage.contentId.type;
             detailContent =
               contentType === "Image"
                 ? "Sent a photo"

@@ -9,11 +9,16 @@ import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
 import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { getPusherClient } from "@/lib/pusher";
+import { PusherDelete } from "@/lib/delete";
+import { PusherRevoke } from "@/lib/revoke";
+import { admin } from "@/constants/object";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
+  const [adminId, setAdminId] = useState("");
+
   const {
     dataChat,
     setDataChat,
@@ -39,91 +44,111 @@ export default function Page() {
     fetchData();
   }, []);
 
+  const handleChatEvent = async (
+    event: "new-message" | "delete-message" | "revoke-message",
+    message: ResponseMessageDTO | PusherDelete | PusherRevoke,
+    boxId: string
+  ) => {
+    let content = "";
+    let senderName = "";
+    let createAt = "";
+
+    if (message) {
+      // Cập nhật trạng thái đọc tin nhắn
+      if (isCurrentPageBoxId(boxId)) {
+        const readMess = await markMessageAsRead(boxId);
+        setReadStatusByBox((prevState) => ({
+          ...prevState,
+          [message.boxId]: readMess
+        }));
+      } else {
+        setReadStatusByBox((prevState) => ({
+          ...prevState,
+          [message.boxId]: false
+        }));
+      }
+
+      // Xác định tên người gửi
+      if (adminId) {
+        if (message.createBy === adminId) {
+          senderName = "You:";
+        }
+        if (detailByBox && detailByBox[boxId]) {
+          const receiverInfo = detailByBox[boxId].receiverIds;
+          if (receiverInfo.length > 0) {
+            receiverInfo.forEach((item) => {
+              if (item.id === message.createBy) {
+                senderName = item.firstName + " " + item.lastName;
+              }
+            });
+          }
+        }
+      }
+
+      // Lấy nội dung tin nhắn
+      if (event === "new-message" && "contentId" in message && !message.text) {
+        const fileContent = message.contentId;
+        content =
+          fileContent.type === "Image"
+            ? "Sent a photo"
+            : fileContent.type === "Video"
+            ? "Sent a video"
+            : fileContent.type === "Audio"
+            ? "Sent an audio"
+            : fileContent.type === "Other"
+            ? "Sent a file"
+            : "";
+      } else {
+        if (event === "revoke-message") {
+          content = "Revoked message.";
+        }
+      }
+
+      // Định dạng thời gian
+      const now = new Date();
+      const sendDate = new Date(message.createAt.toString());
+      const timeDifference = now.getTime() - sendDate.getTime();
+      createAt =
+        timeDifference < 60000
+          ? "1min"
+          : formatTimeMessageBox(message.createAt.toString());
+    }
+
+    // Cập nhật tin nhắn cuối cùng
+    const lastMessage: LatestMessage = {
+      senderName,
+      content,
+      createAt,
+      boxId: message.boxId
+    };
+
+    setLatestMessages((prevMessages) => ({
+      ...prevMessages,
+      [message.boxId]: lastMessage
+    }));
+  };
+
   //LastMessage + UpdatedTime + ReadStatus
-  const adminId = localStorage.getItem("adminId");
   useEffect(() => {
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      setAdminId(adminId);
+    }
     if (dataChat.length > 0) {
       const channels = dataChat.map((box) => {
         const pusherClient = getPusherClient();
         const channel = pusherClient.subscribe(`private-${box.id}`);
 
         channel.bind("new-message", async (newMessage: ResponseMessageDTO) => {
-          console.log(`New message for box ${box.id}:`, newMessage);
-          let content: string = "";
-          let senderName: string = "";
-          let createAt: string = "";
-          if (newMessage) {
-            if (adminId) {
-              if (isCurrentPageBoxId(box.id)) {
-                const readMess = await markMessageAsRead(box.id);
-                setReadStatusByBox((prevState) => ({
-                  ...prevState,
-                  [newMessage.boxId]: readMess
-                }));
-              } else {
-                setReadStatusByBox((prevState) => ({
-                  ...prevState,
-                  [newMessage.boxId]: false
-                }));
-              }
-              if (newMessage.createBy === adminId) {
-                senderName = "You:";
-              }
-              if (detailByBox && detailByBox[box.id]) {
-                const receiverInfo = detailByBox[box.id].receiverIds;
-                if (receiverInfo.length > 0) {
-                  receiverInfo.forEach((item) => {
-                    if (item.id === newMessage.createBy) {
-                      senderName = item.firstName + " " + item.lastName;
-                    }
-                  });
-                }
-              }
-            }
+          await handleChatEvent("new-message", newMessage, box.id);
+        });
 
-            if (
-              newMessage.contentId.length > 0 &&
-              newMessage.text.length === 0
-            ) {
-              let detailContent: string = "";
-              const fileContent =
-                newMessage.contentId[newMessage.contentId.length - 1];
-              detailContent =
-                fileContent.type === "Image"
-                  ? "Sent a photo"
-                  : fileContent.type === "Video"
-                  ? "Sent a video"
-                  : fileContent.type === "Audio"
-                  ? "Sent an audio"
-                  : fileContent.type === "Other"
-                  ? "Sent a file"
-                  : "";
-              content = detailContent;
-            } else {
-              content = newMessage.text[newMessage.text.length - 1];
-            }
+        channel.bind("delete-message", async (deleteMessage: PusherDelete) => {
+          await handleChatEvent("delete-message", deleteMessage, box.id);
+        });
 
-            const now = new Date();
-            const sendDate = new Date(newMessage.createAt);
-            const timeDifference = now.getTime() - sendDate.getTime();
-            if (timeDifference < 60000) {
-              createAt = "1min";
-            } else {
-              createAt = newMessage.createAt; // Lưu thời gian gốc nếu khác 1 phút
-            }
-          }
-
-          const lastMessage: LatestMessage = {
-            senderName: senderName,
-            content: content,
-            createAt: createAt, // Lưu thời gian gốc ở dạng ISO
-            boxId: newMessage.boxId
-          };
-
-          setLatestMessages((prevMessages) => ({
-            ...prevMessages,
-            [newMessage.boxId]: lastMessage
-          }));
+        channel.bind("revoke-message", async (revokeMessage: PusherRevoke) => {
+          await handleChatEvent("revoke-message", revokeMessage, box.id);
         });
 
         return channel;

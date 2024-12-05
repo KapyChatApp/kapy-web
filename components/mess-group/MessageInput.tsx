@@ -3,6 +3,7 @@ import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 interface MessageInputProps {
   onMessageChange: (value: string) => void;
   messageContent: string;
@@ -21,19 +22,24 @@ const MessageInput = ({
     onMessageChange(newMessage); // Cập nhật giá trị khi thêm emoji
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setMessageContent(newValue);
     onMessageChange(newValue); // Gọi callback với giá trị mới
   };
-
+  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.target.style.height = "36px"; // Đặt lại chiều cao ban đầu
+    const newHeight = e.target.scrollHeight;
+    e.target.style.height = `${Math.min(newHeight, 160)}px`; // Giới hạn chiều cao tối đa
+  };
   return (
     <div className="flex justify-start w-full">
       <div className="relative w-full">
-        <Input
-          className="text-dark100_light900 background-light800_dark500 file:background-light800_dark500 file:text-[14px] file:text-wrap file:text-start file:text-dark100_light900 file:font-[320] placeholder:text-start placeholder:text-[14px] placeholder:text-dark100_light900 placeholder:font-[320] h-[36px] rounded-[20px] border-none md:text-[14px] text-[12px] font-[320] px-[16px] py-[9px] "
+        <Textarea
+          className="text-dark100_light900 background-light800_dark500 file:background-light800_dark500 file:text-[14px] file:text-wrap file:text-start file:text-dark100_light900 file:font-[320] placeholder:text-start placeholder:text-[14px] placeholder:text-dark100_light900 placeholder:font-[320] min-h-[36px] h-[36px] rounded-[20px] border-none md:text-[14px] text-[12px] font-[320] px-[16px] py-[9px] pr-[40px]  overflow-scroll scrollable"
           value={messageContent}
           onChange={handleChange}
+          onInput={handleInput}
           placeholder="Aa"
         />
         <button

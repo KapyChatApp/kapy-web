@@ -19,7 +19,7 @@ const MediaSegment: React.FC<SegmentMessage> = ({
   const isActive = createBy !== adminId;
 
   //Render Content
-  const lastContent = contentId[contentId.length - 1];
+  const lastContent = contentId;
   const audioContent = lastContent as FileContent;
 
   //Rounded content

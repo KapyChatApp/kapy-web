@@ -16,7 +16,7 @@ const TextSegment: React.FC<SegmentMessage> = ({ segments, index, length }) => {
 
   //Render Content
   let renderedContent;
-  const textContent = text[text.length - 1];
+  const textContent = text;
 
   //Rounded content
   const getContainerClasses = () => {
@@ -46,34 +46,22 @@ const TextSegment: React.FC<SegmentMessage> = ({ segments, index, length }) => {
     }
   };
 
-  if (text.length > 0 && contentId.length === 0) {
+  if (text !== "" && !contentId) {
     renderedContent = textContent;
   }
-
-  const messageTime = new Date(createAt).toLocaleTimeString();
 
   return (
     <div
       className={`flex flex-row items-center justify-start w-fit gap-2 h-full  relative`}
-      onMouseEnter={() => setIsHovered(true)} // Khi hover vào
-      onMouseLeave={() => setIsHovered(false)} // Khi rời khỏi
     >
-      {/* Hiển thị thời gian khi hover */}
-      {isHovered && (
-        <div
-          className={`absolute ${
-            isActive ? "right-[-74px]" : "left-[-76px]"
-          }  w-fit center bg-dark-700 text-dark100_light900 text-[12px] opacity-80 p-1 rounded-md `}
-        >
-          {messageTime}
-        </div>
-      )}
       <div
         className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
       >
         <p
           className={`${
             isActive ? "text-dark100_light900" : "text-light-900"
+          } ${
+            segments.flag === false ? "text-opacity-70" : ""
           } flex-wrap md:text-[14px] text-[13px] font-[320px]`}
         >
           {textContent}

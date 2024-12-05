@@ -5,7 +5,6 @@ import LocalSearch from "../../shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useToast } from "@/hooks/use-toast";
 import { user } from "@/constants/object";
-import { ActiveComponentProps } from "@/types/mess-group";
 import { Input } from "../../ui/input";
 
 interface CreateGroupProps {
