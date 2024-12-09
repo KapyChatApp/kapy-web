@@ -1,17 +1,22 @@
 import { Button } from "@/components/ui/button";
+import { FileSegment } from "@/components/ui/file-segment";
+import { FileContent } from "@/lib/dataMessages";
 import { Files } from "@/types/media";
 import { SeeAllProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const SeeAllFile: React.FC<SeeAllProps> = ({
   setActiveComponent,
   setItemSent,
   itemSent
 }) => {
-  const fileList = itemSent as Files[];
+  const [fileList, setFileList] = useState<FileContent[]>([]);
+  useEffect(() => {
+    setFileList(itemSent as FileContent[]);
+  }, [itemSent]);
   const handleBack = () => {
     setActiveComponent("");
   };
@@ -40,38 +45,14 @@ const SeeAllFile: React.FC<SeeAllProps> = ({
       </div>
       <div className="flex flex-col items-start w-full gap-5 px-2">
         {fileList.length > 0
-          ? fileList.slice(0, 3).map((item) => {
-              let icon = item.icon;
-              let iconWord = "vscode-icons:file-type-word2";
-              let iconExcel = "vscode-icons:file-type-excel2";
-              let iconPpoint = "vscode-icons:file-type-powerpoint2";
-              let iconPdf = "vscode-icons:file-type-pdf2";
-              switch (item.type) {
-                case "word":
-                  icon = iconWord;
-                  break;
-                case "excel":
-                  icon = iconExcel;
-                  break;
-                case "powerpoint":
-                  icon = iconPpoint;
-                  break;
-                case "pdf":
-                  icon = iconPdf;
-                  break;
-                default:
-                  icon = "flat-color-icons:file";
-              }
+          ? fileList.map((item) => {
               return (
-                <div className="flex flex-row relative gap-[12px] items-center justify-start">
-                  <Icon icon={icon} width={30} height={30} className="" />
-                  <Link
-                    href={item.path}
-                    className="flex flex-grow items-center justify-start text-dark100_light900 paragraph-regular "
-                  >
-                    {item.fileName}
-                  </Link>
-                </div>
+                <FileSegment
+                  fileName={item.fileName}
+                  url={item.url}
+                  textClassName="text-dark100_light900"
+                  iconClassName="text-dark100_light900"
+                />
               );
             })
           : null}

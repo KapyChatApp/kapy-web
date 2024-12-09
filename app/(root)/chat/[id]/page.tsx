@@ -12,7 +12,7 @@ import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 import { getPusherClient } from "@/lib/pusher";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { isCurrentPageBoxId } from "@/lib/utils";
-import { getImageList } from "@/lib/dataImageList";
+import { getFileList } from "@/lib/dataFileList";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -36,7 +36,7 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, setMessagesByBox, setReadStatusByBox, setImageList } =
+  const { dataChat, setMessagesByBox, setReadStatusByBox, setFileList } =
     useChatContext();
 
   //Fetch messages
@@ -48,7 +48,6 @@ const page = () => {
         const boxMessages = await fetchMessages(box.id);
         messagesMap[box.id] = boxMessages;
       }
-
       setMessagesByBox(messagesMap);
     };
 
@@ -58,16 +57,17 @@ const page = () => {
   //Fetch image
   useEffect(() => {
     const fetchImageList = async () => {
+      const imageMap: Record<string, FileContent[]> = {};
       for (const box of dataChat) {
         if (isCurrentPageBoxId(box.id)) {
-          const list: FileContent[] = await getImageList(box.id);
-          setImageList(list);
+          const list: FileContent[] = await getFileList(box.id);
+          imageMap[box.id] = list;
         }
       }
+      setFileList(imageMap);
     };
-
     fetchImageList();
-  }, []);
+  }, [dataChat]);
 
   //Subcribe channel in pusher
   useEffect(() => {

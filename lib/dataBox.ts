@@ -11,6 +11,7 @@ export interface UserInfoBox {
   nickName: string;
   avatar: string;
   phone: string;
+  isOnline: boolean;
 }
 export interface MessageBoxInfo {
   id: string;
@@ -92,7 +93,8 @@ export const fetchMessageBox = async (
           lastName: mem.lastName,
           phone: mem.phoneNumber,
           avatar: mem.avatar,
-          nickName: mem.nickName
+          nickName: mem.nickName,
+          isOnline: false
         }));
 
         const receiver = item.receiverIds.find(
@@ -106,7 +108,8 @@ export const fetchMessageBox = async (
             lastName: receiver.lastName,
             phone: receiver.phoneNumber,
             avatar: receiver.avatar,
-            nickName: receiver.nickName
+            nickName: receiver.nickName,
+            isOnline: false
           };
         } else {
           receiverInfo = {
@@ -115,7 +118,8 @@ export const fetchMessageBox = async (
             lastName: "",
             phone: "",
             avatar: "/assets/ava/default.png",
-            nickName: ""
+            nickName: "",
+            isOnline: false
           };
         }
         return {

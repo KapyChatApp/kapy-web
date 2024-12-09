@@ -4,8 +4,8 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActionButton from "./ActionButton";
 import { usePathname } from "next/navigation";
-import { MoreTopProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { MoreTopProps } from "@/types/mess-group";
 
 interface Top {
   top: MoreTopProps;

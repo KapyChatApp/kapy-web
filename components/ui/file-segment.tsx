@@ -1,38 +1,26 @@
 import { Icon } from "@iconify/react";
-import { cn } from "@/lib/utils";
+import { cn, getDefaultIcon } from "@/lib/utils";
 import Link from "next/link";
 import { useRef } from "react";
 
 export interface FileSegmentProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   fileName: string; // Tên file hiển thị
-  url: string; // Đường dẫn để tải file
+  url: string;
+  iconClassName?: string; // Class cho Icon
+  textClassName?: string;
 }
 
 const FileSegment: React.FC<FileSegmentProps> = ({
   fileName,
   url,
   className,
+  iconClassName,
+  textClassName,
   ...props
 }) => {
   // Xử lý icon mặc định theo type nếu không truyền iconName
   const type = fileName.split(".").pop()?.toLowerCase() || "";
-  const getDefaultIcon = (type: string) => {
-    switch (type) {
-      case "docx":
-        return "mdi:file-word";
-      case "doc":
-        return "mdi:file-word";
-      case "pptx":
-        return "mdi:file-powerpoint";
-      case "xlsx":
-        return "mdi:file-excel";
-      case "pdf":
-        return "bxs:file-pdf";
-      default:
-        return "basil:document-solid"; // Icon mặc định
-    }
-  };
 
   const icon = getDefaultIcon(type);
 
@@ -62,12 +50,18 @@ const FileSegment: React.FC<FileSegmentProps> = ({
         icon={icon}
         width={24}
         height={24}
-        className="text-dark300_light800 md:w-6 md:h-6 w-5 h-5"
+        className={cn(
+          "text-dark300_light800 md:w-6 md:h-6 w-5 h-5",
+          iconClassName
+        )}
       />
       {/* Hiển thị tên file */}
       <div
         onClick={handleDownload}
-        className="text-dark300_light800 flex-wrap md:text-[14px] text-[12px] font-semibold cursor-pointer text-decoration-none hover:text-decoration-none hover:no-underline"
+        className={cn(
+          "text-dark300_light800 flex-wrap md:text-[14px] text-[12px] font-semibold cursor-pointer text-decoration-none hover:text-decoration-none hover:no-underline",
+          textClassName
+        )}
       >
         {fileName}
       </div>

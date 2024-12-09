@@ -16,7 +16,6 @@ import MessageRecorder from "../MessageRecorder";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
-  senderInfo: UserInfoBox | undefined;
 }
 const tempSenderInfo = {
   id: "",
@@ -25,8 +24,8 @@ const tempSenderInfo = {
   nickName: "defaultNick",
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
-const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
-  const { setMessagesByBox } = useChatContext();
+const RightBottom = ({ recipientIds }: BottomProps) => {
+  const { setMessagesByBox, setFileList, fileList } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -300,6 +299,21 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
+      if (data.contentId) {
+        setFileList((prev) => {
+          const fileContent = prev[data.boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
+            const updated = {
+              ...prev,
+              [data.boxId]: [...fileContent, data.contentId]
+            };
+            console.log("Updated fileList: ", updated);
+            return updated;
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
+      }
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
@@ -312,7 +326,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     //   pusherClient.unsubscribe(`private-${boxId}`);
     //   pusherClient.unbind("new-message", handleNewMessage);
     // };
-  }, [boxId, setMessagesByBox]);
+  }, [boxId, setMessagesByBox, setFileList]);
 
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;

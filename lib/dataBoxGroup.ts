@@ -43,7 +43,8 @@ export const fetchMessageBoxGroup = async (
           lastName: mem.lastName,
           phone: mem.phoneNumber,
           avatar: mem.avatar,
-          nickName: mem.nickName
+          nickName: mem.nickName,
+          isOnline: false
         }));
         return {
           id: item._id,

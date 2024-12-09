@@ -20,7 +20,7 @@ const ImageSegment: React.FC<SegmentMessage> = ({
   const adminId = localStorage.getItem("adminId");
   const isActive = createBy !== adminId;
 
-  //Show image in Chat
+  //Show image in More
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
     Fancybox.bind("[data-fancybox='gallery']", {

@@ -5,35 +5,93 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SeeAllProps } from "@/types/mess-group";
+import { useChatContext } from "@/context/ChatContext";
+import { FileContent } from "@/lib/dataMessages";
+import { Fancybox } from "@fancyapps/ui";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import ReactPlayer from "react-player";
+import { FileSegment } from "@/components/ui/file-segment";
+import { UserInfoBox } from "@/lib/dataBox";
 
-const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
+const MoreMiddle = ({
+  setActiveComponent,
+  setItemSent,
+  detailByBox
+}: SeeAllProps) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const idFromPathname = pathname.split("/").pop();
-  const groupInfo = group.filter((info) => info.id === idFromPathname);
+  const [boxId, setBoxId] = useState<string>("");
+  const { fileList } = useChatContext();
+  const [images, setImages] = useState<FileContent[]>([]);
+  const [videos, setVideos] = useState<FileContent[]>([]);
+  const [others, setOthers] = useState<FileContent[]>([]);
+  const [members, setMembers] = useState<UserInfoBox[]>([]);
+  //boxId
+  useEffect(() => {
+    // Lấy đường dẫn hiện tại từ URL
+    const path = window.location.pathname;
+    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
+    const parts = path.split("/");
+    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
+
+    if (id) {
+      setBoxId(id); // Set boxId là chuỗi
+    }
+  }, [boxId]);
+
+  useEffect(() => {
+    if (boxId !== "" && fileList[boxId]) {
+      const imageList = fileList[boxId].filter((item) => item.type === "Image");
+      const videoList = fileList[boxId].filter((item) => item.type === "Video");
+      const otherList = fileList[boxId].filter((item) => item.type === "Other");
+      if (imageList) setImages(imageList);
+      if (videoList) setVideos(videoList);
+      if (otherList) setOthers(otherList);
+    }
+  }, [boxId, fileList[boxId]]);
+
+  //Show image in more
+  useEffect(() => {
+    // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
+    Fancybox.bind("[data-fancybox='more-image']", {
+      Toolbar: true,
+      Thumbs: true
+    });
+    return () => {
+      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+    };
+  }, []);
+
+  //Show video in more
+  useEffect(() => {
+    // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
+    Fancybox.bind("[data-fancybox='more-video']", {
+      Toolbar: true,
+      Thumbs: true
+    });
+    return () => {
+      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+    };
+  }, []);
 
   const handleSeeAllMember = () => {
     setActiveComponent("member");
-    setItemSent(groupInfo[0]?.members);
+    setItemSent(detailByBox.memberInfo);
   };
   const handleSeeAllPhoto = () => {
     setActiveComponent("photo");
-    setItemSent(photo);
+    setItemSent(images);
   };
   const handleSeeAllVideo = () => {
     setActiveComponent("video");
-    setItemSent(video);
+    setItemSent(videos);
   };
   const handleSeeAllFile = () => {
     setActiveComponent("file");
-    setItemSent(file);
-  };
-  const handleSeeAllLink = () => {
-    setActiveComponent("link");
-    setItemSent(link);
+    setItemSent(others);
   };
 
   return (
@@ -46,7 +104,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               <div className="flex flex-row w-fit items-end">
                 <p className="text-dark100_light900 paragraph-bold">Members</p>
                 <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                  {groupInfo[0]?.members.length}
+                  {detailByBox.memberInfo.length}
                 </p>
               </div>
               <div className="flex flex-grow items-center justify-end">
@@ -59,34 +117,31 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </div>
             </div>
             <div className="flex flex-col items-center w-full gap-[8px]">
-              {groupInfo[0]?.members.length > 0
+              {detailByBox.memberInfo.length > 0
                 ? // Sắp xếp members để leader đứng đầu
-                  groupInfo[0]?.members
-                    .sort((a, b) => (a.addedBy === "" ? -1 : 1)) // Sắp xếp người lãnh đạo lên đầu
-                    .slice(0, 3) // Lấy tối đa 3 người
-                    .map((item) => (
-                      <div
-                        className="flex flex-row items-center justify-start w-full gap-[12px]"
-                        key={item.id}
-                      >
-                        <div className="relative flex-shrink-0 w-fit">
-                          <Image
-                            src={item.ava}
-                            alt="ava"
-                            width={36}
-                            height={36}
-                            className="rounded-full"
-                          />
-                          {item.isOnline && (
-                            <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-                          )}
-                        </div>
+                  detailByBox.memberInfo.slice(0, 3).map((item) => (
+                    <div
+                      className="flex flex-row items-center justify-start w-full gap-[12px]"
+                      key={item.id}
+                    >
+                      <div className="relative flex-shrink-0 w-fit">
+                        <Image
+                          src={item.avatar}
+                          alt="ava"
+                          width={36}
+                          height={36}
+                          className="rounded-full"
+                        />
+                        {item.isOnline && (
+                          <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
+                        )}
+                      </div>
 
-                        <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
-                          <p className="paragraph-15-regular h-fit text-dark100_light900">
-                            {item.username}
-                          </p>
-                          <div className="flex items-center justify-start w-full min-w-0">
+                      <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
+                        <p className="paragraph-15-regular h-fit text-dark100_light900">
+                          {item.firstName + " " + item.lastName}
+                        </p>
+                        {/* <div className="flex items-center justify-start w-full min-w-0">
                             {item.addedBy === "" ? (
                               <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
                                 Leader
@@ -101,10 +156,10 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
                                 </p>
                               </div>
                             )}
-                          </div>
-                        </div>
+                          </div> */}
                       </div>
-                    ))
+                    </div>
+                  ))
                 : null}
             </div>
           </div>
@@ -116,7 +171,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
             <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Photo</p>
               <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                {photo.length}
+                {images.length}
               </p>
             </div>
             <div className="flex flex-grow items-center justify-end">
@@ -128,17 +183,23 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </Button>
             </div>
           </div>
-          <div className="flex flex-row items-center w-full md:justify-between justify-around">
-            {photo.length > 0
-              ? photo.slice(0, 3).map((item) => (
+          <div className="flex flex-row items-center w-full md:justify-start md:gap-6 justify-around">
+            {images.length > 0
+              ? images.slice(0, 3).map((item) => (
                   <div className="flex md:w-[26%] sm:w-[36%] w-[30%] relative">
-                    <Image
-                      src={item.path}
-                      alt={item.fileName}
-                      width={100}
-                      height={100}
-                      className="rounded-[4px] cursor-pointer"
-                    />
+                    <a
+                      href={item.url} // Thêm liên kết tới ảnh lớn
+                      data-fancybox="more-image" // Kích hoạt Fancybox cho nhóm hình ảnh
+                      className={` max-w-full h-auto cursor-pointer`}
+                    >
+                      <Image
+                        src={item.url}
+                        alt={item.fileName}
+                        width={100}
+                        height={100}
+                        className="rounded-[4px] cursor-pointer"
+                      />
+                    </a>
                   </div>
                 ))
               : null}
@@ -151,7 +212,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
             <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Video</p>
               <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                {video.length}
+                {videos.length}
               </p>
             </div>
             <div className="flex flex-grow items-center justify-end">
@@ -163,18 +224,24 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
               </Button>
             </div>
           </div>
-          <div className="flex flex-row items-center w-full md:justify-between justify-around">
-            {video.length > 0
-              ? video.slice(0, 3).map((item) => (
-                  <div className="flex md:w-[26%] sm:w-[36%] w-[30%] relative">
-                    <Image
-                      src={item.path}
-                      alt={item.fileName}
-                      width={100}
-                      height={100}
-                      className="rounded-[4px] cursor-pointer"
-                    />
-                  </div>
+          <div className="flex flex-row items-center w-full md:justify-start md:gap-6 justify-around">
+            {videos.length > 0
+              ? videos.slice(0, 3).map((item) => (
+                  <a
+                    href={item.url}
+                    data-fancybox="more-video"
+                    className={` flex md:w-[30%] sm:w-[36%] w-[34%] relative cursor-pointer`}
+                  >
+                    <div className="rounded-[4px] overflow-hidden">
+                      <ReactPlayer
+                        url={item.url}
+                        controls
+                        width="200px"
+                        height="100px"
+                        className="max-w-full h-auto"
+                      />
+                    </div>
+                  </a>
                 ))
               : null}
           </div>
@@ -186,7 +253,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
             <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">File</p>
               <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                {file.length}
+                {others.length}
               </p>
             </div>
             <div className="flex flex-grow items-center justify-end">
@@ -199,92 +266,15 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: SeeAllProps) => {
             </div>
           </div>
           <div className="flex flex-col justify-start w-full gap-[12px]">
-            {file.length > 0
-              ? file.slice(0, 3).map((item) => {
-                  let icon = item.icon;
-                  let iconWord = "vscode-icons:file-type-word2";
-                  let iconExcel = "vscode-icons:file-type-excel2";
-                  let iconPpoint = "vscode-icons:file-type-powerpoint2";
-                  let iconPdf = "vscode-icons:file-type-pdf2";
-                  switch (item.type) {
-                    case "word":
-                      icon = iconWord;
-                      break;
-                    case "excel":
-                      icon = iconExcel;
-                      break;
-                    case "powerpoint":
-                      icon = iconPpoint;
-                      break;
-                    case "pdf":
-                      icon = iconPdf;
-                      break;
-                    default:
-                      icon = "flat-color-icons:file";
-                  }
+            {others.length > 0
+              ? others.slice(0, 3).map((item) => {
                   return (
-                    <div className="flex flex-row relative gap-[12px] items-center justify-start">
-                      <Icon icon={icon} width={20} height={20} className="" />
-                      <Link
-                        href={item.path}
-                        className="flex flex-grow items-center justify-start text-dark100_light900 paragraph-regular "
-                      >
-                        {item.fileName}
-                      </Link>
-                    </div>
-                  );
-                })
-              : null}
-          </div>
-        </div>
-
-        {/* Link */}
-        <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
-          <div className="flex flex-row items-center justify-start w-full">
-            <div className="flex flex-row w-fit items-end">
-              <p className="text-dark100_light900 paragraph-bold">Link</p>
-              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                {link.length}
-              </p>
-            </div>
-            <div className="flex flex-grow items-center justify-end">
-              <Button
-                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
-                onClick={handleSeeAllLink}
-              >
-                See all
-              </Button>
-            </div>
-          </div>
-          <div className="flex flex-col justify-start w-full gap-[12px]">
-            {link.length > 0
-              ? link.slice(0, 3).map((item) => {
-                  let icon = item.icon;
-                  let iconDrive = "logos:google-drive";
-                  switch (item.type) {
-                    case "drive":
-                      icon = iconDrive;
-                      break;
-                    default:
-                      icon = "ph:link-bold";
-                  }
-                  return (
-                    <div className="flex flex-row relative gap-[12px] items-center justify-start">
-                      <Icon
-                        icon={icon}
-                        width={20}
-                        height={20}
-                        className={`${
-                          item.type === " " ? "text-primary-500" : ""
-                        }`}
-                      />
-                      <Link
-                        href={item.path}
-                        className="flex flex-grow items-center justify-start text-dark100_light900 paragraph-regular "
-                      >
-                        {item.linkName}
-                      </Link>
-                    </div>
+                    <FileSegment
+                      fileName={item.fileName}
+                      url={item.url}
+                      textClassName="text-dark100_light900"
+                      iconClassName="text-dark100_light900"
+                    />
                   );
                 })
               : null}

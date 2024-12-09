@@ -28,7 +28,8 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
   const [isConfirm, setConfirm] = useState(false);
   const [action, setAction] = useState("");
   const { toast } = useToast();
-  const { setMessagesByBox } = useChatContext();
+  const { setMessagesByBox, messagesByBox, setFileList, fileList } =
+    useChatContext();
 
   const handleItemClick = () => {
     setClickMore(false);
@@ -50,6 +51,7 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           className:
             "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
         });
+        setConfirm(false);
       } else {
         toast({
           title: "Message can't deleted!",
@@ -74,6 +76,7 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           className:
             "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
         });
+        setConfirm(false);
       } else {
         toast({
           title: "Message can't revoke!",
@@ -92,6 +95,22 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       const adminId = localStorage.getItem("adminId");
       console.log("Successfully delete message: ", data);
       if (adminId && data.createBy === adminId) {
+        const fileDelete = messagesByBox[data.boxId].find(
+          (item) => item.id === data.id
+        );
+
+        if (fileDelete && fileDelete.contentId) {
+          console.log("Updated fileList: ", fileDelete);
+          setFileList((prev) => {
+            const fileContent = prev[data.boxId] || [];
+            return {
+              ...prev,
+              [data.boxId]: fileContent.filter(
+                (msg) => msg.url !== fileDelete.contentId.url
+              )
+            };
+          });
+        }
         setMessagesByBox((prev) => {
           const currentMessages = prev[data.boxId] || [];
 
@@ -110,7 +129,27 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       }
     };
     const handleRevokeMessage = (data: PusherRevoke) => {
-      console.log("Successfully reovoke message: ", data);
+      const fileRevoke = messagesByBox[data.boxId].find(
+        (item) => item.id === data.id
+      );
+      if (fileRevoke && fileRevoke.contentId) {
+        setFileList((prev) => {
+          const fileContent = prev[data.boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (
+            !fileContent.some((msg) => msg.url === fileRevoke.contentId.url)
+          ) {
+            return {
+              ...prev,
+              [data.boxId]: fileContent.filter(
+                (msg) => msg.url !== fileRevoke.contentId.url
+              )
+            };
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
+        console.log(fileList);
+      }
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];
 
@@ -147,7 +186,8 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
     //   pusherClient.unsubscribe(`private-${boxId}`);
     //   pusherClient.unbind("new-message", handleNewMessage);
     // };
-  }, [boxId, setMessagesByBox]);
+  }, [boxId, setMessagesByBox, setFileList, messagesByBox, fileList]);
+
   return (
     <>
       <div className="flex flex-row gap-2 items-center justify-start w-fit h-full group">
