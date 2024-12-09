@@ -36,14 +36,8 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const {
-    dataChat,
-    setMessagesByBox,
-    setDetailByBox,
-    setReadStatusByBox,
-    setImageList,
-    imageList
-  } = useChatContext();
+  const { dataChat, setMessagesByBox, setReadStatusByBox, setImageList } =
+    useChatContext();
 
   //Fetch messages
   useEffect(() => {
@@ -84,7 +78,6 @@ const page = () => {
   }, [dataChat]);
 
   //Fetch Detail Box Chat from Backend
-  const detailBoxMap: Record<string, DetailBox> = {};
   const readStatusMap: Record<string, boolean> = {};
   useEffect(() => {
     const fetchDataForBoxes = async () => {
@@ -94,32 +87,22 @@ const page = () => {
       }
 
       for (const box of dataChat) {
-        const detail = await fetchDetailBox(box.id);
-
-        if (detail) {
-          detailBoxMap[box.id] = detail;
+        if (box) {
           if (isCurrentPageBoxId(box.id)) {
             const readMess = await markMessageAsRead(box.id);
             readStatusMap[box.id] = readMess;
           } else {
-            readStatusMap[box.id] = detail.readStatus;
+            readStatusMap[box.id] = box.readStatus;
           }
         } else {
-          console.log(`No detail for box: ${box.id}`);
+          console.log(`No detail for box: ${box}`);
         }
       }
-
-      // Only set if there is data
-      if (Object.keys(detailBoxMap).length > 0) {
-        setDetailByBox(detailBoxMap);
-        setReadStatusByBox(readStatusMap);
-      } else {
-        console.log("No details to set in detailBox");
-      }
+      setReadStatusByBox(readStatusMap);
     };
 
     fetchDataForBoxes();
-  }, [dataChat, setDetailByBox, setReadStatusByBox]);
+  }, [dataChat, setReadStatusByBox]);
 
   return (
     <section className="py-[16px] pr-[16px] w-full flex h-full">

@@ -1,7 +1,9 @@
 "use client";
 import { useChatContext } from "@/context/ChatContext";
-import { MessageBoxContent } from "@/lib/dataBox";
+import { useUserContext } from "@/context/UserContext";
+import { MessageBoxInfo } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { contentBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import Image from "next/image";
@@ -10,27 +12,45 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Box {
-  box: MessageBoxContent;
+  box: MessageBoxInfo;
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
-  content: string;
-  senderName: string;
-  createAt: string;
 }
 
-const MessageBox: React.FC<Box> = ({
-  box,
-  setClickBox,
-  setClickOtherRight,
-  senderName,
-  content,
-  createAt
-}) => {
-  const { id, receiverInfo, pin, isOnline, readStatus } = box;
+const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
+  const { id, receiverInfo, pin, groupName, groupAva } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const { readStatusByBox } = useChatContext();
+  const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
+  const { adminId } = useUserContext();
+
+  const contentWithSendername = () => {
+    // Tính toán content cho box hiện tại
+    let message: ResponseMessageDTO[] = [];
+    let content: string = "";
+    let senderName: string = "";
+    let createAt: string = "";
+    if (messagesByBox && messagesByBox[id]) {
+      message = messagesByBox[id];
+    }
+    if (message.length > 0 && message[message.length - 1] && dataChat) {
+      const detailByBox = dataChat.find((box) => box.id === id);
+      const detail =
+        isGroup && detailByBox && detailByBox.receiverInfo
+          ? contentBox(
+              message[message.length - 1],
+              adminId,
+              detailByBox.memberInfo
+            )
+          : contentBox(message[message.length - 1], adminId);
+      content = detail.content;
+      senderName = detail.senderName;
+      createAt = detail.createAt;
+    }
+    return { content, senderName, createAt };
+  };
+  const { content, senderName, createAt } = contentWithSendername();
 
   const handleClickLink = () => {
     if (setClickBox) {
@@ -56,21 +76,23 @@ const MessageBox: React.FC<Box> = ({
           <div className="flex flex-row bg-transparent lg:gap-[12px] gap-2 min-w-0 items-center pr-1">
             <div className="relative flex-shrink-0 w-fit">
               <Image
-                src={receiverInfo.avatar}
+                src={isGroup ? groupAva : receiverInfo.avatar}
                 alt="ava"
                 width={48}
                 height={48}
                 className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
-              {isOnline && (
+              {/*{isOnline && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-              )}
+              )}*/}
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
               <div className="flex items-center justify-start w-full min-w-0">
                 <p className="lg:paragraph-15-regular body-regular text-dark100_light900 overflow-hidden text-ellipsis whitespace-nowrap">
-                  {receiverInfo.name}
+                  {isGroup
+                    ? groupName
+                    : receiverInfo.firstName + " " + receiverInfo.lastName}
                 </p>
               </div>
               <div className="flex items-center justify-start w-full min-w-0">

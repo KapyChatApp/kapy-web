@@ -8,6 +8,7 @@ import { UserInfoBox } from "@/lib/dataBox";
 
 import { Icon } from "@iconify/react/dist/iconify.js";
 import MenubarSegment from "@/components/mess-group/RightMessage/Segment/menubar-segment";
+import { useUserContext } from "@/context/UserContext";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
@@ -20,8 +21,7 @@ const RightMiddle = ({
   filteredSegmentOther,
   receiverInfo
 }: RightMiddleProps) => {
-  const [adminId, setAdminId] = useState<string>();
-
+  const { adminId } = useUserContext();
   const combinedSegments = [
     ...filteredSegmentAdmin,
     ...filteredSegmentOther
@@ -66,10 +66,6 @@ const RightMiddle = ({
   });
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
     // Cuộn đến đáy khi component được render
     if (messageContainerRef.current) {
       messageContainerRef.current.scrollTop =

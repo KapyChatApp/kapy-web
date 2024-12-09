@@ -8,11 +8,13 @@ interface MessageInputProps {
   onMessageChange: (value: string) => void;
   messageContent: string;
   setMessageContent: React.Dispatch<React.SetStateAction<string>>;
+  handleAction: () => Promise<void>;
 }
 const MessageInput = ({
   onMessageChange,
   setMessageContent,
-  messageContent
+  messageContent,
+  handleAction
 }: MessageInputProps) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
@@ -25,12 +27,18 @@ const MessageInput = ({
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setMessageContent(newValue);
-    onMessageChange(newValue); // Gọi callback với giá trị mới
+    onMessageChange(newValue);
   };
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "36px"; // Đặt lại chiều cao ban đầu
     const newHeight = e.target.scrollHeight;
     e.target.style.height = `${Math.min(newHeight, 160)}px`; // Giới hạn chiều cao tối đa
+  };
+  const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault(); // Ngăn xuống hàng
+      await handleAction(); // Gửi tin nhắn
+    }
   };
   return (
     <div className="flex justify-start w-full">
@@ -40,6 +48,7 @@ const MessageInput = ({
           value={messageContent}
           onChange={handleChange}
           onInput={handleInput}
+          onKeyDown={handleKeyDown}
           placeholder="Aa"
         />
         <button

@@ -4,7 +4,15 @@ import Image from "next/image";
 import React, { useEffect } from "react";
 import { Button } from "../../ui/button";
 import { usePathname } from "next/navigation";
-import { RightTopProps } from "@/types/mess-group";
+
+interface RightTopProps {
+  ava: string;
+  name: string;
+  membersGroup: string;
+  onlineGroup: number;
+  openMore: boolean;
+  setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 interface rightTop {
   top: RightTopProps;

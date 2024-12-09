@@ -7,8 +7,9 @@ import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { UserInfoBox } from "@/lib/dataBox";
+import { MessageBoxInfo, UserInfoBox } from "@/lib/dataBox";
 import { admin } from "@/constants/object";
+import { useUserContext } from "@/context/UserContext";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -31,54 +32,62 @@ const RightMessage = ({
 
   //FetchMessage Backend
   const [recipientId, setRecipientId] = useState<string[]>();
-  const [adminId, setAdminId] = useState<string>();
   const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[]>();
   const [senderInfo, setSenderInfo] = useState<UserInfoBox>();
-  const { detailByBox, setDetailByBox } = useChatContext();
+  const [boxId, setBoxId] = useState<string>("");
+  const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
+  const { dataChat } = useChatContext();
+  const { adminId } = useUserContext();
 
   //boxId
-  const boxId = pathname.split("/").pop();
+  useEffect(() => {
+    // Lấy đường dẫn hiện tại từ URL
+    const path = window.location.pathname;
+    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
+    const parts = path.split("/");
+    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
+
+    if (id) {
+      setBoxId(id); // Set boxId là chuỗi
+    }
+  }, [boxId]);
 
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
+    if (boxId !== "") {
+      const detail = dataChat.find((box) => box.id === boxId);
+      if (detail) {
+        setDetailByBox(detail);
+        setRecipientInfo(detail.memberInfo);
+        setRecipientId(detail.memberInfo.map((item: any) => item.id));
+      }
     }
-    if (boxId && detailByBox && detailByBox[boxId]) {
-      const detailDataBox = detailByBox[boxId];
-      setRecipientInfo(detailDataBox.receiverIds);
-      setSenderInfo(detailDataBox.senderId);
-      setRecipientId(detailDataBox.receiverIds.map((item: any) => item.id));
-    }
-  }, [detailByBox]);
+  }, [boxId, dataChat, setDetailByBox]);
 
   //RightTop
-  let recieverInfo: UserInfoBox[] = [];
-  if (recipientInfo) {
-    recieverInfo = recipientInfo.filter((item) => item.id !== adminId);
-  }
   let top: any;
-  if (boxId && detailByBox && detailByBox[boxId]) {
+  if (boxId && detailByBox) {
     top = isGroup
       ? {
-          ava: detailByBox[boxId].groupAva,
-          name: detailByBox[boxId].groupName,
-          membersGroup: detailByBox[boxId].receiverIds.length,
+          ava: detailByBox.groupAva,
+          name: detailByBox.groupName,
+          membersGroup: detailByBox.memberInfo.length,
           onlineGroup: 0,
           openMore: openMore,
           setOpenMore: setOpenMore
         }
       : {
           ava:
-            recieverInfo.length > 0 && recieverInfo[0].avatar !== ""
-              ? recieverInfo[0].avatar
+            detailByBox.receiverInfo && detailByBox.receiverInfo.avatar
+              ? detailByBox.receiverInfo.avatar
               : "/assets/ava/default.png",
 
           name:
-            recieverInfo.length > 0 &&
-            recieverInfo[0].firstName !== "" &&
-            recieverInfo[0].lastName !== ""
-              ? recieverInfo[0].firstName + " " + recieverInfo[0].lastName
+            detailByBox.receiverInfo &&
+            detailByBox.receiverInfo.firstName !== "" &&
+            detailByBox.receiverInfo.lastName !== ""
+              ? detailByBox.receiverInfo.firstName +
+                " " +
+                detailByBox.receiverInfo.lastName
               : "Unknown name",
 
           membersGroup: 0,
@@ -174,9 +183,7 @@ const RightMessage = ({
           <RightMiddle
             filteredSegmentAdmin={filteredSegmentAdmin}
             filteredSegmentOther={filteredSegmentOther}
-            receiverInfo={
-              isGroup ? (recipientInfo ? recipientInfo : []) : recieverInfo
-            }
+            receiverInfo={detailByBox ? detailByBox.memberInfo : []}
           />
 
           <RightBottom recipientIds={recipientId} senderInfo={senderInfo} />
