@@ -1,5 +1,5 @@
 "use client";
-import { MessageBoxContent } from "@/lib/dataBox";
+import { MessageBoxInfo } from "@/lib/dataBox";
 import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import { DetailBox } from "@/lib/dataOneBox";
 import { createContext, useContext, useState } from "react";
@@ -16,21 +16,13 @@ interface ChatContextType {
   setReadStatusByBox: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
   >;
-  dataChat: MessageBoxContent[];
-  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>;
+  dataChat: MessageBoxInfo[];
+  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>;
   imageList: FileContent[];
   setImageList: React.Dispatch<React.SetStateAction<FileContent[]>>;
-  latestMessages: Record<string, LatestMessage>;
-  setLatestMessages: React.Dispatch<
-    React.SetStateAction<Record<string, LatestMessage>>
-  >;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
-  >;
-  detailByBox: Record<string, DetailBox>;
-  setDetailByBox: React.Dispatch<
-    React.SetStateAction<Record<string, DetailBox>>
   >;
 }
 
@@ -41,18 +33,14 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
-  const [dataChat, setDataChat] = useState<MessageBoxContent[]>([]);
+  const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
   const [imageList, setImageList] = useState<FileContent[]>([]);
-  const [latestMessages, setLatestMessages] = useState<
-    Record<string, LatestMessage>
-  >({});
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
   >({});
   const [readStatusByBox, setReadStatusByBox] = useState<
     Record<string, boolean>
   >({});
-  const [detailByBox, setDetailByBox] = useState<Record<string, DetailBox>>({});
 
   return (
     <ChatContext.Provider
@@ -61,14 +49,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         setDataChat,
         imageList,
         setImageList,
-        latestMessages,
-        setLatestMessages,
         messagesByBox,
         setMessagesByBox,
         readStatusByBox,
-        setReadStatusByBox,
-        detailByBox,
-        setDetailByBox
+        setReadStatusByBox
       }}
     >
       {children}

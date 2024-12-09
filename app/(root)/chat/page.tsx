@@ -5,24 +5,23 @@ import { fetchMessageBox } from "@/lib/dataBox";
 import { LatestMessage, useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
+import {
+  contentBox,
+  formatTimeMessageBox,
+  isCurrentPageBoxId
+} from "@/lib/utils";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { PusherDelete } from "@/lib/delete";
 import { PusherRevoke } from "@/lib/revoke";
+import { useUserContext } from "@/context/UserContext";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const [adminId, setAdminId] = useState("");
+  const { setAdminId } = useUserContext();
 
-  const {
-    dataChat,
-    messagesByBox,
-    setDataChat,
-    setReadStatusByBox,
-    setLatestMessages
-  } = useChatContext();
+  const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
   // Fetch dataChat
   useEffect(() => {
@@ -39,15 +38,11 @@ export default function Page() {
 
     fetchData();
   }, [setDataChat]);
-  let content = "";
-  let senderName = "";
-  let createAt = "";
+
   const handleChatEvent = async (
-    event: "new-message" | "delete-message" | "revoke-message",
     message: ResponseMessageDTO | PusherRevoke | PusherDelete,
     boxId: string
   ) => {
-    const box = dataChat.find((chat) => chat.id === boxId);
     if (message) {
       // Cập nhật trạng thái đọc tin nhắn
       if (isCurrentPageBoxId(boxId)) {
@@ -62,62 +57,7 @@ export default function Page() {
           [message.boxId]: false
         }));
       }
-
-      // Xác định tên người gửi
-      if (adminId) {
-        senderName = message.createBy === adminId ? "You:" : "";
-      }
-
-      // Lấy nội dung tin nhắn
-      if (event === "new-message") {
-        if (!message.text && "contentId" in message) {
-          const fileContent = message.contentId;
-          content =
-            fileContent.type === "Image"
-              ? "Sent a photo"
-              : fileContent.type === "Video"
-              ? "Sent a video"
-              : fileContent.type === "Audio"
-              ? "Sent an audio"
-              : fileContent.type === "Other"
-              ? "Sent a file"
-              : "Unknown content type";
-        } else if (message.text) {
-          content = message.text; // Nội dung tin nhắn văn bản
-        } else {
-          content = "Unknown message content";
-        }
-      } else if (event === "delete-message") {
-        if (message.createBy === adminId) {
-          content = message.text;
-        } else {
-          content = box ? box.content : "";
-        }
-      } else content = message.text;
-
-      // Định dạng thời gian
-      const now = new Date();
-      const sendDate = new Date(message.createAt);
-      const timeDifference = now.getTime() - sendDate.getTime();
-      if (timeDifference < 60000) {
-        createAt = "1min";
-      } else {
-        createAt = formatTimeMessageBox(message.createAt); // Lưu thời gian gốc nếu khác 1 phút
-      }
     }
-
-    // Cập nhật tin nhắn cuối cùng
-    const lastMessage: LatestMessage = {
-      senderName,
-      content,
-      createAt,
-      boxId: message.boxId
-    };
-    console.log({ event, message, content });
-    setLatestMessages((prevMessages) => ({
-      ...prevMessages,
-      [message.boxId]: lastMessage
-    }));
   };
 
   //LastMessage + UpdatedTime + ReadStatus
@@ -133,20 +73,20 @@ export default function Page() {
         const channel = pusherClient.subscribe(`private-${box.id}`);
 
         // Đăng ký sự kiện "new-message"
-        const handleNewMessage = async (newMessage: ResponseMessageDTO) => {
-          await handleChatEvent("new-message", newMessage, box.id);
+        const handleNewMessage = (newMessage: ResponseMessageDTO) => {
+          handleChatEvent(newMessage, box.id);
         };
         channel.bind("new-message", handleNewMessage);
 
         // Đăng ký sự kiện "delete-message"
-        const handleDeleteMessage = async (deleteMessage: PusherDelete) => {
-          await handleChatEvent("delete-message", deleteMessage, box.id);
+        const handleDeleteMessage = (deleteMessage: PusherDelete) => {
+          handleChatEvent(deleteMessage, box.id);
         };
         channel.bind("delete-message", handleDeleteMessage);
 
         // Đăng ký sự kiện "revoke-message"
-        const handleRevokeMessage = async (revokeMessage: PusherRevoke) => {
-          await handleChatEvent("revoke-message", revokeMessage, box.id);
+        const handleRevokeMessage = (revokeMessage: PusherRevoke) => {
+          handleChatEvent(revokeMessage, box.id);
         };
         channel.bind("revoke-message", handleRevokeMessage);
 
@@ -159,50 +99,26 @@ export default function Page() {
       });
 
       // Đặt interval để cập nhật thời gian
-      console.log(createAt);
-      const interval = setInterval(() => {
-        setLatestMessages((prevMessages) => {
-          const updatedMessages = { ...prevMessages };
-          Object.keys(updatedMessages).forEach((boxId) => {
-            const message = updatedMessages[boxId];
-            const formattedTime =
-              createAt === "1min"
-                ? createAt
-                : formatTimeMessageBox(message.createAt);
+      // const interval = setInterval(() => {
+      //   setLatestMessages((prevMessages) => {
+      //     const updatedMessages = { ...prevMessages };
+      //     Object.keys(updatedMessages).forEach((boxId) => {
+      //       const message = updatedMessages[boxId];
+      //       const formattedTime =
+      //         createAt === "1min"
+      //           ? createAt
+      //           : formatTimeMessageBox(message.createAt);
 
-            updatedMessages[boxId] = {
-              ...message,
-              createAt: formattedTime
-            };
-          });
-          return updatedMessages;
-        });
-      }, 60000); // Cập nhật mỗi phút
-
-      // Cleanup function
-      // return () => {
-      //   channels.forEach(
-      //     ({
-      //       channel,
-      //       handleNewMessage,
-      //       handleDeleteMessage,
-      //       handleRevokeMessage
-      //     }) => {
-      //       // Hủy đăng ký sự kiện
-      //       channel.unbind("new-message", handleNewMessage);
-      //       channel.unbind("delete-message", handleDeleteMessage);
-      //       channel.unbind("revoke-message", handleRevokeMessage);
-
-      //       // Hủy đăng ký kênh
-      //       channel.unsubscribe();
-      //     }
-      //   );
-
-      //   // Hủy interval
-      //   clearInterval(interval);
-      // };
+      //       updatedMessages[boxId] = {
+      //         ...message,
+      //         createAt: formattedTime
+      //       };
+      //     });
+      //     return updatedMessages;
+      //   });
+      // }, 60000);
     }
-  }, [dataChat, handleChatEvent, setLatestMessages]);
+  }, [dataChat, handleChatEvent]);
 
   //Routing
   useEffect(() => {

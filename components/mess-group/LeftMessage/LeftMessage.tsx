@@ -7,10 +7,7 @@ import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
-import axios from "axios";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { formatTimeMessageBox } from "@/lib/utils";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,63 +17,13 @@ export interface LeftMessageProps {
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const { dataChat, messagesByBox, detailByBox, latestMessages } =
-    useChatContext();
+  const { dataChat } = useChatContext();
 
   const searchChat = useSearchMessageBox(dataChat);
   const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
     return searchChat;
   }, [searchChat]);
 
-  const contentWithSendername = (boxId: string, senderName: string) => {
-    // Tính toán content cho box hiện tại
-    let message: ResponseMessageDTO[] = [];
-    let contentCurrent: string = "";
-    let detailContent: string = "";
-    let createAtCurrent: string = "";
-    if (messagesByBox && messagesByBox[boxId]) {
-      message = messagesByBox[boxId];
-    }
-    if (message.length > 0 && message[message.length - 1].contentId) {
-      const contentType = message[message.length - 1].contentId.type;
-      detailContent =
-        contentType === "Image"
-          ? "Sent a photo"
-          : contentType === "Video"
-          ? "Sent a video"
-          : contentType === "Audio"
-          ? "Sent an audio"
-          : contentType === "Other"
-          ? "Sent a file"
-          : "";
-      contentCurrent = detailContent;
-    }
-    if (message.length > 0 && message[message.length - 1].text !== "") {
-      contentCurrent = message[message.length - 1].text;
-    }
-    if (message.length > 0) {
-      createAtCurrent = formatTimeMessageBox(
-        message[message.length - 1].createAt
-      );
-    }
-
-    // Tính toán senderName cho box hiện tại
-    const adminId = localStorage.getItem("adminId");
-    let senderNameCurrent: string = "";
-    if (message.length > 0) {
-      const lastMessage = message[message.length - 1];
-      if (adminId) {
-        senderNameCurrent =
-          lastMessage.createBy === adminId
-            ? "You:"
-            : isGroup
-            ? senderName + ":"
-            : "";
-      }
-    }
-
-    return { contentCurrent, senderNameCurrent, createAtCurrent };
-  };
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
   const handleCreated = () => {
@@ -115,34 +62,11 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         <div className="mt-[12px] flex w-full flex-col scrollable overflow-scroll">
           {filteredBox.length > 0
             ? filteredBox.map((item) => {
-                const { contentCurrent, senderNameCurrent, createAtCurrent } =
-                  contentWithSendername(item.id, item.senderName);
-                let senderName = "";
-                let content = "";
-                let createAt = "";
-                if (
-                  latestMessages &&
-                  latestMessages[item.id] &&
-                  item.id === latestMessages[item.id].boxId &&
-                  latestMessages[item.id].content
-                ) {
-                  console.log(latestMessages[item.id]);
-                  senderName = latestMessages[item.id].senderName;
-                  content = latestMessages[item.id].content;
-                  createAt = latestMessages[item.id].createAt;
-                } else {
-                  senderName = senderNameCurrent;
-                  content = contentCurrent;
-                  createAt = createAtCurrent;
-                }
                 return (
                   <MessageBox
                     box={item}
                     setClickBox={setClickBox}
                     setClickOtherRight={setClickOtherRight}
-                    content={content}
-                    senderName={senderName}
-                    createAt={createAt}
                   />
                 );
               })

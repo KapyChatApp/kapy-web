@@ -12,20 +12,13 @@ export interface UserInfoBox {
   avatar: string;
   phone: string;
 }
-export interface MessageBoxContent {
+export interface MessageBoxInfo {
   id: string;
-  senderName: string;
-  receiverInfo: {
-    id: string;
-    name: string;
-    phone: string;
-    avatar: string;
-  };
-  content: string;
-  createAt: string;
+  receiverInfo: UserInfoBox;
+  memberInfo: UserInfoBox[];
+  groupName: string;
+  groupAva: string;
   pin: boolean;
-  isOnline: boolean;
-  lastMessage: ResponseMessageDTO;
   readStatus: boolean;
 }
 
@@ -36,7 +29,7 @@ interface ResponseUserInfoBox {
   lastName: string;
   nickName: string;
   avatar: string;
-  phone: string;
+  phoneNumber: string;
 }
 interface MessageBoxDTO {
   _id: string;
@@ -55,7 +48,7 @@ export interface ResponseMessageBoxDTO {
 }
 
 export const fetchMessageBox = async (
-  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>,
+  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const storedToken = localStorage.getItem("token");
@@ -91,95 +84,51 @@ export const fetchMessageBox = async (
     });
 
     // Xử lý dữ liệu từ response để tạo ra dataChat
-    const updatedDataChat: MessageBoxContent[] = sortedApiDataChat
+    const updatedDataChat: MessageBoxInfo[] = sortedApiDataChat
       .map((item) => {
-        let content = ""; // Mặc định là rỗng nếu không có message
-        let detailContent = "";
+        const memberInfo: UserInfoBox[] = item.receiverIds.map((mem) => ({
+          id: mem._id,
+          firstName: mem.firstName,
+          lastName: mem.lastName,
+          phone: mem.phoneNumber,
+          avatar: mem.avatar,
+          nickName: mem.nickName
+        }));
 
-        // Kiểm tra xem có messageIds hay không
-        if (item.lastMessage && item.lastMessage.text !== "") {
-          content = item.lastMessage.text;
-        } else {
-          if (item.lastMessage && item.lastMessage.contentId) {
-            const contentType = item.lastMessage.contentId.type;
-            detailContent =
-              contentType === "Image"
-                ? "Sent a photo"
-                : contentType === "Video"
-                ? "Sent a video"
-                : contentType === "Audio"
-                ? "Sent an audio"
-                : contentType === "Other"
-                ? "Sent a file"
-                : "";
-            content = detailContent;
-          }
-        }
         const receiver = item.receiverIds.find(
           (receiver) => receiver._id !== apiDataChat.adminId
         );
-        let receiverInfo;
+        let receiverInfo: UserInfoBox;
         if (receiver) {
           receiverInfo = {
             id: receiver._id,
-            name: receiver.firstName + " " + receiver.lastName,
-            phone: receiver.phone,
-            avatar: receiver.avatar
+            firstName: receiver.firstName,
+            lastName: receiver.lastName,
+            phone: receiver.phoneNumber,
+            avatar: receiver.avatar,
+            nickName: receiver.nickName
           };
         } else {
           receiverInfo = {
             id: "",
-            name: "Unknown",
+            firstName: "Unknown",
+            lastName: "",
             phone: "",
-            avatar: "/assets/ava/default.png"
-          };
-        }
-        // Nếu messageIds trống, trả về đối tượng với content rỗng
-        if (content === "") {
-          return {
-            id: item._id,
-            senderName: "",
-            receiverInfo: receiverInfo,
-            content: "",
-            createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
-            pin: false,
-            isOnline: false,
-            readStatus: item.readStatus
-          };
-        }
-        // Tìm sender và receiver
-        const sender = item.receiverIds.find(
-          (sender) => sender._id === item.lastMessage.createBy
-        );
-        let senderInfo;
-        if (sender) {
-          senderInfo = {
-            id: sender._id,
-            name: sender.firstName + " " + sender.lastName,
-            phone: sender.phone,
-            avatar: sender.avatar
-          };
-        } else {
-          senderInfo = {
-            id: "",
-            name: "Unknown",
-            phone: "",
-            avatar: "/assets/ava/default.png"
+            avatar: "/assets/ava/default.png",
+            nickName: ""
           };
         }
         return {
           id: item._id,
-          senderName:
-            item.lastMessage.createBy === apiDataChat.adminId ? "You:" : "",
           receiverInfo: receiverInfo,
-          content: content,
-          createAt: formatTimeMessageBox(item.lastMessage?.createAt),
+          memberInfo: memberInfo,
+          groupName: "",
+          groupAva: "",
           pin: false,
-          isOnline: false,
           readStatus: item.readStatus
         };
       })
-      .filter((item): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
+      .filter((item): item is MessageBoxInfo => item !== null);
 
     setDataChat(updatedDataChat);
   } catch (err: any) {

@@ -266,6 +266,26 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     }
   };
 
+  const handleAction = async () => {
+    if (record && recorderRef.current && !audioUrl) {
+      try {
+        const [buffer, blob] = await recorderRef.current.stop().getMp3();
+        const newFile = new File([blob], "recording.mp3", {
+          type: "audio/mp3"
+        });
+        setFile(newFile);
+        setRecord(false);
+        await handleSendRecorder(newFile);
+      } catch (err) {
+        console.error("Error stopping and sending recording:", err);
+      }
+    } else if (file) {
+      await handleSendRecorder(file);
+    } else {
+      await handleSendTextMessage();
+    }
+  };
+
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
@@ -392,6 +412,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
             onMessageChange={handleInputChange}
             messageContent={messageContent}
             setMessageContent={setMessageContent}
+            handleAction={handleAction}
           />
         )}
       </div>
@@ -404,27 +425,11 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         <div
           className="flex items-center w-6 h-6 xl:w-[28px] xl:h-[28px] justify-start"
           onClick={async () => {
-            if (record && recorderRef.current && !audioUrl) {
-              // Nếu đang ghi âm, dừng ghi âm trước
-              try {
-                const [buffer, blob] = await recorderRef.current
-                  .stop()
-                  .getMp3();
-                const newFile = new File([blob], "recording.mp3", {
-                  type: "audio/mp3"
-                });
-                setFile(newFile);
-                setRecord(false);
-                await handleSendRecorder(newFile);
-              } catch (err) {
-                console.error("Error stopping and sending recording:", err);
-              }
-            } else if (file) {
-              // Nếu không đang ghi âm, gửi file đã có
-              await handleSendRecorder(file);
-            } else {
-              // Nếu không có file, gửi tin nhắn văn bản
-              await handleSendTextMessage();
+            await handleAction();
+          }}
+          onKeyDown={async (e) => {
+            if (e.key === "Enter") {
+              await handleAction();
             }
           }}
         >

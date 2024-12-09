@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
 import axios from "axios";
 import { formatTimeMessageBox } from "./utils";
-import { ResponseMessageDTO } from "./dataMessages";
-import { MessageBoxContent, ResponseMessageBoxDTO } from "./dataBox";
+import { MessageBoxInfo, ResponseMessageBoxDTO, UserInfoBox } from "./dataBox";
 
 export const fetchMessageBoxGroup = async (
-  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxContent[]>>,
+  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const storedToken = localStorage.getItem("token");
@@ -37,85 +35,33 @@ export const fetchMessageBoxGroup = async (
       return 0;
     });
     // Xử lý dữ liệu từ response để tạo ra dataChat
-    const updatedDataChat: MessageBoxContent[] = sortedApiDataChat
+    const updatedDataChat: MessageBoxInfo[] = sortedApiDataChat
       .map((item: any) => {
-        let content = ""; // Mặc định là rỗng nếu không có message
-        let detailContent = "";
-
-        // Kiểm tra xem có messageIds hay không
-        if (item.lastMessage && item.lastMessage.text !== "") {
-          content = item.lastMessage.text;
-        } else {
-          if (item.lastMessage && item.lastMessage.contentId) {
-            const contentType = item.lastMessage.contentId.type;
-            detailContent =
-              contentType === "Image"
-                ? "Sent a photo"
-                : contentType === "Video"
-                ? "Sent a video"
-                : contentType === "Audio"
-                ? "Sent an audio"
-                : contentType === "Other"
-                ? "Sent a file"
-                : "";
-            content = detailContent;
-          }
-        }
-        if (content === "") {
-          return {
-            id: item._id,
-            senderName: "",
-            receiverInfo: {
-              id: item._id,
-              name: item.groupName,
-              phone: item.groupName,
-              avatar: item.groupAva
-            },
-            content: "",
-            createAt: "", // Có thể để rỗng nếu không có thông tin thời gian
-            pin: false,
-            isOnline: false,
-            readStatus: item.readStatus
-          };
-        }
-        const sender = item.receiverIds.find(
-          (sender: any) => sender._id === item.lastMessage.createBy
-        );
-        let senderInfo;
-        if (sender) {
-          senderInfo = {
-            id: sender._id,
-            name: sender.firstName + " " + sender.lastName,
-            phone: sender.phone,
-            avatar: sender.avatar
-          };
-        } else {
-          senderInfo = {
-            id: "",
-            name: "Unknown",
-            phone: "",
-            avatar: "/assets/ava/default.png"
-          };
-        }
-
+        const memberInfo: UserInfoBox[] = item.receiverIds.map((mem: any) => ({
+          id: mem._id,
+          firstName: mem.firstName,
+          lastName: mem.lastName,
+          phone: mem.phoneNumber,
+          avatar: mem.avatar,
+          nickName: mem.nickName
+        }));
         return {
           id: item._id,
-          senderName:
-            item.lastMessage.createBy === apiDataChat.adminId ? "You" : "",
           receiverInfo: {
             id: item._id,
-            name: item.groupName,
+            firstName: "",
+            lastName: item.groupName,
             phone: item.groupName,
             avatar: item.groupAva
           },
-          content: content,
-          createAt: formatTimeMessageBox(item.lastMessage?.createAt),
+          memberInfo: memberInfo,
+          groupName: item.groupName,
+          groupAva: item.groupAva,
           pin: false,
-          isOnline: true,
           readStatus: item.readStatus
         };
       })
-      .filter((item: any): item is MessageBoxContent => item !== null); // Loại bỏ các giá trị null
+      .filter((item: any): item is MessageBoxInfo => item !== null); // Loại bỏ các giá trị null
 
     setDataChat(updatedDataChat);
   } catch (err: any) {

@@ -1,6 +1,10 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow, format, isValid } from "date-fns";
+import { ResponseMessageDTO } from "./dataMessages";
+import { UserInfoBox } from "./dataBox";
+import { admin } from "@/constants/object";
+import { UserInfo } from "os";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -186,4 +190,59 @@ export const getFileFormat = (mimeType: string, fileName: string): string => {
 
   // Trả về "unknown" nếu không xác định được
   return "unknown";
+};
+
+export const contentBox = (
+  message: ResponseMessageDTO,
+  adminId: string,
+  recievers?: UserInfoBox[]
+) => {
+  let box = {
+    content: "",
+    senderName: "",
+    createAt: ""
+  };
+  if (message.flag) {
+    if (message.contentId) {
+      const type = message.contentId.type;
+      switch (type) {
+        case "Image":
+          box.content = "Sent a photo";
+          break;
+        case "Video":
+          box.content = "Sent a video";
+          break;
+        case "Audio":
+          box.content = "Sent an audio";
+          break;
+        default:
+          box.content = "Sent a file";
+          break;
+      }
+    } else if (message.text) {
+      box.content = message.text;
+    }
+  } else {
+    box.content = "Message revoked";
+  }
+
+  if (message.createBy === adminId) {
+    box.senderName = "You:";
+  } else {
+    if (recievers) {
+      const info = recievers.find((obj) => obj.id === message.createBy);
+      box.senderName = info ? info.firstName + " " + info.lastName + ":" : "";
+    } else box.senderName = "";
+  }
+
+  const now = new Date();
+  const sendDate = new Date(message.createAt);
+  const timeDifference = now.getTime() - sendDate.getTime();
+  if (timeDifference < 60000) {
+    box.createAt = "1min";
+  } else {
+    box.createAt = formatTimeMessageBox(message.createAt); // Lưu thời gian gốc nếu khác 1 phút
+  }
+
+  return box;
 };
