@@ -14,6 +14,7 @@ import { markMessageAsRead } from "@/lib/read-mark";
 import { PusherDelete } from "@/lib/delete";
 import { PusherRevoke } from "@/lib/revoke";
 import { useUserContext } from "@/context/UserContext";
+import { isOnline } from "@/lib/isOnline";
 
 export default function Page() {
   const router = useRouter();
@@ -60,7 +61,7 @@ export default function Page() {
     }
   };
 
-  //LastMessage + UpdatedTime + ReadStatus
+  //UpdatedTime + ReadStatus
   useEffect(() => {
     const adminId = localStorage.getItem("adminId");
     if (adminId) {
@@ -119,6 +120,29 @@ export default function Page() {
       // }, 60000);
     }
   }, [dataChat, handleChatEvent]);
+
+  //isOnline
+  useEffect(() => {
+    const verifyOnline = async () => {
+      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+
+      if (token) {
+        const result = await isOnline(token);
+        if (result && typeof result === "object" && result.online) {
+          for (const box of dataChat) {
+            const user = box.memberInfo.find(
+              (item) => item.id === result.userId
+            );
+            if (user) {
+              user.isOnline = result.online;
+            }
+          }
+        }
+      }
+    };
+
+    verifyOnline();
+  }, []);
 
   //Routing
   useEffect(() => {

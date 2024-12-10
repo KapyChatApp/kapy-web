@@ -3,6 +3,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo } from "@/lib/dataBox";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { getPusherClient } from "@/lib/pusher";
 import { contentBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
@@ -18,12 +19,15 @@ interface Box {
 }
 
 const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
-  const { id, receiverInfo, pin, groupName, groupAva } = box;
+  const { id, receiverInfo, pin, groupName, groupAva, memberInfo } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
-  const { adminId } = useUserContext();
+  const { adminId, isOnlineChat } = useUserContext();
+
+  receiverInfo.isOnline;
+  memberInfo.some((member) => member.isOnline);
 
   const contentWithSendername = () => {
     // Tính toán content cho box hiện tại
@@ -82,9 +86,9 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 height={48}
                 className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
-              {/*{isOnline && (
+              {isOnlineChat[receiverInfo.id] && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-              )}*/}
+              )}
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">

@@ -54,7 +54,7 @@ const page = () => {
     fetchMessagesForBoxes();
   }, []);
 
-  //Fetch image
+  //Fetch file
   useEffect(() => {
     const fetchImageList = async () => {
       const imageMap: Record<string, FileContent[]> = {};
@@ -69,6 +69,9 @@ const page = () => {
     fetchImageList();
   }, [dataChat]);
 
+  useEffect(()=>{
+    
+  })
   //Subcribe channel in pusher
   useEffect(() => {
     for (const box of dataChat) {
