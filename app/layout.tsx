@@ -4,6 +4,8 @@ import { Lexend } from "next/font/google";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { ChatProvider } from "@/context/ChatContext";
+import { UserProvider } from "@/context/UserContext";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -33,7 +35,11 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-helvetica custom-scrollbar">
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <ChatProvider>
+            <UserProvider>{children}</UserProvider>
+          </ChatProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

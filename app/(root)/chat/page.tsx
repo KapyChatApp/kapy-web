@@ -15,12 +15,18 @@ import { PusherDelete } from "@/lib/delete";
 import { PusherRevoke } from "@/lib/revoke";
 import { useUserContext } from "@/context/UserContext";
 import { isOnline } from "@/lib/isOnline";
+import { isOffline } from "@/lib/isOffline";
+export interface OnlineEvent {
+  userId: string;
+  online: boolean;
+}
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const { setAdminId } = useUserContext();
+  const [isTabVisible, setIsTabVisible] = useState(true);
+  const { setAdminId, isOnlineChat } = useUserContext();
 
   const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
@@ -61,88 +67,24 @@ export default function Page() {
     }
   };
 
-  //UpdatedTime + ReadStatus
-  useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
+  const checkOnlineStatus = async (token: string) => {
+    try {
+      const result = await isOnline(token); // Gọi API kiểm tra trạng thái online
+      console.log("User online status:", result);
+      // Xử lý kết quả từ API
+    } catch (error) {
+      console.error("Error checking online status:", error);
     }
-
-    if (dataChat.length > 0) {
-      const channels = dataChat.map((box) => {
-        const pusherClient = getPusherClient();
-        const channel = pusherClient.subscribe(`private-${box.id}`);
-
-        // Đăng ký sự kiện "new-message"
-        const handleNewMessage = (newMessage: ResponseMessageDTO) => {
-          handleChatEvent(newMessage, box.id);
-        };
-        channel.bind("new-message", handleNewMessage);
-
-        // Đăng ký sự kiện "delete-message"
-        const handleDeleteMessage = (deleteMessage: PusherDelete) => {
-          handleChatEvent(deleteMessage, box.id);
-        };
-        channel.bind("delete-message", handleDeleteMessage);
-
-        // Đăng ký sự kiện "revoke-message"
-        const handleRevokeMessage = (revokeMessage: PusherRevoke) => {
-          handleChatEvent(revokeMessage, box.id);
-        };
-        channel.bind("revoke-message", handleRevokeMessage);
-
-        return {
-          channel,
-          handleNewMessage,
-          handleDeleteMessage,
-          handleRevokeMessage
-        };
-      });
-
-      // Đặt interval để cập nhật thời gian
-      // const interval = setInterval(() => {
-      //   setLatestMessages((prevMessages) => {
-      //     const updatedMessages = { ...prevMessages };
-      //     Object.keys(updatedMessages).forEach((boxId) => {
-      //       const message = updatedMessages[boxId];
-      //       const formattedTime =
-      //         createAt === "1min"
-      //           ? createAt
-      //           : formatTimeMessageBox(message.createAt);
-
-      //       updatedMessages[boxId] = {
-      //         ...message,
-      //         createAt: formattedTime
-      //       };
-      //     });
-      //     return updatedMessages;
-      //   });
-      // }, 60000);
+  };
+  // API để gọi trạng thái offline
+  const setOfflineStatus = async (token: string) => {
+    try {
+      await isOffline(token); // Gọi API để cập nhật trạng thái offline
+      console.log("User is offline");
+    } catch (error) {
+      console.error("Error setting offline status:", error);
     }
-  }, [dataChat, handleChatEvent]);
-
-  //isOnline
-  useEffect(() => {
-    const verifyOnline = async () => {
-      const token = localStorage.getItem("token"); // Lấy token từ localStorage
-
-      if (token) {
-        const result = await isOnline(token);
-        if (result && typeof result === "object" && result.online) {
-          for (const box of dataChat) {
-            const user = box.memberInfo.find(
-              (item) => item.id === result.userId
-            );
-            if (user) {
-              user.isOnline = result.online;
-            }
-          }
-        }
-      }
-    };
-
-    verifyOnline();
-  }, []);
+  };
 
   //Routing
   useEffect(() => {

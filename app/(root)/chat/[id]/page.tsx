@@ -13,6 +13,9 @@ import { getPusherClient } from "@/lib/pusher";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { isCurrentPageBoxId } from "@/lib/utils";
 import { getFileList } from "@/lib/dataFileList";
+import { OnlineEvent } from "../page";
+import { isOnline } from "@/lib/isOnline";
+import { useUserContext } from "@/context/UserContext";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -68,10 +71,6 @@ const page = () => {
     };
     fetchImageList();
   }, [dataChat]);
-
-  useEffect(()=>{
-    
-  })
   //Subcribe channel in pusher
   useEffect(() => {
     for (const box of dataChat) {

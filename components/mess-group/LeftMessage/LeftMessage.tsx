@@ -15,10 +15,6 @@ export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-export interface OnlineEvent {
-  userId: string;
-  online: boolean;
-}
 
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
@@ -29,39 +25,6 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
     return searchChat;
   }, [searchChat]);
-  const { setIsOnlineChat, isOnlineChat } = useUserContext();
-  const [isOnlineGroup, setIsOnlineGroup] = useState<Record<string, boolean>>(
-    {}
-  );
-
-  useEffect(() => {
-    const handleOnline = (data: OnlineEvent) => {
-      console.log("Successfully received message: ", data);
-
-      // Khởi tạo bản sao trạng thái cập nhật
-      setIsOnlineChat((prevState) => {
-        const updatedOnlineStatus = { ...prevState };
-        for (const box of dataChat) {
-          for (const user of box.memberInfo) {
-            if (user.id === data.userId) {
-              updatedOnlineStatus[data.userId] = true;
-            }
-          }
-        }
-        return updatedOnlineStatus;
-      });
-    };
-
-    const pusherClient = getPusherClient();
-    const subscriptions: Array<{ channel: string; event: string }> = [];
-    dataChat.forEach((box) => {
-      box.memberInfo.forEach((user) => {
-        const channel = `private-${user.id}`;
-        pusherClient.subscribe(channel).bind("online-status", handleOnline);
-        subscriptions.push({ channel, event: "online-status" });
-      });
-    });
-  }, [dataChat, setIsOnlineChat]);
 
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);

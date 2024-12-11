@@ -26,8 +26,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
   const { adminId, isOnlineChat } = useUserContext();
 
-  receiverInfo.isOnline;
-  memberInfo.some((member) => member.isOnline);
+  const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member.id]);
 
   const contentWithSendername = () => {
     // Tính toán content cho box hiện tại
@@ -86,7 +85,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 height={48}
                 className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
-              {isOnlineChat[receiverInfo.id] && (
+              {(isGroup ? isOnlineGroup : isOnlineChat[receiverInfo.id]) && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
               )}
             </div>

@@ -13,6 +13,8 @@ import { getPusherClient } from "@/lib/pusher";
 import { getFileFormat } from "@/lib/utils";
 import MicRecorder from "mic-recorder-to-mp3";
 import MessageRecorder from "../MessageRecorder";
+import { useUserContext } from "@/context/UserContext";
+import { isTexting } from "@/lib/isTexting";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -25,13 +27,13 @@ const tempSenderInfo = {
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
 const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { setMessagesByBox, setFileList, fileList } = useChatContext();
+  const { setMessagesByBox, setFileList, dataChat } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const [apiAdminId, setAdminId] = useState<string>();
+  const {adminId}=useUserContext();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -85,7 +87,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     const newMessageSegment: ResponseMessageDTO = {
       id: "",
       flag: true,
-      readedId: apiAdminId ? [apiAdminId] : [],
+      readedId: adminId ? [adminId] : [],
       contentId: {
         fileName: "",
         url: "",
@@ -99,7 +101,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       text: messageContent,
       boxId: boxId ? boxId : "",
       createAt: new Date().toISOString(),
-      createBy: apiAdminId ? apiAdminId : ""
+      createBy: adminId ? adminId : ""
     };
 
     // Tạo đối tượng SegmentMessageDTO
@@ -152,7 +154,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       const tempMessages: ResponseMessageDTO[] = files.map((file) => ({
         id: "",
         flag: true,
-        readedId: [apiAdminId || ""],
+        readedId: [adminId || ""],
         contentId: {
           fileName: file.name,
           url: URL.createObjectURL(file), // Preview URL tạm thời
@@ -166,7 +168,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
-        createBy: apiAdminId || ""
+        createBy: adminId || ""
       }));
 
       // Gửi từng file lên server
@@ -211,7 +213,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       const tempMessages: ResponseMessageDTO = {
         id: "",
         flag: true,
-        readedId: [apiAdminId || ""],
+        readedId: [adminId || ""],
         contentId: {
           fileName: record.name,
           url: URL.createObjectURL(record), // Preview URL tạm thời
@@ -225,7 +227,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
-        createBy: apiAdminId || ""
+        createBy: adminId || ""
       };
 
       const fileContent: FileContent = {
@@ -285,6 +287,33 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     }
   };
 
+  useEffect(()=>{
+const createTextingEvent= async () =>{
+  if(messageContent !== ""){
+    try{
+      if (!boxId) return;
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) return;
+      let avatar: string ="";
+      if(dataChat&&adminId){
+        const box = dataChat.filter((item) => item.id === boxId);
+        if(box){
+          const user = box[0].memberInfo.filter ((item)=>item.id === adminId);
+          if(user){
+            avatar=user[0].avatar
+          }
+        }
+      }
+      const result = await isTexting(storedToken, boxId, avatar) 
+      if(result && typeof result === "object" && result.texting){
+        
+      }
+    }catch (error) {
+      console.error("Error texting event:", error);
+    }
+  }
+}
+  }, [])
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
@@ -349,12 +378,6 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     setTemporaryToCloudinaryMap([]);
   }, [temporaryToCloudinaryMap]);
 
-  useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
-  });
 
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">
