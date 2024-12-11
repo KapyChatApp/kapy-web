@@ -4,20 +4,23 @@ export interface TextingEvent {
   avatar: string;
   texting: boolean;
 }
-export async function isTexting(
+export async function disableTexting(
   token: string,
   boxId: string,
   avatar: string
 ): Promise<TextingEvent> {
   try {
-    const response = await fetch(`${process.env.BASE_URL}message/texting`, {
-      method: "POST",
-      headers: {
-        Authorization: token,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ boxId, avatar })
-    });
+    const response = await fetch(
+      `${process.env.BASE_URL}message/disable-texting`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: token,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ boxId, avatar })
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Server error: ${response.statusText}`);

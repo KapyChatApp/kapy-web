@@ -2,20 +2,16 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchMessageBox } from "@/lib/dataBox";
-import { LatestMessage, useChatContext } from "@/context/ChatContext";
-import { getPusherClient } from "@/lib/pusher";
+import { useChatContext } from "@/context/ChatContext";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
-import {
-  contentBox,
-  formatTimeMessageBox,
-  isCurrentPageBoxId
-} from "@/lib/utils";
+import { isCurrentPageBoxId } from "@/lib/utils";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { PusherDelete } from "@/lib/delete";
 import { PusherRevoke } from "@/lib/revoke";
 import { useUserContext } from "@/context/UserContext";
 import { isOnline } from "@/lib/isOnline";
 import { isOffline } from "@/lib/isOffline";
+import { getPusherClient } from "@/lib/pusher";
 export interface OnlineEvent {
   userId: string;
   online: boolean;
@@ -67,24 +63,65 @@ export default function Page() {
     }
   };
 
-  const checkOnlineStatus = async (token: string) => {
-    try {
-      const result = await isOnline(token); // Gọi API kiểm tra trạng thái online
-      console.log("User online status:", result);
-      // Xử lý kết quả từ API
-    } catch (error) {
-      console.error("Error checking online status:", error);
+  //LastMessage + UpdatedTime + ReadStatus
+  useEffect(() => {
+    const adminId = localStorage.getItem("adminId");
+    if (adminId) {
+      setAdminId(adminId);
     }
-  };
-  // API để gọi trạng thái offline
-  const setOfflineStatus = async (token: string) => {
-    try {
-      await isOffline(token); // Gọi API để cập nhật trạng thái offline
-      console.log("User is offline");
-    } catch (error) {
-      console.error("Error setting offline status:", error);
+
+    if (dataChat.length > 0) {
+      const channels = dataChat.map((box) => {
+        const pusherClient = getPusherClient();
+        const channel = pusherClient.subscribe(`private-${box.id}`);
+
+        // Đăng ký sự kiện "new-message"
+        const handleNewMessage = (newMessage: ResponseMessageDTO) => {
+          handleChatEvent(newMessage, box.id);
+        };
+        channel.bind("new-message", handleNewMessage);
+
+        // Đăng ký sự kiện "delete-message"
+        const handleDeleteMessage = (deleteMessage: PusherDelete) => {
+          handleChatEvent(deleteMessage, box.id);
+        };
+        channel.bind("delete-message", handleDeleteMessage);
+
+        // Đăng ký sự kiện "revoke-message"
+        const handleRevokeMessage = (revokeMessage: PusherRevoke) => {
+          handleChatEvent(revokeMessage, box.id);
+        };
+        channel.bind("revoke-message", handleRevokeMessage);
+
+        return {
+          channel,
+          handleNewMessage,
+          handleDeleteMessage,
+          handleRevokeMessage
+        };
+      });
+
+      // Đặt interval để cập nhật thời gian
+      // const interval = setInterval(() => {
+      //   setLatestMessages((prevMessages) => {
+      //     const updatedMessages = { ...prevMessages };
+      //     Object.keys(updatedMessages).forEach((boxId) => {
+      //       const message = updatedMessages[boxId];
+      //       const formattedTime =
+      //         createAt === "1min"
+      //           ? createAt
+      //           : formatTimeMessageBox(message.createAt);
+
+      //       updatedMessages[boxId] = {
+      //         ...message,
+      //         createAt: formattedTime
+      //       };
+      //     });
+      //     return updatedMessages;
+      //   });
+      // }, 60000);
     }
-  };
+  }, [dataChat, handleChatEvent]);
 
   //Routing
   useEffect(() => {

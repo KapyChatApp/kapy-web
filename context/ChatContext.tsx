@@ -2,13 +2,8 @@
 import { MessageBoxInfo } from "@/lib/dataBox";
 import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import { DetailBox } from "@/lib/dataOneBox";
+import { TextingEvent } from "@/lib/isTexting";
 import { createContext, useContext, useState } from "react";
-export interface LatestMessage {
-  senderName: string;
-  content: string;
-  createAt: string;
-  boxId: string;
-}
 
 // Tạo kiểu cho context
 interface ChatContextType {
@@ -26,6 +21,8 @@ interface ChatContextType {
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
   >;
+  isTyping: boolean;
+  setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Tạo context
@@ -43,6 +40,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [readStatusByBox, setReadStatusByBox] = useState<
     Record<string, boolean>
   >({});
+  const [isTyping, setIsTyping] = useState<boolean>(false);
 
   return (
     <ChatContext.Provider
@@ -54,7 +52,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         messagesByBox,
         setMessagesByBox,
         readStatusByBox,
-        setReadStatusByBox
+        setReadStatusByBox,
+        isTyping,
+        setIsTyping
       }}
     >
       {children}

@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; // Sử dụng useRouter để điều hướng
 import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
-import { LatestMessage, useChatContext } from "@/context/ChatContext";
+import { useChatContext } from "@/context/ChatContext";
 import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
 import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";

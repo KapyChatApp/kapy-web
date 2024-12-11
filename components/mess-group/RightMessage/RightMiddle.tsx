@@ -9,6 +9,11 @@ import { UserInfoBox } from "@/lib/dataBox";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import MenubarSegment from "@/components/mess-group/RightMessage/Segment/menubar-segment";
 import { useUserContext } from "@/context/UserContext";
+import { useChatContext } from "@/context/ChatContext";
+import { getPusherClient } from "@/lib/pusher";
+import { TextingEvent } from "@/lib/isTexting";
+import { channel } from "diagnostics_channel";
+import { usePathname } from "next/navigation";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
@@ -21,7 +26,12 @@ const RightMiddle = ({
   filteredSegmentOther,
   receiverInfo
 }: RightMiddleProps) => {
-  const { adminId } = useUserContext();
+  const { adminId, setAdminId } = useUserContext();
+  const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
+  const pathname = usePathname();
+  const boxId = pathname.split("/").pop();
+  const { isTyping } = useChatContext();
+  const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
     ...filteredSegmentAdmin,
     ...filteredSegmentOther
@@ -72,6 +82,40 @@ const RightMiddle = ({
         messageContainerRef.current.scrollHeight;
     }
   }, [messagesToDisplay]);
+
+  useEffect(() => {
+    const localAdminId = localStorage.getItem("adminId");
+    if (localAdminId) {
+      setAdminId(localAdminId);
+    }
+  });
+
+  useEffect(() => {
+    const handleTexting = (data: TextingEvent) => {
+      console.log("Successfully received texting-status:", data);
+
+      if (adminId !== "" && data.userId !== adminId) {
+        setIsTexting((prevState) => ({
+          ...prevState, // Giữ lại các trạng thái trước đó
+          [data.userId]: data // Cập nhật trạng thái mới
+        }));
+      }
+    };
+    const pusherClient = getPusherClient();
+    if (boxId) {
+      const channel = pusherClient.subscribe(`private-${boxId}`);
+      channel.bind("texting-status", handleTexting);
+    }
+
+    // Cleanup subscriptions
+    return () => {
+      const channel = pusherClient.channel(`private-${boxId}`);
+      if (channel) {
+        channel.unbind("texting-status", handleTexting);
+        pusherClient.unsubscribe(`private-${boxId}`);
+      }
+    };
+  }, [isTyping, adminId]);
 
   return (
     <div
@@ -189,6 +233,74 @@ const RightMiddle = ({
             );
           })}
         </div>
+
+        {Object.entries(isTexting).filter(([key, value]) => value.texting) // Lọc các entry có value.texting là true
+          .length > 0 && (
+          <div
+            className={`flex w-full justify-start items-center gap-3 pb-4 pt-1 h-auto`}
+          >
+            <div
+              className="flex items-center w-7 h-7 justify-center flex-shrink-0 relative"
+              style={{
+                width: `calc(28px * ${Math.min(
+                  3,
+                  Object.entries(isTexting).filter(
+                    ([key, value]) => value.texting
+                  ).length
+                )} + 16px * ${Math.max(
+                  0,
+                  Math.min(
+                    2,
+                    Object.entries(isTexting).filter(
+                      ([key, value]) => value.texting
+                    ).length - 1
+                  )
+                )})`
+              }}
+            >
+              {Object.entries(isTexting)
+                .filter(([key, value]) => value.texting)
+                .slice(0, 3)
+                .map(([key, value], index) => (
+                  <div
+                    key={index}
+                    className={`absolute rounded-full bg-light-800 dark:bg-dark-500 ${
+                      index === 0 ? "left-0" : index === 1 ? "left-4" : "left-8"
+                    }`}
+                  >
+                    <Image
+                      src={value.avatar}
+                      alt="Avatar"
+                      width={28}
+                      height={28}
+                      className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                    />
+                  </div>
+                ))}
+              {/* <div className={`absolute ${"left-0"}`}>
+                <Image
+                  src="/assets/ava/ava1.jpg"
+                  alt="Avatar"
+                  width={28}
+                  height={28}
+                  className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                />
+              </div> */}
+            </div>
+
+            <div
+              className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] items-start`}
+            >
+              <div className="relative group h-full flex flex-row gap-2 items-center justify-start">
+                <div className="flex w-fit h-9 items-center justify-center bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-2 rounded-[18px] gap-2 ">
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                  <span className="dot"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

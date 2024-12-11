@@ -15,6 +15,7 @@ import MicRecorder from "mic-recorder-to-mp3";
 import MessageRecorder from "../MessageRecorder";
 import { useUserContext } from "@/context/UserContext";
 import { isTexting } from "@/lib/isTexting";
+import { disableTexting } from "@/lib/disableTexting";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -27,13 +28,14 @@ const tempSenderInfo = {
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
 const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { setMessagesByBox, setFileList, dataChat } = useChatContext();
+  const { setMessagesByBox, setFileList, dataChat, isTyping, setIsTyping } =
+    useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const {adminId}=useUserContext();
+  const { adminId } = useUserContext();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -287,33 +289,48 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     }
   };
 
-  useEffect(()=>{
-const createTextingEvent= async () =>{
-  if(messageContent !== ""){
-    try{
+  //Create Texting/DisableTexting Event
+  let avatar: string = "";
+  useEffect(() => {
+    const createTextingEvent = async () => {
       if (!boxId) return;
       const storedToken = localStorage.getItem("token");
       if (!storedToken) return;
-      let avatar: string ="";
-      if(dataChat&&adminId){
-        const box = dataChat.filter((item) => item.id === boxId);
-        if(box){
-          const user = box[0].memberInfo.filter ((item)=>item.id === adminId);
-          if(user){
-            avatar=user[0].avatar
+      const box = dataChat.filter((item) => item.id === boxId);
+      if (isTyping) {
+        if (dataChat && adminId && box.length > 0) {
+          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          if (user && user.length > 0) {
+            avatar = user[0].avatar;
           }
         }
+        try {
+          // Gọi API để thông báo người dùng đang nhập
+          const result = await isTexting(storedToken, boxId, avatar);
+          console.log(result);
+        } catch (error) {
+          console.error("Error texting event:", error);
+        }
+      } else {
+        if (dataChat && adminId && box.length > 0) {
+          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          if (user && user.length > 0) {
+            avatar = user[0].avatar;
+          }
+        }
+        try {
+          const result = await disableTexting(storedToken, boxId, avatar);
+          console.log(result);
+        } catch (error) {
+          console.error("Error texting event:", error);
+        }
       }
-      const result = await isTexting(storedToken, boxId, avatar) 
-      if(result && typeof result === "object" && result.texting){
-        
-      }
-    }catch (error) {
-      console.error("Error texting event:", error);
-    }
-  }
-}
-  }, [])
+    };
+
+    createTextingEvent();
+  }, [isTyping, avatar]);
+
+  //Send Message
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
@@ -350,12 +367,12 @@ const createTextingEvent= async () =>{
     // Bind sự kiện với handler
     pusherClient.bind("new-message", handleNewMessage);
 
-    // Cleanup khi component bị unmount hoặc boxId thay đổi
-    // return () => {
-    //   pusherClient.unsubscribe(`private-${boxId}`);
-    //   pusherClient.unbind("new-message", handleNewMessage);
-    // };
-  }, [boxId, setMessagesByBox, setFileList]);
+    //Cleanup khi component bị unmount hoặc boxId thay đổi
+    return () => {
+      pusherClient.unsubscribe(`private-${boxId}`);
+      pusherClient.unbind("new-message", handleNewMessage);
+    };
+  }, [isTyping]);
 
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
@@ -377,7 +394,6 @@ const createTextingEvent= async () =>{
     // Sau khi cập nhật xong, loại bỏ các URL đã xử lý
     setTemporaryToCloudinaryMap([]);
   }, [temporaryToCloudinaryMap]);
-
 
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">
@@ -448,7 +464,7 @@ const createTextingEvent= async () =>{
           <MessageInput
             onMessageChange={handleInputChange}
             messageContent={messageContent}
-            setMessageContent={setMessageContent}
+            setTyping={setIsTyping}
             handleAction={handleAction}
           />
         )}

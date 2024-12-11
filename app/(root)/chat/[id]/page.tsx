@@ -8,14 +8,10 @@ import {
   ResponseMessageDTO
 } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 import { getPusherClient } from "@/lib/pusher";
 import { markMessageAsRead } from "@/lib/read-mark";
 import { isCurrentPageBoxId } from "@/lib/utils";
 import { getFileList } from "@/lib/dataFileList";
-import { OnlineEvent } from "../page";
-import { isOnline } from "@/lib/isOnline";
-import { useUserContext } from "@/context/UserContext";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);

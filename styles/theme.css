@@ -6,6 +6,9 @@
   .background-light900_dark100 {
     @apply bg-light-900 dark:bg-dark-100;
   }
+  .background-dark100_light900 {
+    @apply bg-dark-100 dark:bg-light-900;
+  }
   .background-light850_dark200 {
     @apply bg-light-850 dark:bg-dark-200 !important;
   }
@@ -316,6 +319,40 @@
     align-items: center;
     justify-content: center;
     z-index: 20;
+  }
+
+  /* Các lớp Tailwind CSS sẽ được áp dụng trực tiếp vào JSX */
+  .dot {
+    @apply inline-block w-[6px] h-[6px] rounded-full background-dark100_light900;
+    animation: finger-1-animation-span 1.5s infinite ease-out;
+  }
+
+  @keyframes finger-1-animation-span {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  /* Áp dụng hiệu ứng delay cho từng dấu chấm */
+  .dot:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  .dot:nth-child(2) {
+    animation-delay: 0.3s;
+  }
+
+  .dot:nth-child(3) {
+    animation-delay: 0.6s;
   }
 
   .chewy-regular {
