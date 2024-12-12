@@ -3,12 +3,12 @@
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import { useEffect, useState } from "react";
-import { fetchMessages, ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { DetailBox } from "@/lib/dataOneBox";
 import { isCurrentPageBoxId } from "@/lib/utils";
-import { markMessageAsRead } from "@/lib/read-mark";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { getPusherClient } from "@/lib/pusher";
+import { ResponseMessageDTO } from "@/lib/DTO/message";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);

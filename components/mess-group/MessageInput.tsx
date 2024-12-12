@@ -7,12 +7,12 @@ import { Textarea } from "../ui/textarea";
 interface MessageInputProps {
   onMessageChange: (value: string) => void;
   messageContent: string;
-  setMessageContent: React.Dispatch<React.SetStateAction<string>>;
+  setTyping: React.Dispatch<React.SetStateAction<boolean>>;
   handleAction: () => Promise<void>;
 }
 const MessageInput = ({
   onMessageChange,
-  setMessageContent,
+  setTyping,
   messageContent,
   handleAction
 }: MessageInputProps) => {
@@ -20,19 +20,23 @@ const MessageInput = ({
 
   const onEmojiClick = (emojiData: { emoji: string }) => {
     const newMessage = messageContent + emojiData.emoji;
-    setMessageContent(newMessage);
     onMessageChange(newMessage); // Cập nhật giá trị khi thêm emoji
+    setTyping(newMessage.length > 0);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newValue = e.target.value;
-    setMessageContent(newValue);
     onMessageChange(newValue);
+    setTyping(newValue.length > 0);
   };
   const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "36px"; // Đặt lại chiều cao ban đầu
     const newHeight = e.target.scrollHeight;
     e.target.style.height = `${Math.min(newHeight, 160)}px`; // Giới hạn chiều cao tối đa
+  };
+  // Hàm xử lý khi người dùng dừng nhập sau một khoảng thời gian nhất định (ví dụ 2 giây)
+  const handleBlur = () => {
+    setTyping(false); // Khi người dùng rời khỏi textarea, reset trạng thái
   };
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -48,6 +52,7 @@ const MessageInput = ({
           value={messageContent}
           onChange={handleChange}
           onInput={handleInput}
+          onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           placeholder="Aa"
         />

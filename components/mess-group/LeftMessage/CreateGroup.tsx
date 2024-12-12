@@ -1,6 +1,6 @@
 import React from "react";
 import { Button } from "../../ui/button";
-import UserCheckbox from "../MoreActions/UserCheckbox";
+import UserCheckbox from "../RightMessage/MoreActions/UserCheckbox";
 import LocalSearch from "../../shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useToast } from "@/hooks/use-toast";

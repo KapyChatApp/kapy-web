@@ -1,10 +1,9 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow, format, isValid } from "date-fns";
-import { ResponseMessageDTO } from "./dataMessages";
-import { UserInfoBox } from "./dataBox";
 import { admin } from "@/constants/object";
 import { UserInfo } from "os";
+import { ResponseMessageDTO, UserInfoBox } from "./DTO/message";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -235,14 +234,24 @@ export const contentBox = (
     } else box.senderName = "";
   }
 
-  const now = new Date();
-  const sendDate = new Date(message.createAt);
-  const timeDifference = now.getTime() - sendDate.getTime();
-  if (timeDifference < 60000) {
-    box.createAt = "1min";
-  } else {
-    box.createAt = formatTimeMessageBox(message.createAt); // Lưu thời gian gốc nếu khác 1 phút
-  }
+  box.createAt = message.createAt;
 
   return box;
+};
+
+export const getDefaultIcon = (type: string) => {
+  switch (type) {
+    case "docx":
+      return "mdi:file-word";
+    case "doc":
+      return "mdi:file-word";
+    case "pptx":
+      return "mdi:file-powerpoint";
+    case "xlsx":
+      return "mdi:file-excel";
+    case "pdf":
+      return "bxs:file-pdf";
+    default:
+      return "basil:document-solid"; // Icon mặc định
+  }
 };

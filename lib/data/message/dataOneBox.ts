@@ -1,18 +1,5 @@
+import { DetailBox, UserInfoBox } from "@/lib/DTO/message";
 import axios from "axios";
-import { UserInfoBox } from "./dataBox";
-
-export interface DetailBox {
-  id: string;
-  senderId: UserInfoBox;
-  receiverIds: UserInfoBox[];
-  groupName: string;
-  groupAva: string;
-  flag: boolean;
-  pin: boolean;
-  createAt: string;
-  createBy: string;
-  readStatus: boolean;
-}
 
 let detailDataBox: DetailBox = {
   id: "",
@@ -22,10 +9,19 @@ let detailDataBox: DetailBox = {
     lastName: "",
     nickName: "",
     avatar: "",
-    phone: ""
+    phone: "",
+    isOnline: false
   },
   receiverIds: [
-    { id: "", firstName: "", lastName: "", nickName: "", avatar: "", phone: "" }
+    {
+      id: "",
+      firstName: "",
+      lastName: "",
+      nickName: "",
+      avatar: "",
+      phone: "",
+      isOnline: false
+    }
   ],
   groupName: "",
   groupAva: "",
@@ -60,7 +56,8 @@ export const fetchDetailBox = async (boxId: string) => {
       lastName: apiDataBox.box.senderId.lastName,
       nickName: apiDataBox.box.senderId.nickName,
       avatar: apiDataBox.box.senderId.avatar,
-      phone: apiDataBox.box.senderId.phoneNumber
+      phone: apiDataBox.box.senderId.phoneNumber,
+      isOnline: false
     };
 
     const recieverInfo: UserInfoBox[] = Array.isArray(

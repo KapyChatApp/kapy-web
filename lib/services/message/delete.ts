@@ -1,16 +1,4 @@
 import axios from "axios";
-
-export interface PusherDelete {
-  id: string;
-  flag: boolean;
-  visibility: boolean;
-  isReact: boolean;
-  text: string;
-  boxId: string;
-  action: string;
-  createAt: string;
-  createBy: string;
-}
 export async function DeleteMessage(messageId: string): Promise<boolean> {
   try {
     const storedToken = localStorage.getItem("token");

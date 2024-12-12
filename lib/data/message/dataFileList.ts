@@ -1,13 +1,13 @@
+import { FileContent } from "@/lib/DTO/message";
 import axios from "axios";
-import { FileContent } from "./dataMessages";
 
-export const getImageList = async (boxId: string): Promise<FileContent[]> => {
+export const getFileList = async (boxId: string): Promise<FileContent[]> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) throw new Error("Authentication token not found");
 
   try {
     const response = await axios.get(
-      `${process.env.BASE_URL}message/get-list/images?boxId=${boxId}`,
+      `${process.env.BASE_URL}message/files?boxId=${boxId}`,
       {
         headers: {
           "Content-Type": "application/json",

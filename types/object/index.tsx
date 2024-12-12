@@ -30,18 +30,3 @@ export interface MememberGroup {
   addedBy: string;
   isOnline: boolean;
 }
-
-export interface Admin {
-  id: string;
-  name: string;
-  ava: string;
-  background: string;
-  image: Photo[];
-  mutualFriend: number;
-  mutualGroup: number;
-  status: string;
-  birth: Date;
-  bio: string;
-  phone: string;
-  sex: number;
-}

@@ -1,11 +1,9 @@
 "use client";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo } from "@/lib/dataBox";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { contentBox } from "@/lib/utils";
+import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,12 +16,15 @@ interface Box {
 }
 
 const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
-  const { id, receiverInfo, pin, groupName, groupAva } = box;
+  const { id, receiverInfo, pin, groupName, groupAva, memberInfo } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
-  const { adminId } = useUserContext();
+  const { adminId, isOnlineChat } = useUserContext();
+
+  const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member.id]);
+  const [formattedCreateAt, setFormattedCreateAt] = useState("");
 
   const contentWithSendername = () => {
     // Tính toán content cho box hiện tại
@@ -51,12 +52,31 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
-
   const handleClickLink = () => {
     if (setClickBox) {
       setClickBox(true); //Click box for responsive
     }
   };
+
+  // Cập nhật createAt mỗi phút
+  useEffect(() => {
+    // Cập nhật ngay khi render lần đầu
+    if (createAt !== "") {
+      const updateCreateAt = () => {
+        const now = new Date();
+        const sendDate = new Date(createAt);
+        const timeDifference = now.getTime() - sendDate.getTime();
+        const formattedTime =
+          timeDifference < 60000 ? "1min" : formatTimeMessageBox(createAt);
+        setFormattedCreateAt(formattedTime);
+      };
+      updateCreateAt();
+      const interval = setInterval(() => {
+        updateCreateAt();
+      }, 60000); // Cập nhật mỗi 1 phút
+      return () => clearInterval(interval); // Cleanup interval khi component unmount
+    }
+  }, [createAt]);
 
   return (
     <Link
@@ -82,9 +102,9 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 height={48}
                 className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
-              {/*{isOnline && (
+              {(isGroup ? isOnlineGroup : isOnlineChat[receiverInfo.id]) && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-              )}*/}
+              )}
             </div>
 
             <div className="flex flex-col bg-transparent items-start justify-start gap-[6px] flex-grow overflow-hidden min-w-0">
@@ -117,7 +137,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
           </div>
 
           <div className="flex flex-col bg-transparent items-center justify-end gap-[7px] relative">
-            <p className="small-custom">{createAt}</p>
+            <p className="small-custom">{formattedCreateAt}</p>
             {pin ? (
               <div className="w-full justify-end items-end flex">
                 <Icon

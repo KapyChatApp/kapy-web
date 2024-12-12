@@ -5,11 +5,9 @@ import RightTop from "./RightTop";
 import RightBottom from "./RightBottom";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { MessageBoxInfo, UserInfoBox } from "@/lib/dataBox";
-import { admin } from "@/constants/object";
 import { useUserContext } from "@/context/UserContext";
+import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,12 +30,11 @@ const RightMessage = ({
 
   //FetchMessage Backend
   const [recipientId, setRecipientId] = useState<string[]>();
-  const [recipientInfo, setRecipientInfo] = useState<UserInfoBox[]>();
-  const [senderInfo, setSenderInfo] = useState<UserInfoBox>();
   const [boxId, setBoxId] = useState<string>("");
   const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
   const { dataChat } = useChatContext();
-  const { adminId } = useUserContext();
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
 
   //boxId
   useEffect(() => {
@@ -57,7 +54,6 @@ const RightMessage = ({
       const detail = dataChat.find((box) => box.id === boxId);
       if (detail) {
         setDetailByBox(detail);
-        setRecipientInfo(detail.memberInfo);
         setRecipientId(detail.memberInfo.map((item: any) => item.id));
       }
     }
@@ -128,6 +124,7 @@ const RightMessage = ({
 
   //OpenMoreDisplay
   const display = {
+    detailByBox,
     openMore,
     setOpenMore,
     isClickOtherRight,
@@ -186,7 +183,7 @@ const RightMessage = ({
             receiverInfo={detailByBox ? detailByBox.memberInfo : []}
           />
 
-          <RightBottom recipientIds={recipientId} senderInfo={senderInfo} />
+          <RightBottom recipientIds={recipientId} />
         </div>
       </div>
       <OpenMoreDisplay display={display} />

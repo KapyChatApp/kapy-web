@@ -1,25 +1,28 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchMessageBox } from "@/lib/dataBox";
-import { LatestMessage, useChatContext } from "@/context/ChatContext";
-import { getPusherClient } from "@/lib/pusher";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import {
-  contentBox,
-  formatTimeMessageBox,
-  isCurrentPageBoxId
-} from "@/lib/utils";
-import { markMessageAsRead } from "@/lib/read-mark";
-import { PusherDelete } from "@/lib/delete";
-import { PusherRevoke } from "@/lib/revoke";
+import { useChatContext } from "@/context/ChatContext";
+import { isCurrentPageBoxId } from "@/lib/utils";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { useUserContext } from "@/context/UserContext";
+import { getPusherClient } from "@/lib/pusher";
+import { fetchMessageBox } from "@/lib/data/message/dataBox";
+import {
+  PusherDelete,
+  PusherRevoke,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
+export interface OnlineEvent {
+  userId: string;
+  online: boolean;
+}
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const { setAdminId } = useUserContext();
+  const [isTabVisible, setIsTabVisible] = useState(true);
+  const { adminInfo, isOnlineChat } = useUserContext();
 
   const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
@@ -62,10 +65,7 @@ export default function Page() {
 
   //LastMessage + UpdatedTime + ReadStatus
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
+    const adminId = adminInfo._id;
 
     if (dataChat.length > 0) {
       const channels = dataChat.map((box) => {
@@ -97,26 +97,6 @@ export default function Page() {
           handleRevokeMessage
         };
       });
-
-      // Đặt interval để cập nhật thời gian
-      // const interval = setInterval(() => {
-      //   setLatestMessages((prevMessages) => {
-      //     const updatedMessages = { ...prevMessages };
-      //     Object.keys(updatedMessages).forEach((boxId) => {
-      //       const message = updatedMessages[boxId];
-      //       const formattedTime =
-      //         createAt === "1min"
-      //           ? createAt
-      //           : formatTimeMessageBox(message.createAt);
-
-      //       updatedMessages[boxId] = {
-      //         ...message,
-      //         createAt: formattedTime
-      //       };
-      //     });
-      //     return updatedMessages;
-      //   });
-      // }, 60000);
     }
   }, [dataChat, handleChatEvent]);
 

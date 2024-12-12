@@ -1,6 +1,9 @@
+import {
+  MessageBoxInfo,
+  ResponseMessageBoxDTO,
+  UserInfoBox
+} from "@/lib/DTO/message";
 import axios from "axios";
-import { formatTimeMessageBox } from "./utils";
-import { MessageBoxInfo, ResponseMessageBoxDTO, UserInfoBox } from "./dataBox";
 
 export const fetchMessageBoxGroup = async (
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
@@ -43,7 +46,8 @@ export const fetchMessageBoxGroup = async (
           lastName: mem.lastName,
           phone: mem.phoneNumber,
           avatar: mem.avatar,
-          nickName: mem.nickName
+          nickName: mem.nickName,
+          isOnline: false
         }));
         return {
           id: item._id,

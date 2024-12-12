@@ -2,17 +2,13 @@
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
-import {
-  fetchMessages,
-  FileContent,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
 import { getPusherClient } from "@/lib/pusher";
-import { markMessageAsRead } from "@/lib/read-mark";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { isCurrentPageBoxId } from "@/lib/utils";
-import { getImageList } from "@/lib/dataImageList";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { getFileList } from "@/lib/data/message/dataFileList";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);
@@ -36,7 +32,7 @@ const page = () => {
   }, []);
 
   //Fetch Box Chat from Backend
-  const { dataChat, setMessagesByBox, setReadStatusByBox, setImageList } =
+  const { dataChat, setMessagesByBox, setReadStatusByBox, setFileList } =
     useChatContext();
 
   //Fetch messages
@@ -48,27 +44,26 @@ const page = () => {
         const boxMessages = await fetchMessages(box.id);
         messagesMap[box.id] = boxMessages;
       }
-
       setMessagesByBox(messagesMap);
     };
 
     fetchMessagesForBoxes();
   }, []);
 
-  //Fetch image
+  //Fetch file
   useEffect(() => {
     const fetchImageList = async () => {
+      const imageMap: Record<string, FileContent[]> = {};
       for (const box of dataChat) {
         if (isCurrentPageBoxId(box.id)) {
-          const list: FileContent[] = await getImageList(box.id);
-          setImageList(list);
+          const list: FileContent[] = await getFileList(box.id);
+          imageMap[box.id] = list;
         }
       }
+      setFileList(imageMap);
     };
-
     fetchImageList();
-  }, []);
-
+  }, [dataChat]);
   //Subcribe channel in pusher
   useEffect(() => {
     for (const box of dataChat) {

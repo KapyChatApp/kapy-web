@@ -5,11 +5,7 @@ import { group, user } from "@/constants/object";
 import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
-import {
-  ActiveComponentProps,
-  SeeAllProps,
-  StateType
-} from "@/types/mess-group";
+import { SeeAllProps } from "@/types/mess-group";
 
 interface MoreActionsProps {
   propsAll: SeeAllProps;
@@ -24,22 +20,22 @@ const MoreActions = ({
   setOpenMore,
   openMore
 }: MoreActionsProps) => {
-  const { setActiveComponent, setItemSent, itemSent } = propsAll;
+  const { detailByBox, setActiveComponent, setItemSent, itemSent } = propsAll;
   const pathname = usePathname();
-  const idFromPathname = pathname.split("/").pop();
-  const userInfo = user.filter((info) => info.id === idFromPathname);
-  const groupInfo = group.filter((info) => info.id === idFromPathname);
 
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
   const top = {
-    ava: userInfo[userInfo.length - 1]?.ava,
-    name: userInfo[userInfo.length - 1]?.name
+    ava: detailByBox.receiverInfo.avatar,
+    name:
+      detailByBox.receiverInfo.firstName +
+      " " +
+      detailByBox.receiverInfo.lastName
   };
 
   const topGroup = {
-    ava: groupInfo[userInfo.length - 1]?.ava,
-    name: groupInfo[userInfo.length - 1]?.name
+    ava: detailByBox.groupAva,
+    name: detailByBox.groupName
   };
 
   return isGroup ? (
@@ -52,11 +48,11 @@ const MoreActions = ({
       />
 
       <MoreMiddle
+        detailByBox={detailByBox}
         setActiveComponent={setActiveComponent}
         setItemSent={setItemSent}
         itemSent={itemSent}
       />
-
       <MoreBottom setActiveComponent={setActiveComponent} />
     </div>
   ) : (
@@ -69,6 +65,7 @@ const MoreActions = ({
       />
 
       <MoreMiddle
+        detailByBox={detailByBox}
         setActiveComponent={setActiveComponent}
         setItemSent={setItemSent}
         itemSent={itemSent}

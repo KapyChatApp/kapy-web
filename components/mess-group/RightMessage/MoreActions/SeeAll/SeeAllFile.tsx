@@ -1,16 +1,19 @@
 import { Button } from "@/components/ui/button";
-import { Video } from "@/types/media";
-import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
+import { FileSegment } from "@/components/ui/file-segment";
+import { FileContent } from "@/lib/DTO/message";
+import { SeeAllProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-const SeeAllVideo: React.FC<SeeAllProps> = ({
+const SeeAllFile: React.FC<SeeAllProps> = ({
   setActiveComponent,
   setItemSent,
   itemSent
 }) => {
-  const videoList = itemSent as Video[];
+  const [fileList, setFileList] = useState<FileContent[]>([]);
+  useEffect(() => {
+    setFileList(itemSent as FileContent[]);
+  }, [itemSent]);
   const handleBack = () => {
     setActiveComponent("");
   };
@@ -29,31 +32,30 @@ const SeeAllVideo: React.FC<SeeAllProps> = ({
           />
           <div className="flex justify-center items-end w-full">
             <p className="paragraph-semibold text-dark100_light900">
-              Videos of Group
+              Files of Group
             </p>
             <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 paragraph-regular ml-1">
-              ({videoList.length})
+              ({fileList.length})
             </p>
           </div>
         </Button>
       </div>
-      <div className="flex flex-row flex-wrap items-center w-full md:justify-between justify-start md:px-2 px-0 md:gap-2 gap-4">
-        {videoList.length > 0
-          ? videoList.map((item) => (
-              <div className="flex w-[20%] md:w-[30%] relative">
-                <Image
-                  src={item.path}
-                  alt={item.fileName}
-                  width={500}
-                  height={500}
-                  className="w-full h-auto rounded-[4px] cursor-pointer object-cover"
+      <div className="flex flex-col items-start w-full gap-5 px-2">
+        {fileList.length > 0
+          ? fileList.map((item) => {
+              return (
+                <FileSegment
+                  fileName={item.fileName}
+                  url={item.url}
+                  textClassName="text-dark100_light900"
+                  iconClassName="text-dark100_light900"
                 />
-              </div>
-            ))
+              );
+            })
           : null}
       </div>
     </div>
   );
 };
 
-export default SeeAllVideo;
+export default SeeAllFile;

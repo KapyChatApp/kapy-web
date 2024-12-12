@@ -1,4 +1,5 @@
-import React from "react";
+"use client";
+import React, { useState } from "react";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Input } from "@/components/ui/input";
@@ -12,18 +13,63 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
+import { updateUserProfile } from "@/lib/services/user/updateUser";
+import { UserUpdateRequest } from "@/lib/DTO/user";
+import { useUserContext } from "@/context/UserContext";
 
 const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
+  const birth = new Date(personal.birthDay);
+  const { setAdminInfo, adminInfo } = useUserContext();
   const handleBack = () => {
     setEdit(false);
   };
-  const handleEdit = () => {
-    toast({
-      title: "Profile information is updated successfully!",
-      className:
-        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
-    });
-    setEdit(false);
+  const [firstName, setFirstName] = useState(personal.firstName.trim());
+  const [lastName, setLastName] = useState(personal.lastName.trim());
+  const [gender, setGender] = useState(personal.gender ? "male" : "female");
+  const [birthDay, setBirthDay] = useState({
+    day: birth.getDate(),
+    month: birth.getMonth() + 1,
+    year: birth.getFullYear()
+  });
+  const handleEdit = async () => {
+    try {
+      const formattedDate = new Date(
+        `${birthDay.year}-${birthDay.month
+          .toString()
+          .padStart(2, "0")}-${birthDay.day.toString().padStart(2, "0")}`
+      ).toISOString();
+      const updatedProfile: UserUpdateRequest = {
+        firstName,
+        lastName,
+        gender: gender === "male" ? true : false,
+        birthDay: formattedDate,
+        nickName: adminInfo.nickName,
+        phoneNumber: adminInfo.phoneNumber,
+        email: adminInfo.email,
+        password: adminInfo.password,
+        rePassword: adminInfo.password,
+        address: adminInfo.address
+      };
+
+      const result = await updateUserProfile(updatedProfile);
+      console.log(result.newProfile);
+      setAdminInfo(result.newProfile);
+
+      toast({
+        title: "Profile information is updated successfully!",
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
+      setEdit(false);
+    } catch (error) {
+      toast({
+        title: "Failed to update profile",
+        description:
+          "An error occurred while updating the profile. Please try again.",
+        className:
+          "border-none rounded-lg bg-red-500 text-white paragraph-regular items-center justify-center "
+      });
+    }
   };
   return (
     <div className="modal-overlay">
@@ -45,10 +91,20 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
 
         <div className="flex flex-col h-[440px] w-full overflow-scroll scrollable p-4 gap-8">
           <div className="flex flex-col gap-3 w-full h-fit">
-            <p className="text-dark100_light900 body-regular">Display name</p>
+            <p className="text-dark100_light900 body-regular">First name</p>
             <Input
               type="text"
-              placeholder={personal.name}
+              placeholder={personal.firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
+            ></Input>
+          </div>
+          <div className="flex flex-col gap-3 w-full h-fit">
+            <p className="text-dark100_light900 body-regular">Last name</p>
+            <Input
+              type="text"
+              placeholder={personal.lastName}
+              onChange={(e) => setLastName(e.target.value)}
               className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
             ></Input>
           </div>
@@ -58,7 +114,8 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               Personal information
             </p>
             <RadioGroup
-              defaultValue={personal.sex === 1 ? "female" : "male"}
+              defaultValue={gender}
+              onValueChange={setGender}
               className="flex flex-row gap-12 w-full h-fit"
             >
               <div className="flex items-center gap-3">
@@ -81,10 +138,15 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
             <div className="flex flex-col gap-3 w-full h-fit">
               <p className="text-dark100_light900 body-regular">Birthdate</p>
               <div className="flex flex-row gap-3 w-full h-fit">
-                <Select>
+                <Select
+                  value={birthDay.day.toString()}
+                  onValueChange={(value) =>
+                    setBirthDay((prev) => ({ ...prev, day: Number(value) }))
+                  }
+                >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={personal.birth.getDate().toString()}
+                      placeholder={birth.getDate().toString()}
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>
@@ -101,10 +163,15 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
                   </SelectContent>
                 </Select>
 
-                <Select>
+                <Select
+                  value={birthDay.month.toString()}
+                  onValueChange={(value) =>
+                    setBirthDay((prev) => ({ ...prev, month: Number(value) }))
+                  }
+                >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={(personal.birth.getMonth() + 1).toString()}
+                      placeholder={(birth.getMonth() + 1).toString()}
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>
@@ -121,10 +188,15 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
                   </SelectContent>
                 </Select>
 
-                <Select>
+                <Select
+                  value={birthDay.year.toString()}
+                  onValueChange={(value) =>
+                    setBirthDay((prev) => ({ ...prev, year: Number(value) }))
+                  }
+                >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={personal.birth.getFullYear().toString()}
+                      placeholder={birth.getFullYear().toString()}
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>

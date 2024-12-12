@@ -1,38 +1,69 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import FindComponent from "../MoreActions/FindComponent";
-import ManagementComponent from "../MoreActions/ManagementComponent";
-import AddComponent from "../MoreActions/AddComponent";
-import MoreActions from "../MoreActions/MoreActions";
-import SeeAllMember from "../MoreActions/SeeAll/SeeAllMember";
-import SeeAllFile from "../MoreActions/SeeAll/SeeAllFile";
-import SeeAllPhoto from "../MoreActions/SeeAll/SeeAllPhoto";
-import SeeAllLink from "../MoreActions/SeeAll/SeeAllLink";
-import SeeAllVideo from "../MoreActions/SeeAll/SeeAllVideo";
-import { MememberGroup } from "@/types/object";
-import { Files, Links, Photo, Video } from "@/types/media";
+import FindComponent from "./MoreActions/FindComponent";
+import ManagementComponent from "./MoreActions/ManagementComponent";
+import AddComponent from "./MoreActions/AddComponent";
+import MoreActions from "./MoreActions/MoreActions";
+import SeeAllMember from "./MoreActions/SeeAll/SeeAllMember";
+import SeeAllFile from "./MoreActions/SeeAll/SeeAllFile";
+import SeeAllPhoto from "./MoreActions/SeeAll/SeeAllPhoto";
+import SeeAllVideo from "./MoreActions/SeeAll/SeeAllVideo";
+import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 
 interface OpenMoreDisplayProps {
+  detailByBox: MessageBoxInfo | undefined;
   openMore: boolean;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
   isClickOtherRight?: boolean;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 interface MoreDisplay {
   display: OpenMoreDisplayProps;
 }
 
 const OpenMoreDisplay = ({ display }: MoreDisplay) => {
-  const { openMore, setOpenMore, isClickOtherRight, setClickOtherRight } =
-    display;
-
+  const {
+    openMore,
+    setOpenMore,
+    isClickOtherRight,
+    setClickOtherRight,
+    detailByBox
+  } = display;
+  let detail: MessageBoxInfo = {
+    id: "",
+    receiverInfo: {
+      id: "",
+      firstName: "",
+      lastName: "",
+      nickName: "",
+      avatar: "",
+      phone: "",
+      isOnline: false
+    },
+    memberInfo: [
+      {
+        id: "",
+        firstName: "",
+        lastName: "",
+        nickName: "",
+        avatar: "",
+        phone: "",
+        isOnline: false
+      }
+    ],
+    groupName: "",
+    groupAva: "",
+    pin: false,
+    readStatus: true
+  };
+  if (detailByBox) {
+    detail = detailByBox;
+  }
   const [activeComponent, setActiveComponent] = useState<string>("");
-  const [itemSent, setItemSent] = useState(
-    [] as MememberGroup[] | Photo[] | Video[] | Files[] | Links[]
-  );
+  const [itemSent, setItemSent] = useState([] as UserInfoBox[] | FileContent[]);
 
   const propsAll = {
+    detailByBox: detail,
     setActiveComponent: setActiveComponent,
     setItemSent: setItemSent,
     itemSent: itemSent
@@ -55,6 +86,7 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       case "member":
         return (
           <SeeAllMember
+            detailByBox={detail}
             setActiveComponent={setActiveComponent}
             setItemSent={setItemSent}
             itemSent={itemSent}
@@ -63,6 +95,7 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       case "file":
         return (
           <SeeAllFile
+            detailByBox={detail}
             setActiveComponent={setActiveComponent}
             setItemSent={setItemSent}
             itemSent={itemSent}
@@ -71,14 +104,7 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       case "photo":
         return (
           <SeeAllPhoto
-            setActiveComponent={setActiveComponent}
-            setItemSent={setItemSent}
-            itemSent={itemSent}
-          />
-        );
-      case "link":
-        return (
-          <SeeAllLink
+            detailByBox={detail}
             setActiveComponent={setActiveComponent}
             setItemSent={setItemSent}
             itemSent={itemSent}
@@ -87,6 +113,7 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       case "video":
         return (
           <SeeAllVideo
+            detailByBox={detail}
             setActiveComponent={setActiveComponent}
             setItemSent={setItemSent}
             itemSent={itemSent}

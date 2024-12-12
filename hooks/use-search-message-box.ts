@@ -1,4 +1,4 @@
-import { MessageBoxInfo } from "@/lib/dataBox";
+import { MessageBoxInfo } from "@/lib/DTO/message";
 import { useState } from "react";
 
 const useSearchMessageBox = (box: MessageBoxInfo[]) => {
@@ -6,17 +6,12 @@ const useSearchMessageBox = (box: MessageBoxInfo[]) => {
 
   const filteredBox = box.filter((item) => {
     // Kiểm tra xem item có phải là đối tượng hợp lệ và có otherName hay không
-    if (
-      item &&
-      typeof item === "object" &&
-      item.receiverInfo.firstName + item.receiverInfo.lastName
-    ) {
-      return (
-        item.receiverInfo.firstName +
-        item.receiverInfo.lastName
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase())
-      );
+    let name = item.receiverInfo.firstName + item.receiverInfo.lastName;
+    if (item.groupName !== "") {
+      name = item.groupName;
+    }
+    if (item && typeof item === "object" && name) {
+      return name.toLowerCase().includes(searchTerm.toLowerCase());
     }
     // Nếu item không hợp lệ, trả về false để loại bỏ khỏi filteredBox
     return false;

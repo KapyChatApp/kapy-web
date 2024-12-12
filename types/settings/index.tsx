@@ -1,7 +1,7 @@
-import { Admin, User } from "../object";
+import { UserResponseDTO } from "@/lib/DTO/user";
 
 export interface PersonalItemProps {
-  personal: Admin;
+  personal: UserResponseDTO;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 

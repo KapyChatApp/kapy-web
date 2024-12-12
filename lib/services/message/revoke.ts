@@ -1,15 +1,5 @@
 import axios from "axios";
 
-export interface PusherRevoke {
-  id: string;
-  flag: boolean;
-  isReact: boolean;
-  text: string;
-  boxId: string;
-  action: string;
-  createAt: string;
-  createBy: string;
-}
 export async function RevokeMessage(messageId: string): Promise<boolean> {
   try {
     const storedToken = localStorage.getItem("token");

@@ -3,20 +3,21 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useRef, useState } from "react";
 import MessageInput from "../MessageInput";
 import { Button } from "../../ui/button";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import axios from "axios";
 import { usePathname } from "next/navigation";
-import { ResponseUserInfo } from "@/lib/dataUser";
 import { useChatContext } from "@/context/ChatContext";
-import { UserInfoBox } from "@/lib/dataBox";
 import { getPusherClient } from "@/lib/pusher";
 import { getFileFormat } from "@/lib/utils";
 import MicRecorder from "mic-recorder-to-mp3";
 import MessageRecorder from "../MessageRecorder";
+import { useUserContext } from "@/context/UserContext";
+import { isTexting } from "@/lib/services/message/isTexting";
+import { disableTexting } from "@/lib/services/message/disableTexting";
+import { ResponseUserInfo } from "@/lib/DTO/user";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
-  senderInfo: UserInfoBox | undefined;
 }
 const tempSenderInfo = {
   id: "",
@@ -25,14 +26,15 @@ const tempSenderInfo = {
   nickName: "defaultNick",
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
-const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
-  const { setMessagesByBox } = useChatContext();
+const RightBottom = ({ recipientIds }: BottomProps) => {
+  const { setMessagesByBox, setFileList, dataChat, isTyping, setIsTyping } =
+    useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const [apiAdminId, setAdminId] = useState<string>();
+  const { adminId } = useUserContext();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -86,7 +88,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     const newMessageSegment: ResponseMessageDTO = {
       id: "",
       flag: true,
-      readedId: apiAdminId ? [apiAdminId] : [],
+      readedId: adminId ? [adminId] : [],
       contentId: {
         fileName: "",
         url: "",
@@ -100,7 +102,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       text: messageContent,
       boxId: boxId ? boxId : "",
       createAt: new Date().toISOString(),
-      createBy: apiAdminId ? apiAdminId : ""
+      createBy: adminId ? adminId : ""
     };
 
     // Tạo đối tượng SegmentMessageDTO
@@ -153,7 +155,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       const tempMessages: ResponseMessageDTO[] = files.map((file) => ({
         id: "",
         flag: true,
-        readedId: [apiAdminId || ""],
+        readedId: [adminId || ""],
         contentId: {
           fileName: file.name,
           url: URL.createObjectURL(file), // Preview URL tạm thời
@@ -167,7 +169,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
-        createBy: apiAdminId || ""
+        createBy: adminId || ""
       }));
 
       // Gửi từng file lên server
@@ -212,7 +214,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
       const tempMessages: ResponseMessageDTO = {
         id: "",
         flag: true,
-        readedId: [apiAdminId || ""],
+        readedId: [adminId || ""],
         contentId: {
           fileName: record.name,
           url: URL.createObjectURL(record), // Preview URL tạm thời
@@ -226,7 +228,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         text: "",
         boxId: boxId ? boxId : "",
         createAt: new Date().toISOString(),
-        createBy: apiAdminId || ""
+        createBy: adminId || ""
       };
 
       const fileContent: FileContent = {
@@ -286,6 +288,48 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     }
   };
 
+  //Create Texting/DisableTexting Event
+  let avatar: string = "";
+  useEffect(() => {
+    const createTextingEvent = async () => {
+      if (!boxId) return;
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) return;
+      const box = dataChat.filter((item) => item.id === boxId);
+      if (isTyping) {
+        if (dataChat && adminId && box.length > 0) {
+          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          if (user && user.length > 0) {
+            avatar = user[0].avatar;
+          }
+        }
+        try {
+          // Gọi API để thông báo người dùng đang nhập
+          const result = await isTexting(storedToken, boxId, avatar);
+          console.log(result);
+        } catch (error) {
+          console.error("Error texting event:", error);
+        }
+      } else {
+        if (dataChat && adminId && box.length > 0) {
+          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          if (user && user.length > 0) {
+            avatar = user[0].avatar;
+          }
+        }
+        try {
+          const result = await disableTexting(storedToken, boxId, avatar);
+          console.log(result);
+        } catch (error) {
+          console.error("Error texting event:", error);
+        }
+      }
+    };
+
+    createTextingEvent();
+  }, [isTyping, avatar]);
+
+  //Send Message
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
@@ -300,6 +344,21 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
+      if (data.contentId) {
+        setFileList((prev) => {
+          const fileContent = prev[data.boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
+            const updated = {
+              ...prev,
+              [data.boxId]: [...fileContent, data.contentId]
+            };
+            console.log("Updated fileList: ", updated);
+            return updated;
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
+      }
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
@@ -307,12 +366,12 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     // Bind sự kiện với handler
     pusherClient.bind("new-message", handleNewMessage);
 
-    // Cleanup khi component bị unmount hoặc boxId thay đổi
-    // return () => {
-    //   pusherClient.unsubscribe(`private-${boxId}`);
-    //   pusherClient.unbind("new-message", handleNewMessage);
-    // };
-  }, [boxId, setMessagesByBox]);
+    //Cleanup khi component bị unmount hoặc boxId thay đổi
+    return () => {
+      pusherClient.unsubscribe(`private-${boxId}`);
+      pusherClient.unbind("new-message", handleNewMessage);
+    };
+  }, [isTyping]);
 
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
@@ -334,13 +393,6 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
     // Sau khi cập nhật xong, loại bỏ các URL đã xử lý
     setTemporaryToCloudinaryMap([]);
   }, [temporaryToCloudinaryMap]);
-
-  useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
-  });
 
   return (
     <div className="flex flex-row bg-transparent items-center justify-start w-full">
@@ -411,7 +463,7 @@ const RightBottom = ({ recipientIds, senderInfo }: BottomProps) => {
           <MessageInput
             onMessageChange={handleInputChange}
             messageContent={messageContent}
-            setMessageContent={setMessageContent}
+            setTyping={setIsTyping}
             handleAction={handleAction}
           />
         )}

@@ -1,19 +1,48 @@
 "use client";
-import { MessageBoxContent } from "@/lib/dataBox";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
-import { DetailBox } from "@/lib/dataOneBox";
+import { UserResponseDTO } from "@/lib/DTO/user";
 import { createContext, useContext, useState } from "react";
-export interface LatestMessage {
-  senderName: string;
-  content: string;
-  createAt: string;
-  boxId: string;
-}
+export const defaultUserResponseDTO: UserResponseDTO = {
+  _id: "",
+  firstName: "",
+  lastName: "",
+  nickName: "",
+  phoneNumber: "",
+  email: "",
+  password: "",
+  role: [],
+  avatar: "",
+  background: "",
+  gender: true,
+  address: "",
+  job: "",
+  hobbies: "",
+  bio: "",
+  point: 0,
+  relationShip: "",
+  birthDay: "",
+  flag: false,
+  attendDate: "",
+  friendIds: [],
+  bestFriendIds: [],
+  blockedIds: [],
+  postIds: [],
+  rateIds: [],
+  createAt: "",
+  createBy: ""
+};
 
 // Tạo kiểu cho context
 interface UserContextType {
   adminId: string;
   setAdminId: React.Dispatch<React.SetStateAction<string>>;
+  isOnlineChat: Record<string, boolean>;
+  setIsOnlineChat: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
+  adminInfo: UserResponseDTO;
+  setAdminInfo: React.Dispatch<React.SetStateAction<UserResponseDTO>>;
+  newAva: string;
+  setNewAva: React.Dispatch<React.SetStateAction<string>>;
 }
 
 // Tạo context
@@ -24,12 +53,22 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [adminId, setAdminId] = useState<string>("");
-
+  const [isOnlineChat, setIsOnlineChat] = useState<Record<string, boolean>>({});
+  const [adminInfo, setAdminInfo] = useState<UserResponseDTO>(
+    defaultUserResponseDTO
+  );
+  const [newAva, setNewAva] = useState<string>("");
   return (
     <UserContext.Provider
       value={{
         adminId,
-        setAdminId
+        setAdminId,
+        isOnlineChat,
+        setIsOnlineChat,
+        adminInfo,
+        setAdminInfo,
+        newAva,
+        setNewAva
       }}
     >
       {children}

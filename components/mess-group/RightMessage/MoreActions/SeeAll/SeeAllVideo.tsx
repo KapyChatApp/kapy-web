@@ -1,19 +1,37 @@
+"use client";
 import { Button } from "@/components/ui/button";
-import { Photo } from "@/types/media";
+import { FileContent } from "@/lib/DTO/message";
 import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
+import { Fancybox } from "@fancyapps/ui";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import ReactPlayer from "react-player";
 
-const SeeAllPhoto: React.FC<SeeAllProps> = ({
+const SeeAllVideo: React.FC<SeeAllProps> = ({
   setActiveComponent,
   setItemSent,
   itemSent
 }) => {
-  const photoList = itemSent as Photo[];
+  const [videoList, setVideoList] = useState<FileContent[]>([]);
+  useEffect(() => {
+    setVideoList(itemSent as FileContent[]);
+  }, [itemSent]);
+  console.log(videoList);
   const handleBack = () => {
     setActiveComponent("");
   };
+  //Show image in More
+  useEffect(() => {
+    // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
+    Fancybox.bind("[data-fancybox='more-video']", {
+      Toolbar: true,
+      Thumbs: true
+    });
+    return () => {
+      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+    };
+  }, []);
   return (
     <div className="flex flex-col items-center justify-start w-full h-fit gap-6">
       <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center h-[80px]">
@@ -29,26 +47,32 @@ const SeeAllPhoto: React.FC<SeeAllProps> = ({
           />
           <div className="flex justify-center items-end w-full">
             <p className="paragraph-semibold text-dark100_light900">
-              Photos of Group
+              Videos of Group
             </p>
             <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 paragraph-regular ml-1">
-              ({photoList.length})
+              ({videoList.length})
             </p>
           </div>
         </Button>
       </div>
       <div className="flex flex-row flex-wrap items-center w-full md:justify-between justify-start md:px-2 px-0 md:gap-2 gap-4">
-        {photoList.length > 0
-          ? photoList.map((item) => (
-              <div className="flex w-[20%] md:w-[30%] relative">
-                <Image
-                  src={item.path}
-                  alt={item.fileName}
-                  width={500}
-                  height={500}
-                  className="w-full h-auto rounded-[4px] cursor-pointer object-cover"
-                />
-              </div>
+        {videoList.length > 0
+          ? videoList.map((item) => (
+              <a
+                href={item.url}
+                data-fancybox="more-video"
+                className={` flex md:w-[32%] w-[30%] h-auto relative`}
+              >
+                <div className="rounded-[4px] overflow-hidden">
+                  <ReactPlayer
+                    url={item.url}
+                    controls
+                    width="200px"
+                    height="120px"
+                    className="max-w-full h-auto"
+                  />
+                </div>
+              </a>
             ))
           : null}
       </div>
@@ -56,4 +80,4 @@ const SeeAllPhoto: React.FC<SeeAllProps> = ({
   );
 };
 
-export default SeeAllPhoto;
+export default SeeAllVideo;

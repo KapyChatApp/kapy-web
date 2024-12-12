@@ -1,10 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Actions } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
+interface Actions {
+  icon: string;
+  label: string;
+  click: string;
+}
 interface ActionButtonProps {
   action: Actions;
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;

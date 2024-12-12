@@ -8,6 +8,8 @@ import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
 import { useChatContext } from "@/context/ChatContext";
+import { getPusherClient } from "@/lib/pusher";
+import { useUserContext } from "@/context/UserContext";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,10 +21,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { dataChat } = useChatContext();
 
-  const searchChat = useSearchMessageBox(dataChat);
-  const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
-    return searchChat;
-  }, [searchChat]);
+  const { searchTerm, setSearchTerm, filteredBox } =
+    useSearchMessageBox(dataChat);
 
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);

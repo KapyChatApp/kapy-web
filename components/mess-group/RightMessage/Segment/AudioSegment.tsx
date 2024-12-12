@@ -1,7 +1,8 @@
 "use client";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import React from "react";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
+import { useUserContext } from "@/context/UserContext";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -15,7 +16,8 @@ const MediaSegment: React.FC<SegmentMessage> = ({
   length
 }) => {
   const { createBy, contentId } = segments;
-  const adminId = localStorage.getItem("adminId");
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const isActive = createBy !== adminId;
 
   //Render Content

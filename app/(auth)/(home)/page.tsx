@@ -2,7 +2,8 @@
 import InputCustom from "@/components/auth/InputCustom";
 import { Button } from "@/components/ui/button";
 import { inputCustomItems } from "@/constants/auth";
-import { pusherClient } from "@/lib/pusher";
+import { useUserContext } from "@/context/UserContext";
+import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -10,7 +11,8 @@ import React, { useState } from "react";
 const Signin = () => {
   const [phone, setPhone] = useState("");
   const [pass, setPass] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string>("");
+  const { adminInfo, setAdminInfo } = useUserContext();
 
   const handleLogin = async () => {
     try {
@@ -36,6 +38,8 @@ const Signin = () => {
 
       localStorage.setItem("token", token);
       localStorage.setItem("phone", phone);
+
+      await getMyProfile(setAdminInfo, setError);
 
       window.location.href = "/chat";
     } catch (error) {
