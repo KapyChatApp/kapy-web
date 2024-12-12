@@ -1,8 +1,9 @@
 "use client";
-import { MessageBoxInfo } from "@/lib/dataBox";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
-import { DetailBox } from "@/lib/dataOneBox";
-import { TextingEvent } from "@/lib/isTexting";
+import {
+  FileContent,
+  MessageBoxInfo,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
 import { createContext, useContext, useState } from "react";
 
 // Tạo kiểu cho context

@@ -1,4 +1,3 @@
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroupItem, RadioGroup } from "@/components/ui/radio-group";
 import Image from "next/image";
 import React from "react";

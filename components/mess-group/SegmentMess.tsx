@@ -1,5 +1,4 @@
 "use client";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
 import React, { useState } from "react";
 import ImageSegment from "./RightMessage/Segment/ImageSegment";
 import TextSegment from "./RightMessage/Segment/TextSegment";
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/menubar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "../ui/badge";
+import { ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;

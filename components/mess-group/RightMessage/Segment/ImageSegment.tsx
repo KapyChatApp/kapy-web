@@ -1,5 +1,5 @@
 "use client";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { Fancybox } from "@fancyapps/ui";

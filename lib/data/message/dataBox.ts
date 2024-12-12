@@ -1,52 +1,9 @@
-import { useState, useEffect } from "react";
+import {
+  MessageBoxInfo,
+  ResponseMessageBoxDTO,
+  UserInfoBox
+} from "@/lib/DTO/message";
 import axios from "axios";
-import { formatTimeMessageBox } from "./utils";
-import { ResponseMessageDTO } from "./dataMessages";
-
-// Interface FE
-export interface UserInfoBox {
-  id: string;
-  firstName: string;
-  lastName: string;
-  nickName: string;
-  avatar: string;
-  phone: string;
-  isOnline: boolean;
-}
-export interface MessageBoxInfo {
-  id: string;
-  receiverInfo: UserInfoBox;
-  memberInfo: UserInfoBox[];
-  groupName: string;
-  groupAva: string;
-  pin: boolean;
-  readStatus: boolean;
-}
-
-// Interface Response
-interface ResponseUserInfoBox {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  nickName: string;
-  avatar: string;
-  phoneNumber: string;
-}
-interface MessageBoxDTO {
-  _id: string;
-  senderId: string | ResponseUserInfoBox;
-  receiverIds: ResponseUserInfoBox[];
-  groupName: string;
-  groupAva: string;
-  flag: boolean;
-  pin: boolean;
-  lastMessage: ResponseMessageDTO;
-  readStatus: boolean;
-}
-export interface ResponseMessageBoxDTO {
-  box: MessageBoxDTO[];
-  adminId: string;
-}
 
 export const fetchMessageBox = async (
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,

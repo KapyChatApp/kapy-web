@@ -1,16 +1,13 @@
 "use client";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo } from "@/lib/dataBox";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { getPusherClient } from "@/lib/pusher";
+import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
 import { contentBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import axios from "axios";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 interface Box {
   box: MessageBoxInfo;

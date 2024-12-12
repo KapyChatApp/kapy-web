@@ -1,5 +1,5 @@
+import { FileContent } from "@/lib/DTO/message";
 import axios from "axios";
-import { FileContent } from "./dataMessages";
 
 export const getFileList = async (boxId: string): Promise<FileContent[]> => {
   const storedToken = localStorage.getItem("token");

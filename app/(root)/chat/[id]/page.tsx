@@ -2,16 +2,13 @@
 import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
-import {
-  fetchMessages,
-  FileContent,
-  ResponseMessageDTO
-} from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
-import { markMessageAsRead } from "@/lib/read-mark";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { isCurrentPageBoxId } from "@/lib/utils";
-import { getFileList } from "@/lib/dataFileList";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { getFileList } from "@/lib/data/message/dataFileList";
 
 const page = () => {
   const [isClickBox, setClickBox] = useState(true);

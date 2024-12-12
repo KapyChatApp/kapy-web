@@ -21,10 +21,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { dataChat } = useChatContext();
 
-  const searchChat = useSearchMessageBox(dataChat);
-  const { searchTerm, setSearchTerm, filteredBox } = React.useMemo(() => {
-    return searchChat;
-  }, [searchChat]);
+  const { searchTerm, setSearchTerm, filteredBox } =
+    useSearchMessageBox(dataChat);
 
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);

@@ -1,17 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fetchMessageBox } from "@/lib/dataBox";
 import { useChatContext } from "@/context/ChatContext";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { isCurrentPageBoxId } from "@/lib/utils";
-import { markMessageAsRead } from "@/lib/read-mark";
-import { PusherDelete } from "@/lib/delete";
-import { PusherRevoke } from "@/lib/revoke";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { useUserContext } from "@/context/UserContext";
-import { isOnline } from "@/lib/isOnline";
-import { isOffline } from "@/lib/isOffline";
 import { getPusherClient } from "@/lib/pusher";
+import { fetchMessageBox } from "@/lib/data/message/dataBox";
+import {
+  PusherDelete,
+  PusherRevoke,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
 export interface OnlineEvent {
   userId: string;
   online: boolean;

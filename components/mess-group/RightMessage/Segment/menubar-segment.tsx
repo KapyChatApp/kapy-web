@@ -8,13 +8,13 @@ import {
   MenubarTrigger
 } from "@/components/ui/menubar";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { DeleteMessage, PusherDelete } from "@/lib/delete";
 import { useToast } from "@/hooks/use-toast";
 import { getPusherClient } from "@/lib/pusher";
 import { useChatContext } from "@/context/ChatContext";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { PusherRevoke, RevokeMessage } from "@/lib/revoke";
 import ConfirmRemove from "./ConfirmRemove";
+import { PusherDelete, PusherRevoke } from "@/lib/DTO/message";
+import { RevokeMessage } from "@/lib/services/message/revoke";
+import { DeleteMessage } from "@/lib/services/message/delete";
 
 interface MenuProps {
   createAt: string;

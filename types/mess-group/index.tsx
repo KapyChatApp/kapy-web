@@ -1,16 +1,4 @@
-import { MessageBoxInfo, UserInfoBox } from "@/lib/dataBox";
-import { FileContent } from "@/lib/dataMessages";
-
-export interface Actions {
-  icon: string;
-  label: string;
-  click: string;
-}
-
-export interface MoreTopProps {
-  ava: string;
-  name: string;
-}
+import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 
 export interface ActiveComponentProps {
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;

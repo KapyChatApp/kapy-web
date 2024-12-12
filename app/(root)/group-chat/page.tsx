@@ -1,16 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Sử dụng useRouter để điều hướng
-import { fetchMessageBoxGroup } from "@/lib/dataBoxGroup";
+import { useRouter } from "next/navigation";
 import { useChatContext } from "@/context/ChatContext";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { formatTimeMessageBox, isCurrentPageBoxId } from "@/lib/utils";
-import { DetailBox, fetchDetailBox } from "@/lib/dataOneBox";
-import { markMessageAsRead } from "@/lib/read-mark";
+import { isCurrentPageBoxId } from "@/lib/utils";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { getPusherClient } from "@/lib/pusher";
-import { PusherDelete } from "@/lib/delete";
-import { PusherRevoke } from "@/lib/revoke";
-import { admin } from "@/constants/object";
+import {
+  PusherDelete,
+  PusherRevoke,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
+import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
 
 export default function Page() {
   const router = useRouter();

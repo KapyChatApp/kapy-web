@@ -1,9 +1,5 @@
-export interface TextingEvent {
-  boxId: string;
-  userId: string;
-  avatar: string;
-  texting: boolean;
-}
+import { TextingEvent } from "@/lib/DTO/message";
+
 export async function isTexting(
   token: string,
   boxId: string,

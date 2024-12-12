@@ -1,32 +1,5 @@
+import { ResponseMessageDTO } from "@/lib/DTO/message";
 import axios from "axios";
-
-export interface FileContent {
-  fileName: string;
-  url: string;
-  publicId: string;
-  bytes: string;
-  width: string;
-  height: string;
-  format: string;
-  type: string;
-}
-export interface GPSContent {
-  type: "gps";
-  latitude: number;
-  longitude: number;
-  description?: string;
-}
-
-export interface ResponseMessageDTO {
-  id: string;
-  flag: boolean;
-  readedId: string[];
-  contentId: FileContent;
-  text: string;
-  boxId: string;
-  createAt: string;
-  createBy: string;
-}
 
 let messageData: ResponseMessageDTO[];
 export const fetchMessages = async (

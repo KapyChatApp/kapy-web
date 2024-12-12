@@ -1,11 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { FileSegment } from "@/components/ui/file-segment";
-import { FileContent } from "@/lib/dataMessages";
-import { Files } from "@/types/media";
+import { FileContent } from "@/lib/DTO/message";
 import { SeeAllProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import Image from "next/image";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
 
 const SeeAllFile: React.FC<SeeAllProps> = ({

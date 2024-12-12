@@ -1,5 +1,5 @@
 "use client";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
+import { ResponseMessageDTO } from "@/lib/DTO/message";
 import React, { useState } from "react";
 
 interface SegmentMessage {

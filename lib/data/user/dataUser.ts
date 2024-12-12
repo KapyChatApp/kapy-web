@@ -1,27 +1,8 @@
+import { ResponseUserInfo } from "@/lib/DTO/user";
 import axios from "axios";
 
 // Cập nhật interface để trả về đầy đủ thông tin của người dùng
-export interface ResponseUserInfo {
-  id: string;
-  firstName: string;
-  lastName: string;
-  nickName: string;
-  avatar: string;
-  email: string;
-  phoneNumber: string;
-  address: string;
-  job: string;
-  hobbies: string;
-  bio: string;
-  birthDay: string;
-  attendDate: string;
-  relationShip: string;
-  flag: boolean;
-  friendIds: string[];
-  bestFriendIds: string[];
-  blockedIds: string[];
-  posts: string[];
-}
+
 let userData: ResponseUserInfo;
 export const fetchUser = async (
   userId: string

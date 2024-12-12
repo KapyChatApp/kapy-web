@@ -1,5 +1,5 @@
 "use client";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import React, { useState } from "react";
 import { FileSegment } from "@/components/ui/file-segment";
 

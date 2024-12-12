@@ -1,20 +1,15 @@
 "use client";
-import { group } from "@/constants/object";
-import { file, link, photo, video } from "@/constants/media";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SeeAllProps } from "@/types/mess-group";
 import { useChatContext } from "@/context/ChatContext";
-import { FileContent } from "@/lib/dataMessages";
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
-import { UserInfoBox } from "@/lib/dataBox";
+import { FileContent, UserInfoBox } from "@/lib/DTO/message";
 
 const MoreMiddle = ({
   setActiveComponent,

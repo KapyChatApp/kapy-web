@@ -5,8 +5,7 @@ import { group, user } from "@/constants/object";
 import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
-import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
-import { MessageBoxInfo } from "@/lib/dataBox";
+import { SeeAllProps } from "@/types/mess-group";
 
 interface MoreActionsProps {
   propsAll: SeeAllProps;

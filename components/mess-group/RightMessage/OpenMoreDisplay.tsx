@@ -1,15 +1,14 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import FindComponent from "../MoreActions/FindComponent";
-import ManagementComponent from "../MoreActions/ManagementComponent";
-import AddComponent from "../MoreActions/AddComponent";
-import MoreActions from "../MoreActions/MoreActions";
-import SeeAllMember from "../MoreActions/SeeAll/SeeAllMember";
-import SeeAllFile from "../MoreActions/SeeAll/SeeAllFile";
-import SeeAllPhoto from "../MoreActions/SeeAll/SeeAllPhoto";
-import SeeAllVideo from "../MoreActions/SeeAll/SeeAllVideo";
-import { MessageBoxInfo, UserInfoBox } from "@/lib/dataBox";
-import { FileContent } from "@/lib/dataMessages";
+import FindComponent from "./MoreActions/FindComponent";
+import ManagementComponent from "./MoreActions/ManagementComponent";
+import AddComponent from "./MoreActions/AddComponent";
+import MoreActions from "./MoreActions/MoreActions";
+import SeeAllMember from "./MoreActions/SeeAll/SeeAllMember";
+import SeeAllFile from "./MoreActions/SeeAll/SeeAllFile";
+import SeeAllPhoto from "./MoreActions/SeeAll/SeeAllPhoto";
+import SeeAllVideo from "./MoreActions/SeeAll/SeeAllVideo";
+import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 
 interface OpenMoreDisplayProps {
   detailByBox: MessageBoxInfo | undefined;
@@ -18,7 +17,6 @@ interface OpenMoreDisplayProps {
   isClickOtherRight?: boolean;
   setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 interface MoreDisplay {
   display: OpenMoreDisplayProps;
 }

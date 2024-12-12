@@ -5,10 +5,9 @@ import RightTop from "./RightTop";
 import RightBottom from "./RightBottom";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
 import { useChatContext } from "@/context/ChatContext";
-import { MessageBoxInfo } from "@/lib/dataBox";
 import { useUserContext } from "@/context/UserContext";
+import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;

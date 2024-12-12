@@ -1,7 +1,7 @@
 "use client";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import React from "react";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;

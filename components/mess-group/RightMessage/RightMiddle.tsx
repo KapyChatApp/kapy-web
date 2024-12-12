@@ -3,17 +3,17 @@ import React, { useEffect, useRef, useState } from "react";
 import SegmentMess from "../SegmentMess";
 import Image from "next/image";
 import { formatTime } from "@/lib/utils";
-import { ResponseMessageDTO } from "@/lib/dataMessages";
-import { UserInfoBox } from "@/lib/dataBox";
 
-import { Icon } from "@iconify/react/dist/iconify.js";
 import MenubarSegment from "@/components/mess-group/RightMessage/Segment/menubar-segment";
 import { useUserContext } from "@/context/UserContext";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
-import { TextingEvent } from "@/lib/isTexting";
-import { channel } from "diagnostics_channel";
 import { usePathname } from "next/navigation";
+import {
+  ResponseMessageDTO,
+  TextingEvent,
+  UserInfoBox
+} from "@/lib/DTO/message";
 
 interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];

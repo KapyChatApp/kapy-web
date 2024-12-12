@@ -5,8 +5,11 @@ import React, { useEffect, useState } from "react";
 import ActionButton from "./ActionButton";
 import { usePathname } from "next/navigation";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { MoreTopProps } from "@/types/mess-group";
 
+interface MoreTopProps {
+  ava: string;
+  name: string;
+}
 interface Top {
   top: MoreTopProps;
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;

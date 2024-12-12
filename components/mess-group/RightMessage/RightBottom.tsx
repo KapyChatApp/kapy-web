@@ -3,19 +3,18 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useRef, useState } from "react";
 import MessageInput from "../MessageInput";
 import { Button } from "../../ui/button";
-import { FileContent, ResponseMessageDTO } from "@/lib/dataMessages";
 import axios from "axios";
 import { usePathname } from "next/navigation";
-import { ResponseUserInfo } from "@/lib/dataUser";
 import { useChatContext } from "@/context/ChatContext";
-import { UserInfoBox } from "@/lib/dataBox";
 import { getPusherClient } from "@/lib/pusher";
 import { getFileFormat } from "@/lib/utils";
 import MicRecorder from "mic-recorder-to-mp3";
 import MessageRecorder from "../MessageRecorder";
 import { useUserContext } from "@/context/UserContext";
-import { isTexting } from "@/lib/isTexting";
-import { disableTexting } from "@/lib/disableTexting";
+import { isTexting } from "@/lib/services/message/isTexting";
+import { disableTexting } from "@/lib/services/message/disableTexting";
+import { ResponseUserInfo } from "@/lib/DTO/user";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 
 interface BottomProps {
   recipientIds: string[] | undefined;

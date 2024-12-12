@@ -1,10 +1,9 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow, format, isValid } from "date-fns";
-import { ResponseMessageDTO } from "./dataMessages";
-import { UserInfoBox } from "./dataBox";
 import { admin } from "@/constants/object";
 import { UserInfo } from "os";
+import { ResponseMessageDTO, UserInfoBox } from "./DTO/message";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
