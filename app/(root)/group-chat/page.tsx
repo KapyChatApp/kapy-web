@@ -11,13 +11,13 @@ import {
   ResponseMessageDTO
 } from "@/lib/DTO/message";
 import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
+import { useUserContext } from "@/context/UserContext";
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
-  const [adminId, setAdminId] = useState("");
-
+  const { adminInfo } = useUserContext();
   const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
   //Fetch dataChat
@@ -60,10 +60,7 @@ export default function Page() {
 
   //LastMessage + UpdatedTime + ReadStatus
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
+    const adminId = adminInfo._id;
     if (dataChat.length > 0) {
       const channels = dataChat.map((box) => {
         const pusherClient = getPusherClient();
@@ -93,25 +90,6 @@ export default function Page() {
           handleRevokeMessage
         };
       });
-
-      // const interval = setInterval(() => {
-      //   setLatestMessages((prevMessages) => {
-      //     const updatedMessages = { ...prevMessages };
-      //     Object.keys(updatedMessages).forEach((boxId) => {
-      //       const message = updatedMessages[boxId];
-      //       const formattedTime =
-      //         createAt === "1min"
-      //           ? createAt
-      //           : formatTimeMessageBox(message.createAt);
-
-      //       updatedMessages[boxId] = {
-      //         ...message,
-      //         createAt: formattedTime // Chỉ cập nhật nếu định dạng thay đổi
-      //       };
-      //     });
-      //     return updatedMessages;
-      //   });
-      // }, 60000); // Chạy mỗi phút
     }
   }, [dataChat, setReadStatusByBox]);
 

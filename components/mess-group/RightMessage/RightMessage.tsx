@@ -33,7 +33,8 @@ const RightMessage = ({
   const [boxId, setBoxId] = useState<string>("");
   const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
   const { dataChat } = useChatContext();
-  const { adminId, setAdminId } = useUserContext();
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
 
   //boxId
   useEffect(() => {
@@ -57,13 +58,6 @@ const RightMessage = ({
       }
     }
   }, [boxId, dataChat, setDetailByBox]);
-
-  useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
-  }, [adminId]);
 
   //RightTop
   let top: any;

@@ -27,8 +27,6 @@ export const fetchMessageBox = async (
     );
 
     const apiDataChat: ResponseMessageBoxDTO = responseChat.data;
-    localStorage.setItem("adminId", apiDataChat.adminId);
-    console.log(apiDataChat);
 
     const sortedApiDataChat = apiDataChat.box.sort((a: any, b: any) => {
       if (a.lastMessage && b.lastMessage) {

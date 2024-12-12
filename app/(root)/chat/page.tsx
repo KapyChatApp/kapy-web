@@ -22,7 +22,7 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [isTabVisible, setIsTabVisible] = useState(true);
-  const { setAdminId, isOnlineChat } = useUserContext();
+  const { adminInfo, isOnlineChat } = useUserContext();
 
   const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
@@ -65,10 +65,7 @@ export default function Page() {
 
   //LastMessage + UpdatedTime + ReadStatus
   useEffect(() => {
-    const adminId = localStorage.getItem("adminId");
-    if (adminId) {
-      setAdminId(adminId);
-    }
+    const adminId = adminInfo._id;
 
     if (dataChat.length > 0) {
       const channels = dataChat.map((box) => {
@@ -100,26 +97,6 @@ export default function Page() {
           handleRevokeMessage
         };
       });
-
-      // Đặt interval để cập nhật thời gian
-      // const interval = setInterval(() => {
-      //   setLatestMessages((prevMessages) => {
-      //     const updatedMessages = { ...prevMessages };
-      //     Object.keys(updatedMessages).forEach((boxId) => {
-      //       const message = updatedMessages[boxId];
-      //       const formattedTime =
-      //         createAt === "1min"
-      //           ? createAt
-      //           : formatTimeMessageBox(message.createAt);
-
-      //       updatedMessages[boxId] = {
-      //         ...message,
-      //         createAt: formattedTime
-      //       };
-      //     });
-      //     return updatedMessages;
-      //   });
-      // }, 60000);
     }
   }, [dataChat, handleChatEvent]);
 

@@ -2,6 +2,7 @@
 import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import React, { useState } from "react";
 import { FileSegment } from "@/components/ui/file-segment";
+import { useUserContext } from "@/context/UserContext";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -15,7 +16,8 @@ const OtherSegment: React.FC<SegmentMessage> = ({
   length
 }) => {
   const { createBy, contentId, text, createAt } = segments;
-  const adminId = localStorage.getItem("adminId");
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const isActive = createBy !== adminId;
   const [isHovered, setIsHovered] = useState(false);
 

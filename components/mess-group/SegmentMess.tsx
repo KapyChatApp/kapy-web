@@ -17,6 +17,7 @@ import {
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Badge } from "../ui/badge";
 import { ResponseMessageDTO } from "@/lib/DTO/message";
+import { useUserContext } from "@/context/UserContext";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -26,7 +27,8 @@ interface SegmentMessage {
 
 const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   const { createBy, contentId, text, createAt } = segments;
-  const adminId = localStorage.getItem("adminId");
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const isActive = createBy !== adminId;
   const [isHovered, setIsHovered] = useState(false);
 

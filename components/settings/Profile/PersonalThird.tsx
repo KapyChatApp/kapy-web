@@ -20,7 +20,7 @@ const PersonalThird = ({ personal }: PersonalItemProps) => {
     <div className="flex flex-col items-start justify-start gap-3 w-full h-fit">
       <p className="text-dark100_light900 paragraph-15-regular">Pictures</p>
       <div className="flex flex-row flex-wrap justify-between items-center w-full h-fit cursor-pointer">
-        {user.image.slice(0, imagesToShow).map((item, index) => (
+        {/* {user.postIds.slice(0, imagesToShow).map((item, index) => (
           <div key={index} className="relative">
             <Image
               src={item.path}
@@ -42,7 +42,7 @@ const PersonalThird = ({ personal }: PersonalItemProps) => {
               </div>
             )}
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );

@@ -234,14 +234,7 @@ export const contentBox = (
     } else box.senderName = "";
   }
 
-  const now = new Date();
-  const sendDate = new Date(message.createAt);
-  const timeDifference = now.getTime() - sendDate.getTime();
-  if (timeDifference < 60000) {
-    box.createAt = "1min";
-  } else {
-    box.createAt = formatTimeMessageBox(message.createAt); // Lưu thời gian gốc nếu khác 1 phút
-  }
+  box.createAt = message.createAt;
 
   return box;
 };

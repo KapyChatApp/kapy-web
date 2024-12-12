@@ -1,4 +1,5 @@
 "use client";
+import { useUserContext } from "@/context/UserContext";
 import { ResponseMessageDTO } from "@/lib/DTO/message";
 import React, { useState } from "react";
 
@@ -10,7 +11,8 @@ interface SegmentMessage {
 
 const TextSegment: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   const { createBy, contentId, text, createAt } = segments;
-  const adminId = localStorage.getItem("adminId");
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const isActive = createBy !== adminId;
   const [isHovered, setIsHovered] = useState(false);
 

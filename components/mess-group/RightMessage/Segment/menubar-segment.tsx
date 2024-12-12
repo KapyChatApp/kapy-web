@@ -15,6 +15,7 @@ import ConfirmRemove from "./ConfirmRemove";
 import { PusherDelete, PusherRevoke } from "@/lib/DTO/message";
 import { RevokeMessage } from "@/lib/services/message/revoke";
 import { DeleteMessage } from "@/lib/services/message/delete";
+import { useUserContext } from "@/context/UserContext";
 
 interface MenuProps {
   createAt: string;
@@ -30,6 +31,8 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
   const { toast } = useToast();
   const { setMessagesByBox, messagesByBox, setFileList, fileList } =
     useChatContext();
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
 
   const handleItemClick = () => {
     setClickMore(false);
@@ -92,7 +95,6 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
 
   useEffect(() => {
     const handleDeleteMessage = (data: PusherDelete) => {
-      const adminId = localStorage.getItem("adminId");
       console.log("Successfully delete message: ", data);
       if (adminId && data.createBy === adminId) {
         const fileDelete = messagesByBox[data.boxId].find(
@@ -175,7 +177,6 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
     pusherClient.subscribe(`private-${boxId}`);
 
     // Bind sự kiện với handler
-    const adminId = localStorage.getItem("adminId");
     if (adminId) {
       pusherClient.bind("delete-message", handleDeleteMessage);
     }

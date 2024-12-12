@@ -22,14 +22,12 @@ import {
   MenubarSeparator,
   MenubarTrigger
 } from "@radix-ui/react-menubar";
-import { admin } from "@/constants/object";
-import AccountModal from "@/components/friends/AccountModal";
 import { PersonalAccount } from "@/components/settings/Profile/PersonalAccount";
 import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
+import { useUserContext } from "@/context/UserContext";
 
 const Leftsidebar = () => {
   const [isParagraphVisible, setIsParagraphVisible] = useState(true);
-
   const toggleParagraphVisibility = () => {
     setIsParagraphVisible(!isParagraphVisible);
   };
@@ -55,7 +53,7 @@ const Leftsidebar = () => {
   const [isAccount, setAccount] = useState(false);
   const [isSetting, setSetting] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const [isModalOpen, setModalOpen] = useState(false);
+  const { adminInfo, newAva } = useUserContext();
 
   const handleAccount = () => {
     setAccount(!isAccount);
@@ -195,7 +193,11 @@ const Leftsidebar = () => {
                 <div className="flex w-full">
                   <Image
                     src={
-                      admin.ava !== "" ? admin.ava : "/assets/ava/default.png"
+                      adminInfo && adminInfo.avatar !== ""
+                        ? newAva
+                          ? newAva
+                          : adminInfo.avatar
+                        : "/assets/ava/default.png"
                     }
                     alt="logo"
                     width={isParagraphVisible ? 28 : 32}
@@ -205,7 +207,9 @@ const Leftsidebar = () => {
                   {isParagraphVisible && (
                     <div className="flex w-full justify-start items-center">
                       <p className="xl:paragraph-regular lg:body-regular md:small-regular lg:ml-[12px] ml-1 text-dark100_light900">
-                        {admin.name}
+                        {adminInfo && adminInfo.firstName
+                          ? adminInfo.firstName + " " + adminInfo.lastName
+                          : "Unknown name"}
                       </p>
                     </div>
                   )}

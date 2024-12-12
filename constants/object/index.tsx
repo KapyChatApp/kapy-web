@@ -1,4 +1,4 @@
-import { Admin, Group, User } from "@/types/object";
+import { Group, User } from "@/types/object";
 import { photo } from "../media";
 
 export const user: User[] = [
@@ -287,18 +287,3 @@ export const group: Group[] = [
     ]
   }
 ];
-
-export const admin: Admin = {
-  id: "admin-123",
-  name: "Quinanh",
-  ava: "/assets/ava/ava1.jpg",
-  background: "",
-  image: photo,
-  mutualFriend: 0,
-  mutualGroup: 0,
-  status: "active",
-  birth: new Date("2004-06-01"),
-  bio: "I am an admin",
-  phone: "123-456-7890",
-  sex: 1
-};

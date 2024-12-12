@@ -26,12 +26,12 @@ const RightMiddle = ({
   filteredSegmentOther,
   receiverInfo
 }: RightMiddleProps) => {
-  const { adminId, setAdminId } = useUserContext();
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const { isTyping } = useChatContext();
-  const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
     ...filteredSegmentAdmin,
     ...filteredSegmentOther
@@ -82,13 +82,6 @@ const RightMiddle = ({
         messageContainerRef.current.scrollHeight;
     }
   }, [messagesToDisplay]);
-
-  useEffect(() => {
-    const localAdminId = localStorage.getItem("adminId");
-    if (localAdminId) {
-      setAdminId(localAdminId);
-    }
-  });
 
   useEffect(() => {
     const handleTexting = (data: TextingEvent) => {

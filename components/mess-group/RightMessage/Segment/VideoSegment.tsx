@@ -4,6 +4,7 @@ import ReactPlayer from "react-player";
 import React, { useEffect } from "react";
 import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { useUserContext } from "@/context/UserContext";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -17,7 +18,8 @@ const VideoSegment: React.FC<SegmentMessage> = ({
   length
 }) => {
   const { createBy, contentId } = segments;
-  const adminId = localStorage.getItem("adminId");
+  const { adminInfo } = useUserContext();
+  const adminId = adminInfo._id;
   const isActive = createBy !== adminId;
 
   //Show image in Chat

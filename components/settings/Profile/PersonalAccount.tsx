@@ -1,21 +1,21 @@
 "use clien";
-import { User } from "@/types/object";
 import React, { useState } from "react";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import PersonalFirst from "../Profile/PersonalFirst";
-import { admin } from "@/constants/object";
 import PersonalSecond from "../Profile/PersonalSecond";
 import PersonalThird from "../Profile/PersonalThird";
 import PersonalFourth from "../Profile/PersonalFourth";
 import PersonalEdit from "./PersonalEdit";
 import { Toaster } from "@/components/ui/toaster";
+import { useUserContext } from "@/context/UserContext";
 interface PersonalProps {
   setPersonal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const PersonalAccount = ({ setPersonal }: PersonalProps) => {
   const [isEdit, setEdit] = useState(false);
+  const { adminInfo } = useUserContext();
   const handleBack = () => {
     setPersonal(false);
   };
@@ -41,26 +41,26 @@ export const PersonalAccount = ({ setPersonal }: PersonalProps) => {
           </div>
 
           {/*Background-Ava-Name*/}
-          <PersonalFirst personal={admin} setEdit={setEdit} />
+          <PersonalFirst personal={adminInfo} setEdit={setEdit} />
 
           <div className="flex flex-col gap-4 w-full h-fit px-4">
             <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
             {/*Information*/}
-            <PersonalSecond personal={admin} setEdit={setEdit} />
+            <PersonalSecond personal={adminInfo} setEdit={setEdit} />
 
             <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
             {/*Picture*/}
-            <PersonalThird personal={admin} setEdit={setEdit} />
+            <PersonalThird personal={adminInfo} setEdit={setEdit} />
 
             <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
-            <PersonalFourth personal={admin} setEdit={setEdit} />
+            <PersonalFourth personal={adminInfo} setEdit={setEdit} />
           </div>
         </div>
       </div>
-      {isEdit && <PersonalEdit personal={admin} setEdit={setEdit} />}
+      {isEdit && <PersonalEdit personal={adminInfo} setEdit={setEdit} />}
       <Toaster />
     </>
   );

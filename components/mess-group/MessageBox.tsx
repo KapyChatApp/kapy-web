@@ -2,12 +2,12 @@
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
-import { contentBox } from "@/lib/utils";
+import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface Box {
   box: MessageBoxInfo;
@@ -24,6 +24,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { adminId, isOnlineChat } = useUserContext();
 
   const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member.id]);
+  const [formattedCreateAt, setFormattedCreateAt] = useState("");
 
   const contentWithSendername = () => {
     // Tính toán content cho box hiện tại
@@ -51,12 +52,31 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
-
   const handleClickLink = () => {
     if (setClickBox) {
       setClickBox(true); //Click box for responsive
     }
   };
+
+  // Cập nhật createAt mỗi phút
+  useEffect(() => {
+    // Cập nhật ngay khi render lần đầu
+    if (createAt !== "") {
+      const updateCreateAt = () => {
+        const now = new Date();
+        const sendDate = new Date(createAt);
+        const timeDifference = now.getTime() - sendDate.getTime();
+        const formattedTime =
+          timeDifference < 60000 ? "1min" : formatTimeMessageBox(createAt);
+        setFormattedCreateAt(formattedTime);
+      };
+      updateCreateAt();
+      const interval = setInterval(() => {
+        updateCreateAt();
+      }, 60000); // Cập nhật mỗi 1 phút
+      return () => clearInterval(interval); // Cleanup interval khi component unmount
+    }
+  }, [createAt]);
 
   return (
     <Link
@@ -117,7 +137,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
           </div>
 
           <div className="flex flex-col bg-transparent items-center justify-end gap-[7px] relative">
-            <p className="small-custom">{createAt}</p>
+            <p className="small-custom">{formattedCreateAt}</p>
             {pin ? (
               <div className="w-full justify-end items-end flex">
                 <Icon

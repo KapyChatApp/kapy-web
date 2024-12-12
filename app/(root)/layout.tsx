@@ -9,13 +9,16 @@ import { getPusherClient } from "@/lib/pusher";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { OnlineEvent } from "./chat/page";
+import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { dataChat } = useChatContext();
   const router = useRouter();
   const [isTabVisible, setIsTabVisible] = useState(true);
+  const [error, setError] = useState<string>("");
+  const { adminInfo, setAdminInfo } = useUserContext();
 
-  // const { setIsOnlineChat, setAdminId } = useUserContext();
+  // const { setIsOnlineChat, adminInfo } = useUserContext();
   // // API để gọi trạng thái online
   // const checkOnlineStatus = async (token: string) => {
   //   try {
@@ -95,10 +98,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   //   }
   // }, [isTabVisible]);
   // useEffect(() => {
-  //   const adminId = localStorage.getItem("adminId");
-  //   if (adminId) {
-  //     setAdminId(adminId);
-  //   }
+  //   const adminId = adminInfo._id;
   //   // Tạo một tham chiếu để lưu trữ các đăng ký
   //   const pusherClient = getPusherClient();
 
@@ -132,6 +132,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     const verifyToken = async () => {
       const token = localStorage.getItem("token"); // Lấy token từ localStorage
+      await getMyProfile(setAdminInfo, setError);
 
       if (token) {
         const result = await checkTokenFrontend(token);
