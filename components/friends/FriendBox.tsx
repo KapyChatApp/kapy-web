@@ -8,9 +8,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { otherBox } from "@/constants/friends";
 import OtherBoxButton from "./OtherBoxButton";
 import AccountModal from "./AccountModal";
+import { FriendResponseDTO } from "@/lib/DTO/friend";
 
 interface FriendBoxProps {
-  friend: User;
+  friend: FriendResponseDTO;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 
@@ -31,7 +32,7 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
       <div className="flex flex-row shadow-none border-[0.5px] bg-transparent border-light-500 dark:border-dark-200 dark:border-opacity-50 rounded-lg p-4 items-center justify-between w-full h-fit">
         <div className="flex flex-row justify-start items-center gap-3 w-fit h-fit">
           <Image
-            src={info.ava}
+            src={info.avatar}
             alt="ava"
             width={80}
             height={80}
@@ -39,10 +40,12 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
             onClick={handleClick}
           />
           <div className="flex flex-col justify-start items-start gap-2 ">
-            <p className="text-dark100_light900 base-medium">{info.name}</p>
-            {info.mutualFriend > 0 && (
+            <p className="text-dark100_light900 base-medium">
+              {info.firstName + " " + info.lastName}
+            </p>
+            {info.mutualFriends > 0 && (
               <p className="text-dark100_light900 body-regular">
-                Mutual friends: {info.mutualFriend}
+                Mutual friends: {info.mutualFriends}
               </p>
             )}
           </div>

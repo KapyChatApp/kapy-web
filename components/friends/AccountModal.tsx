@@ -1,24 +1,50 @@
+"use client";
 import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { HistoryFindFriend } from "@/types/friends";
 import FirstItem from "./AccountModalItems/FirstItem";
 import SecondItem from "./AccountModalItems/SecondItem";
 import ThirdItem from "./AccountModalItems/ThirdItem";
 import FourthItem from "./AccountModalItems/FourthItem";
+import { FriendProfileResponseDTO, FriendResponseDTO } from "@/lib/DTO/friend";
+import {
+  defaultFriendProfileResponseDTO,
+  fetchFriendProfile
+} from "@/lib/services/friend/getFriendProfile";
+import { defaultFriendResponseDTO } from "@/context/FriendContext";
 
 interface AccountProps {
-  user: User | HistoryFindFriend;
+  user: FriendResponseDTO;
   setAccount: React.Dispatch<React.SetStateAction<boolean>>;
 }
-
 interface Account {
   account: AccountProps;
 }
 
 const AccountModal: React.FC<Account> = ({ account }) => {
   const { user, setAccount } = account;
+  const [error, setError] = useState<string>("");
+  const [friendProfile, setFriendProfile] = useState<FriendProfileResponseDTO>(
+    defaultFriendProfileResponseDTO
+  );
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      if (user._id) {
+        const result = await fetchFriendProfile(user._id, setError);
+        setFriendProfile(result);
+      }
+    };
+
+    fetchInfo();
+  }, [user._id]);
+
+  if (!friendProfile) {
+    return <div>Loading...</div>;
+  }
+
   const handleBack = () => {
     setAccount(false);
   };
@@ -43,22 +69,22 @@ const AccountModal: React.FC<Account> = ({ account }) => {
         </div>
 
         {/*Background-Ava-Name*/}
-        <FirstItem user={user} />
+        <FirstItem user={friendProfile} />
 
         <div className="flex flex-col gap-4 w-full h-fit px-4">
           <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
           {/*Information*/}
-          <SecondItem user={user} />
+          <SecondItem user={friendProfile} />
 
           <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
           {/*Picture*/}
-          <ThirdItem user={user} />
+          <ThirdItem user={friendProfile} />
 
           <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
-          <FourthItem user={user} />
+          <FourthItem user={friendProfile} />
         </div>
       </div>
     </div>

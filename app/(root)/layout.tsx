@@ -2,7 +2,7 @@
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { checkTokenFrontend } from "@/lib/services/message/check-toke";
+import { checkTokenFrontend } from "@/lib/services/auth/check-toke";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
 import { getPusherClient } from "@/lib/pusher";

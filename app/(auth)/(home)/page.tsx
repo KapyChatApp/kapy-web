@@ -1,9 +1,12 @@
 "use client";
 import InputCustom from "@/components/auth/InputCustom";
 import { Button } from "@/components/ui/button";
-import { inputCustomItems } from "@/constants/auth";
 import { useUserContext } from "@/context/UserContext";
+import { toast } from "@/hooks/use-toast";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import { UserLoginDTO } from "@/lib/DTO/user";
+import { loginUser } from "@/lib/services/auth/login";
+import { InputCustomProps } from "@/types/auth";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React, { useState } from "react";
@@ -13,31 +16,32 @@ const Signin = () => {
   const [pass, setPass] = useState("");
   const [error, setError] = useState<string>("");
   const { adminInfo, setAdminInfo } = useUserContext();
+  const inputCustomItems: InputCustomProps[] = [
+    { placeholder: "PhoneNumber", value: "", setValue: setPhone },
+    { placeholder: "Password", value: "", setValue: setPass }
+  ];
 
   const handleLogin = async () => {
     try {
-      const response = await fetch(`${process.env.BASE_URL}auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          phoneNumber: phone,
-          password: pass
-        })
-      });
+      const params: UserLoginDTO = {
+        phoneNumber: phone,
+        password: pass
+      };
+      console.log(params);
+      const result = await loginUser(params);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        setError(errorData.message || "Login failed");
+      if (result.token === "") {
+        setError("Login failed");
+        toast({
+          title: "Error",
+          description: error,
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
         return;
       }
-
-      const data = await response.json();
-      const token = data.token;
-
+      const token = result.token;
       localStorage.setItem("token", token);
-      localStorage.setItem("phone", phone);
 
       await getMyProfile(setAdminInfo, setError);
 
@@ -62,13 +66,12 @@ const Signin = () => {
 
       <div className="flex flex-col w-full h-fit gap-3">
         <div className="flex flex-col gap-6 w-full h-fit">
-          {inputCustomItems.slice(0, 2).map((item, index) => (
+          {inputCustomItems.map((item, index) => (
             <InputCustom
               key={index}
               placeholder={item.placeholder}
               value={item.value}
-              setPhone={setPhone}
-              setPass={setPass}
+              setValue={item.setValue}
             />
           ))}
         </div>

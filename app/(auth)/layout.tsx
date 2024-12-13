@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Image from "next/image";
-import { checkTokenFrontend } from "@/lib/services/message/check-toke";
+import { checkTokenFrontend } from "@/lib/services/auth/check-toke";
 import { useRouter } from "next/navigation";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {

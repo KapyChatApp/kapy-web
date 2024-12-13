@@ -18,12 +18,7 @@ import {
 import { Calendar } from "../ui/calendar";
 import { genderList } from "@/constants/auth";
 
-const InputCustom = ({
-  placeholder,
-  value,
-  setPhone,
-  setPass
-}: InputCustomProps) => {
+const InputCustom = ({ placeholder, setValue }: InputCustomProps) => {
   const [date, setDate] = React.useState<Date | undefined>();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -32,14 +27,7 @@ const InputCustom = ({
   };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
-    if (
-      (placeholder === "Password" || placeholder === "Confirmed password") &&
-      setPass
-    ) {
-      setPass(newValue);
-    } else if (setPhone && placeholder === "Username or PhoneNumber") {
-      setPhone(newValue);
-    }
+    setValue(newValue);
   };
   return placeholder === "Password" || placeholder === "Confirmed password" ? (
     <div className=" border-light-500 border-b relative flex h-[24px] min-h-[36px] grow items-center gap-[12px] w-full bg-transparent">
@@ -58,16 +46,6 @@ const InputCustom = ({
         onClick={togglePasswordVisibility}
       />
     </div>
-  ) : placeholder === "Phone number" ? (
-    <div className="border-light-500 border-b relative flex h-[24px] min-h-[36px] grow items-center w-full bg-transparent">
-      <Input
-        className="bg-transparent border-none focus:outline-none ring-0 border-light-500 border-b placeholder:text-dark600_light600 placeholder:paragraph-light px-2 py-1 w-full"
-        type="number"
-        placeholder={placeholder}
-        // onChange={handleChange}
-        onChange={handleChange}
-      />
-    </div>
   ) : placeholder === "Birth" ? (
     <Popover>
       <PopoverTrigger asChild>
@@ -78,7 +56,7 @@ const InputCustom = ({
               "text-dark100_light900 paragraph-light bg-transparent hover:bg-transparent shadow-none"
           )}
         >
-          <div className="flex w-full rounded-md h-[24px] min-h-[36px]  items-center justify-between border-b border-light-500 bg-transparent py-1 px-2 shadow-none">
+          <div className="flex w-full rounded-md h-[24px] min-h-[36px]  items-center justify-between border-b border-light-500 bg-transparent py-1 px-2 shadow-none text-dark100_light900">
             {date ? (
               format(date, "PPP")
             ) : (
@@ -97,13 +75,30 @@ const InputCustom = ({
           }
         ></Select>
         <div className="rounded-md border text-dark100_light900 paragraph-regular">
-          <Calendar mode="single" selected={date} onSelect={setDate} />
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(selectedDate) => {
+              setDate(selectedDate);
+              if (placeholder === "Birth" && setValue) {
+                setValue(selectedDate?.toISOString() || "");
+              }
+            }}
+            disabled={(date) => date > addDays(new Date(), 1)}
+            initialFocus
+          />
         </div>
       </PopoverContent>
     </Popover>
   ) : placeholder === "Gender" ? (
     <div className="flex w-full h-fit border-b border-light500 bg-transparent">
-      <Select>
+      <Select
+        onValueChange={(value) => {
+          if (placeholder === "Gender" && setValue) {
+            setValue(value);
+          }
+        }}
+      >
         <SelectTrigger className="w-full bg-transparent focus border-none py-1 px-2 shadow-none">
           <SelectValue className="paragraph-regular text-dark100_light900" />
         </SelectTrigger>
@@ -126,7 +121,6 @@ const InputCustom = ({
         className="bg-transparent border-none focus:outline-none ring-0 border-light-500 border-b placeholder:text-dark600_light600 placeholder:paragraph-light px-2 py-1 w-full"
         type="text"
         placeholder={placeholder}
-        // onChange={handleChange}
         onChange={handleChange}
       />
     </div>

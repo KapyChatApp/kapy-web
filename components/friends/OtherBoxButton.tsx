@@ -5,9 +5,10 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { User } from "@/types/object";
 import { useParams, usePathname } from "next/navigation";
+import { FriendResponseDTO } from "@/lib/DTO/friend";
 
 interface OtherButton {
-  account: User;
+  account: FriendResponseDTO;
   other: OtherBoxButtonProps;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -29,7 +30,7 @@ const OtherBoxButton: React.FC<OtherButton> = ({
 
   const handleNotBest = () => {
     if (containsBestFriend) {
-      setIndex(info.id);
+      setIndex(info._id);
     }
   };
 
@@ -39,10 +40,10 @@ const OtherBoxButton: React.FC<OtherButton> = ({
         handleNotBest();
         break;
       case "Block":
-        setIndex(info.id);
+        setIndex(info._id);
         break;
       default:
-        setIndex(info.id);
+        setIndex(info._id);
         break;
     }
   };

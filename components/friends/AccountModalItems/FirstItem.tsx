@@ -1,17 +1,20 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { HistoryFindFriend } from "@/types/friends";
-import { User } from "@/types/object";
+import { useFriendContext } from "@/context/FriendContext";
+import { FriendProfileResponseDTO, FriendResponseDTO } from "@/lib/DTO/friend";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useState } from "react";
 
 interface FirstItemProps {
-  user: User | HistoryFindFriend;
+  user: FriendProfileResponseDTO;
 }
 
 const FirstItem = ({ user }: FirstItemProps) => {
-  const [status, setStatus] = useState(user.status);
+  const { listBestFriend, listFriend } = useFriendContext();
+
+  const [status, setStatus] = useState(user.relation);
+  console.log(user);
 
   const handleAccept = () => {
     setStatus("friend");
@@ -32,7 +35,7 @@ const FirstItem = ({ user }: FirstItemProps) => {
   return (
     <div className="w-full h-fit relative px-4">
       {/* Background */}
-      {user.background === "" ? (
+      {!user.background ? (
         <div className="absolute top-0 left-0 w-full h-[129px] background-light500_dark400 z-0"></div>
       ) : (
         <div className="absolute top-0 left-0 w-full h-[129px] z-0">
@@ -49,7 +52,7 @@ const FirstItem = ({ user }: FirstItemProps) => {
         {/* Avatar */}
         <div className="mt-[112px] h-fit w-fit">
           <Image
-            src={user.ava !== "" ? user.ava : "/assets/ava/default.png"}
+            src={user.avatar ? user.avatar : "/assets/ava/default.png"}
             alt="ava"
             width={80}
             height={80}
@@ -62,11 +65,11 @@ const FirstItem = ({ user }: FirstItemProps) => {
           <div className="flex flex-row w-full items-center justify-between">
             <div className="flex flex-col w-fit items-start justify-start">
               <p className="text-dark100_light900 paragraph-regular">
-                {user.name}
+                {user.firstName + " " + user.lastName}
               </p>
-              {user.mutualFriend > 0 && (
+              {user.mutualFriends > 0 && (
                 <p className="text-dark100_light900 subtle-light">
-                  {user.mutualFriend} mutual friends
+                  {user.mutualFriends} mutual friends
                 </p>
               )}
             </div>

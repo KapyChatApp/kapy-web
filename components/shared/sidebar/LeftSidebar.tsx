@@ -73,7 +73,7 @@ const Leftsidebar = () => {
       });
 
       if (response.ok) {
-        localStorage.clear();
+        localStorage.removeItem("token");
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
@@ -193,7 +193,7 @@ const Leftsidebar = () => {
                 <div className="flex w-full">
                   <Image
                     src={
-                      adminInfo && adminInfo.avatar !== ""
+                      adminInfo && adminInfo.avatar
                         ? newAva
                           ? newAva
                           : adminInfo.avatar

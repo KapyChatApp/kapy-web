@@ -67,3 +67,20 @@ export interface UserUpdatePassRequest {
   password: string;
   rePassword: string;
 }
+
+export interface UserRegisterDTO {
+  firstName: string;
+  lastName: string;
+  nickName: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  rePassword: string;
+  gender: boolean;
+  birthDay: string;
+}
+
+export interface UserLoginDTO {
+  phoneNumber: string;
+  password: string;
+}

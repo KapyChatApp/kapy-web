@@ -7,13 +7,12 @@ import VerticalBox from "./VerticalBox";
 import FriendBox from "./FriendBox";
 import useSearch from "@/hooks/use-search";
 import LeftComponent from "./LeftComponent";
+import { useFriendContext } from "@/context/FriendContext";
 
-interface RightComponentProps {
-  friendList: User[];
-}
+const RightComponent = () => {
+  const { listFriend, listBestFriend, listSuggestedFriend } =
+    useFriendContext();
 
-const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
-  const friend = friendList;
   const [isIndex, setIndex] = useState("");
 
   const pathname = usePathname();
@@ -34,16 +33,24 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
       ? "Suggestions"
       : "Invitations";
 
-  const quantity =
-    matchedPath === "all-friend" || matchedPath === "best-friend"
-      ? friend.filter((fr) => fr.status === "" || fr.status === "best").length
-      : matchedPath === "suggestion"
-      ? friend.filter((fr) => fr.status === "suggest").length
-      : matchedPath === "invitation"
-      ? friend.filter((fr) => fr.status === "invite").length
-      : 0;
+  let quantity = 0;
+  switch (matchedPath) {
+    case "all-friend":
+      quantity = listFriend.length;
+    case "best-friend":
+      quantity = listBestFriend.length;
+    default:
+      quantity = listSuggestedFriend.length;
+  }
 
-  const { searchTerm, setSearchTerm, filteredFriends } = useSearch(friendList);
+  const { searchTerm, setSearchTerm, filteredFriends } =
+    matchedPath === "all-friend"
+      ? useSearch(listFriend)
+      : matchedPath === "best-friend"
+      ? useSearch(listBestFriend)
+      : matchedPath === "suggestion"
+      ? useSearch(listSuggestedFriend)
+      : useSearch(listFriend);
 
   return (
     <div className="flex flex-col w-full h-full px-4 pt-4 pb-3 md:p-0 overflow-scroll scrollable">
@@ -68,15 +75,11 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
         {(matchedPath === "best-friend" || matchedPath === "all-friend") && (
           <div className="flex md:flex-row flex-col md:justify-between justify-start items-center md:flex-wrap md:gap-3 gap-1 overflow-scroll scrollable">
             {filteredFriends
-              .filter(
-                (fr) =>
-                  (fr.status === "" || fr.status === "best") &&
-                  fr.id !== isIndex
-              )
+              .filter((fr) => fr._id !== isIndex)
               .map((item) => (
                 <div
                   className="flex md:flex-row lg:w-[48.6%] xl:w-[49%] w-full h-fit"
-                  key={item.id}
+                  key={item._id}
                 >
                   <FriendBox friend={item} setIndex={setIndex} />
                 </div>
@@ -84,7 +87,7 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
           </div>
         )}
 
-        {matchedPath === "invitation" && (
+        {/* {matchedPath === "invitation" && (
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
             {filteredFriends
               .filter((fr) => fr.status === "invite" && fr.id !== isIndex)
@@ -106,7 +109,7 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
                 </div>
               ))}
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
