@@ -25,6 +25,8 @@
     "@types/react-mic": "^12.4.6",
     "autoprefixer": "^10.4.20",
     "axios": "^1.7.7",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cors": "^2.8.5",
@@ -54,6 +56,8 @@
     "yet-another-react-lightbox": "^3.21.7"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/node": "^20",
     "@types/react": "^18",

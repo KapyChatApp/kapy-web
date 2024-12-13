@@ -62,3 +62,8 @@ export interface UserUpdateRequest {
   address: string;
   birthDay: string;
 }
+
+export interface UserUpdatePassRequest {
+  password: string;
+  rePassword: string;
+}
