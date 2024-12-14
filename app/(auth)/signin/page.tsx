@@ -36,7 +36,7 @@ const Signin = () => {
           title: "Error",
           description: error,
           className:
-            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center"
         });
         return;
       }

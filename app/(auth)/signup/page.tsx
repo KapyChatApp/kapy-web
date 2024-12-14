@@ -8,8 +8,12 @@ import React, { useState } from "react";
 import { UserRegisterDTO } from "@/lib/DTO/user";
 import { registerUser } from "@/lib/services/user/register";
 import { SignInSchema } from "@/lib/validation";
+import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import { useUserContext } from "@/context/UserContext";
 
 const Signup = () => {
+  const { adminInfo, setAdminInfo } = useUserContext();
+
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -111,7 +115,7 @@ const Signup = () => {
             "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
         });
       }
-
+      await getMyProfile(setAdminInfo, setError);
       window.location.href = "/chat";
     } catch (error: any) {
       const errorMessage =
@@ -202,7 +206,7 @@ const Signup = () => {
             <p className="text-dark100_light900 paragraph-light">
               You have an account?
             </p>
-            <Link href="/">
+            <Link href="/signin">
               <p className="text-primary-500 paragraph-bold">Sign in</p>
             </Link>
           </div>

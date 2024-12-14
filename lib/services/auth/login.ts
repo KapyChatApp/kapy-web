@@ -1,5 +1,4 @@
 import { defaultUserResponseDTO } from "@/context/UserContext";
-import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { UserLoginDTO, UserRegisterDTO, UserResponseDTO } from "@/lib/DTO/user";
 
 export const loginUser = async (

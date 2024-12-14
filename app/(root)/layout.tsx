@@ -2,7 +2,7 @@
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { checkTokenFrontend } from "@/lib/services/auth/check-toke";
+import { checkTokenFrontend } from "@/lib/services/auth/check-token";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
 import { getPusherClient } from "@/lib/pusher";
@@ -131,19 +131,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      const token = localStorage.getItem("token"); // Lấy token từ localStorage
-      await getMyProfile(setAdminInfo, setError);
+      const token = localStorage.getItem("token");
 
       if (token) {
         const result = await checkTokenFrontend(token);
         console.log(result);
         if (result && typeof result === "object" && result.isAuthenticated) {
+          await getMyProfile(setAdminInfo, setError);
           router.push("/chat");
         } else {
-          router.push("/");
+          router.push("/signin");
         }
       } else {
-        router.push("/");
+        router.push("/signin");
       }
     };
 

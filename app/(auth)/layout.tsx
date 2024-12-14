@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import Image from "next/image";
-import { checkTokenFrontend } from "@/lib/services/auth/check-toke";
+import { checkTokenFrontend } from "@/lib/services/auth/check-token";
 import { useRouter } from "next/navigation";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -16,10 +16,10 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         if (result && typeof result === "object" && result.isAuthenticated) {
           router.push("/chat");
         } else {
-          router.push("/");
+          router.push("/signin");
         }
       } else {
-        router.push("/");
+        router.push("/signin");
       }
     };
 
