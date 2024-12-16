@@ -21,9 +21,9 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
-  const { adminId, isOnlineChat } = useUserContext();
-
-  const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member.id]);
+  const { adminInfo, isOnlineChat } = useUserContext();
+  const adminId = adminInfo._id;
+  const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member._id]);
   const [formattedCreateAt, setFormattedCreateAt] = useState("");
 
   const contentWithSendername = () => {
@@ -102,7 +102,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 height={48}
                 className="rounded-full lg:w-12 lg:h-12 w-10 h-10"
               />
-              {(isGroup ? isOnlineGroup : isOnlineChat[receiverInfo.id]) && (
+              {(isGroup ? isOnlineGroup : isOnlineChat[receiverInfo._id]) && (
                 <div className="bg-green-600 rounded-full w-[10px] h-[10px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
               )}
             </div>

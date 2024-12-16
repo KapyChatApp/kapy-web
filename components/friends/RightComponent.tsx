@@ -7,18 +7,23 @@ import VerticalBox from "./VerticalBox";
 import FriendBox from "./FriendBox";
 import useSearch from "@/hooks/use-search";
 import LeftComponent from "./LeftComponent";
+import { useFriendContext } from "@/context/FriendContext";
+import useSearchFriendByPhone from "@/hooks/use-search-friend-by-phone";
+import { FindUserDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
 
-interface RightComponentProps {
-  friendList: User[];
-}
+const RightComponent = () => {
+  const {
+    listFriend,
+    listBestFriend,
+    listSuggestedFriend,
+    listRequestedFriend
+  } = useFriendContext();
 
-const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
-  const friend = friendList;
   const [isIndex, setIndex] = useState("");
 
   const pathname = usePathname();
   const getPathNameMatch = () => {
-    const paths = ["all-friend", "best-friend", "suggestion", "invitation"];
+    const paths = ["all-friend", "best-friend", "suggestion", "request"];
     return paths.find((path) =>
       new RegExp(`^/friends/${path}(\\/.*)?$`).test(pathname)
     );
@@ -32,18 +37,32 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
       ? "Best friends"
       : matchedPath === "suggestion"
       ? "Suggestions"
-      : "Invitations";
+      : "Requests";
 
-  const quantity =
-    matchedPath === "all-friend" || matchedPath === "best-friend"
-      ? friend.filter((fr) => fr.status === "" || fr.status === "best").length
+  let quantity = 0;
+  switch (matchedPath) {
+    case "all-friend":
+      quantity = listFriend.length;
+      break;
+    case "best-friend":
+      quantity = listBestFriend.length;
+      break;
+    case "suggestion":
+      quantity = listSuggestedFriend.length;
+      break;
+    default:
+      quantity = listRequestedFriend.length;
+      break;
+  }
+
+  const { searchTerm, setSearchTerm, filteredFriends } =
+    matchedPath === "all-friend"
+      ? useSearchFriendByPhone(listFriend)
+      : matchedPath === "best-friend"
+      ? useSearchFriendByPhone(listBestFriend)
       : matchedPath === "suggestion"
-      ? friend.filter((fr) => fr.status === "suggest").length
-      : matchedPath === "invitation"
-      ? friend.filter((fr) => fr.status === "invite").length
-      : 0;
-
-  const { searchTerm, setSearchTerm, filteredFriends } = useSearch(friendList);
+      ? useSearchFriendByPhone(listSuggestedFriend)
+      : useSearchFriendByPhone(listRequestedFriend);
 
   return (
     <div className="flex flex-col w-full h-full px-4 pt-4 pb-3 md:p-0 overflow-scroll scrollable">
@@ -67,30 +86,59 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
 
         {(matchedPath === "best-friend" || matchedPath === "all-friend") && (
           <div className="flex md:flex-row flex-col md:justify-between justify-start items-center md:flex-wrap md:gap-3 gap-1 overflow-scroll scrollable">
-            {filteredFriends
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) =>
-                  (fr.status === "" || fr.status === "best") &&
-                  fr.id !== isIndex
+                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
               )
               .map((item) => (
                 <div
                   className="flex md:flex-row lg:w-[48.6%] xl:w-[49%] w-full h-fit"
-                  key={item.id}
+                  key={item._id}
                 >
                   <FriendBox friend={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
         )}
-
-        {matchedPath === "invitation" && (
-          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
-            {filteredFriends
-              .filter((fr) => fr.status === "invite" && fr.id !== isIndex)
+        {(matchedPath === "best-friend" || matchedPath === "all-friend") && (
+          <div className="flex flex-col md:justify-between justify-start items-center md:flex-wrap gap-3 overflow-scroll scrollable">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) => fr.relation === "stranger" || fr.relation === "block"
+              )
               .map((item) => (
-                <div className="flex flex-row w-fit h-fit" key={item.id}>
-                  <VerticalBox invitation={item} setIndex={setIndex} />
+                <div
+                  className="flex md:flex-row lg:w-[48.6%] xl:w-[49%] w-full h-fit"
+                  key={item._id}
+                >
+                  <VerticalBox request={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+
+        {matchedPath === "request" && (
+          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) => fr.relation === "stranger" || fr.relation === "block"
+              )
+              .map((item) => (
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <VerticalBox request={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+        {matchedPath === "request" && (
+          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
+              )
+              .map((item) => (
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <FriendBox friend={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
@@ -98,11 +146,26 @@ const RightComponent: React.FC<RightComponentProps> = ({ friendList }) => {
 
         {matchedPath === "suggestion" && (
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap xl:gap-x-3 xl:gap-y-6 gap-3 overflow-scroll scrollable h-fit">
-            {filteredFriends
-              .filter((fr) => fr.status === "suggest" && fr.id !== isIndex)
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) => fr.relation === "stranger" || fr.relation === "block"
+              )
               .map((item) => (
-                <div className="flex flex-row w-fit h-fit" key={item.id}>
-                  <VerticalBox invitation={item} setIndex={setIndex} />
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <VerticalBox request={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+        {matchedPath === "suggestion" && (
+          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap xl:gap-x-3 xl:gap-y-6 gap-3 overflow-scroll scrollable h-fit">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
+              )
+              .map((item) => (
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <FriendBox friend={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>

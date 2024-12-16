@@ -1,25 +1,35 @@
-import { DetailBox, UserInfoBox } from "@/lib/DTO/message";
+import { UserInfoBox } from "@/lib/DTO/message";
 import axios from "axios";
+interface DetailBox {
+  id: string;
+  senderId: UserInfoBox;
+  receiverIds: UserInfoBox[];
+  groupName: string;
+  groupAva: string;
+  flag: boolean;
+  pin: boolean;
+  createAt: string;
+  createBy: string;
+  readStatus: boolean;
+}
 
 let detailDataBox: DetailBox = {
   id: "",
   senderId: {
-    id: "",
+    _id: "",
     firstName: "",
     lastName: "",
     nickName: "",
     avatar: "",
-    phone: "",
     isOnline: false
   },
   receiverIds: [
     {
-      id: "",
+      _id: "",
       firstName: "",
       lastName: "",
       nickName: "",
       avatar: "",
-      phone: "",
       isOnline: false
     }
   ],
@@ -51,12 +61,11 @@ export const fetchDetailBox = async (boxId: string) => {
     apiDataBox = responseChat.data;
 
     const senderInfo: UserInfoBox = {
-      id: apiDataBox.box.senderId._id,
+      _id: apiDataBox.box.senderId._id,
       firstName: apiDataBox.box.senderId.firstName,
       lastName: apiDataBox.box.senderId.lastName,
       nickName: apiDataBox.box.senderId.nickName,
       avatar: apiDataBox.box.senderId.avatar,
-      phone: apiDataBox.box.senderId.phoneNumber,
       isOnline: false
     };
 

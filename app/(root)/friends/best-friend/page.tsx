@@ -1,11 +1,36 @@
-import LeftComponent from "@/components/friends/LeftComponent";
+"use client";
 import RightComponent from "@/components/friends/RightComponent";
-import { user } from "@/constants/object";
-import React from "react";
+import { useFriendContext } from "@/context/FriendContext";
+import { getMyListBestFriend } from "@/lib/data/mine/dataBestFriend";
+import React, { useEffect, useState } from "react";
 
 const page = () => {
-  const bestUser = user.filter((item) => item.status === "best");
-  return <RightComponent friendList={bestUser} />;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>("");
+  const { listBestFriend, setListBestFriend } = useFriendContext();
+
+  useEffect(() => {
+    // Gọi API lấy danh sách bạn thân khi component mount
+    const fetchData = async () => {
+      try {
+        await getMyListBestFriend(setListBestFriend, setError);
+        console.log(listBestFriend);
+      } catch (err) {
+        setError("Failed to fetch data.");
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return <RightComponent />;
 };
 
 export default page;

@@ -1,11 +1,8 @@
-import {
-  MessageBoxInfo,
-  ResponseMessageBoxDTO,
-  UserInfoBox
-} from "@/lib/DTO/message";
+import { MessageBoxDTO, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 import axios from "axios";
 
 export const fetchMessageBox = async (
+  adminId: string,
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
 ) => {
@@ -26,52 +23,42 @@ export const fetchMessageBox = async (
       }
     );
 
-    const apiDataChat: ResponseMessageBoxDTO = responseChat.data;
+    const apiDataChat = responseChat.data;
 
-    const sortedApiDataChat = apiDataChat.box.sort((a: any, b: any) => {
-      if (a.lastMessage && b.lastMessage) {
-        const timeA = new Date(a.lastMessage.createAt || 0).getTime();
-        const timeB = new Date(b.lastMessage.createAt || 0).getTime();
-        return timeB - timeA;
+    const sortedApiDataChat: MessageBoxDTO[] = apiDataChat.box.sort(
+      (a: any, b: any) => {
+        if (a.lastMessage && b.lastMessage) {
+          const timeA = new Date(a.lastMessage.createAt || 0).getTime();
+          const timeB = new Date(b.lastMessage.createAt || 0).getTime();
+          return timeB - timeA;
+        }
+        if (!a.lastMessage) return 1;
+        if (!b.lastMessage) return -1;
+        return 0;
       }
-      if (!a.lastMessage) return 1;
-      if (!b.lastMessage) return -1;
-      return 0;
-    });
+    );
 
     // Xử lý dữ liệu từ response để tạo ra dataChat
     const updatedDataChat: MessageBoxInfo[] = sortedApiDataChat
       .map((item) => {
-        const memberInfo: UserInfoBox[] = item.receiverIds.map((mem) => ({
-          id: mem._id,
-          firstName: mem.firstName,
-          lastName: mem.lastName,
-          phone: mem.phoneNumber,
-          avatar: mem.avatar,
-          nickName: mem.nickName,
-          isOnline: false
-        }));
-
         const receiver = item.receiverIds.find(
-          (receiver) => receiver._id !== apiDataChat.adminId
+          (receiver) => receiver._id !== adminId
         );
         let receiverInfo: UserInfoBox;
         if (receiver) {
           receiverInfo = {
-            id: receiver._id,
+            _id: receiver._id,
             firstName: receiver.firstName,
             lastName: receiver.lastName,
-            phone: receiver.phoneNumber,
             avatar: receiver.avatar,
             nickName: receiver.nickName,
             isOnline: false
           };
         } else {
           receiverInfo = {
-            id: "",
+            _id: "",
             firstName: "Unknown",
             lastName: "",
-            phone: "",
             avatar: "/assets/ava/default.png",
             nickName: "",
             isOnline: false
@@ -80,14 +67,16 @@ export const fetchMessageBox = async (
         return {
           id: item._id,
           receiverInfo: receiverInfo,
-          memberInfo: memberInfo,
+          memberInfo: item.receiverIds,
           groupName: "",
           groupAva: "",
           pin: false,
-          readStatus: item.readStatus
+          readStatus: item.readStatus,
+          stranger: item.stranger
         };
       })
       .filter((item): item is MessageBoxInfo => item !== null);
+    console.log(updatedDataChat);
 
     setDataChat(updatedDataChat);
   } catch (err: any) {

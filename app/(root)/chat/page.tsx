@@ -12,6 +12,8 @@ import {
   PusherRevoke,
   ResponseMessageDTO
 } from "@/lib/DTO/message";
+import LeftMessageRaw from "@/components/mess-group/UI-Raw/LeftMessageRaw";
+import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
 export interface OnlineEvent {
   userId: string;
   online: boolean;
@@ -23,6 +25,7 @@ export default function Page() {
   const [error, setError] = useState<string>("");
   const [isTabVisible, setIsTabVisible] = useState(true);
   const { adminInfo, isOnlineChat } = useUserContext();
+  const [noData, setNoData] = useState(false);
 
   const { dataChat, setDataChat, setReadStatusByBox } = useChatContext();
 
@@ -30,7 +33,7 @@ export default function Page() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await fetchMessageBox(setDataChat, setError);
+        await fetchMessageBox(adminInfo._id, setDataChat, setError);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
@@ -40,7 +43,7 @@ export default function Page() {
     };
 
     fetchData();
-  }, [setDataChat]);
+  }, [dataChat, adminInfo]);
 
   const handleChatEvent = async (
     message: ResponseMessageDTO | PusherRevoke | PusherDelete,
@@ -103,6 +106,7 @@ export default function Page() {
   //Routing
   useEffect(() => {
     if (!loading && dataChat.length === 0) {
+      setNoData(true);
       console.warn("No detail in messChat.");
       return;
     }
@@ -114,6 +118,23 @@ export default function Page() {
 
   if (loading) {
     return <div>Loading...</div>;
+  }
+
+  if (noData) {
+    return (
+      <section className="py-[16px] pr-[16px] flex h-screen w-full gap-[16px]">
+        <div
+          className={`flex flex-row w-full background-light900_dark400 gap-[16px] rounded-[12px]`}
+        >
+          <div className="flex h-full lg:w-[28%] md:w-[27%] w-[30%]">
+            <LeftMessageRaw />
+          </div>
+          <div className="flex h-full w-full flex-grow bg-transparent">
+            <RightMessageRaw />
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return null;

@@ -1,9 +1,12 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
+import { useUserContext } from "@/context/UserContext";
+import { toast } from "@/hooks/use-toast";
 
 interface RightTopProps {
   ava: string;
@@ -43,6 +46,62 @@ const RightTop: React.FC<rightTop> = ({
     setClickOtherRight(true); //Responsive
   };
 
+  const client = useStreamVideoClient();
+  const { adminInfo } = useUserContext();
+  const [values, setValues] = useState({
+    dateTime: new Date(),
+    description: "",
+    link: ""
+  });
+  const [callDetails, setCallDetails] = useState<Call>();
+  const router = useRouter();
+  const handleCreateMeeting = async () => {
+    if (!client || !adminInfo) return;
+    try {
+      if (!values.dateTime) {
+        toast({
+          title: "Please select a date and time",
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
+        return;
+      }
+      const id = crypto.randomUUID();
+      const call = client.call("default", id);
+
+      if (!call) throw new Error("Fail to create call");
+
+      const startsAt =
+        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+
+      const description = values.description || "Instant meeting";
+
+      await call.getOrCreate({
+        data: {
+          starts_at: startsAt,
+          custom: {
+            description
+          }
+        }
+      });
+
+      setCallDetails(call);
+
+      if (!values.description) {
+        // const newTabUrl = `/calling/video/${call.id}`; // Tạo URL mới
+        // window.open(newTabUrl);
+        router.push(`/calling/video/${call.id}`);
+      }
+
+      toast({
+        title: "Create video call",
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div className="flex flex-row h-fit w-full lg:pl-[6px] pl-0 justify-between items-center">
       <div className="flex flex-row h-full">
@@ -86,7 +145,10 @@ const RightTop: React.FC<rightTop> = ({
         </div>
       </div>
       <div className="flex flex-row items-center justify-start h-full gap-[10px] lg:gap-4">
-        <Button className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]">
+        <Button
+          className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
+          onClick={handleCreateMeeting}
+        >
           <Icon
             icon="fluent:video-20-filled"
             width={24}

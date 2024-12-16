@@ -73,7 +73,7 @@ const Leftsidebar = () => {
       });
 
       if (response.ok) {
-        localStorage.clear();
+        localStorage.removeItem("token");
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
@@ -193,7 +193,7 @@ const Leftsidebar = () => {
                 <div className="flex w-full">
                   <Image
                     src={
-                      adminInfo && adminInfo.avatar !== ""
+                      adminInfo && adminInfo.avatar
                         ? newAva
                           ? newAva
                           : adminInfo.avatar
@@ -358,7 +358,7 @@ const Leftsidebar = () => {
                 <DropdownMenuLabel className="hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg">
                   <Link
                     key="logout"
-                    href="/"
+                    href="/signin"
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent w-full"
                     onClick={handleLogout}
                   >

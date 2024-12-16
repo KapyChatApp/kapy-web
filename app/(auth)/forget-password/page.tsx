@@ -1,47 +1,40 @@
 import InputCustom from "@/components/auth/InputCustom";
 import { Button } from "@/components/ui/button";
-import { inputCustomItems } from "@/constants/auth";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React from "react";
 
-const Signup = () => {
+const ForgetPassword = () => {
   return (
-    <div className="flex flex-col items-start justify-center w-full h-fit gap-10 pb-5">
+    <div className="flex flex-col items-start justify-center w-full h-fit gap-[48px]">
       <div className="flex flex-col gap-4 items-start justify-center w-full h-fit">
-        <p className="text-primary-500 h1-bold">Welcome Back</p>
+        <p className="text-primary-500 h1-bold">Forgot Password</p>
         <p className="text-dark100_ligh900 paragraph-light">
-          Please enter sign up details below
+          No worries, we'll send you code to reset your password!
         </p>
       </div>
 
-      <div className="flex flex-col w-full h-fit gap-6">
-        <div className="flex flex-col gap-6 w-full h-fit">
-          {inputCustomItems.slice(2, 6).map((item) => (
+      <div className="flex flex-col w-full h-fit gap-3">
+        {/* <div className="flex flex-col gap-6 w-full h-fit">
+          {inputCustomItems.slice(0, 2).map((item) => (
             <InputCustom placeholder={item.placeholder} value={item.value} />
           ))}
-        </div>
-        <div className="flex flex-row justify-between w-full h-fit items-center gap-6">
-          <div className="flex flex-col gap-6 w-[50%] h-fit">
-            {inputCustomItems.slice(6, 8).map((item) => (
-              <InputCustom placeholder={item.placeholder} value={item.value} />
-            ))}
-          </div>
-          <div className="flex flex-col gap-6 w-[50%] h-fit">
-            {inputCustomItems.slice(8, 10).map((item) => (
-              <InputCustom placeholder={item.placeholder} value={item.value} />
-            ))}
-          </div>
-        </div>
+        </div> */}
+        <Link
+          href="/forget-password"
+          className="flex items-center justify-end w-full h-fit "
+        >
+          <p className="text-dark100_light900 paragraph-light italic">
+            Forget password
+          </p>
+        </Link>
       </div>
 
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
-        <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px]">
-          <div className="w-full h-[30px] items-center justify-center flex">
-            <p className="text-[20px] font-bold text-light-900 ">
-              Create an account
-            </p>
-          </div>
+        <Button className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-fit py-4 rounded-[20px] ">
+          <p className="text-[20px] font-bold text-light-900 h-[30px]">
+            Sign in
+          </p>
         </Button>
 
         <div className="flex flex-row gap-3 justify-between items-center h-fit w-full">
@@ -61,10 +54,10 @@ const Signup = () => {
           </Button>
           <div className="flex flex-row gap-3 w-full items-center justify-center h-fit">
             <p className="text-dark100_light900 paragraph-light">
-              You have an account?
+              Don't have an account?
             </p>
-            <Link href="/signin">
-              <p className="text-primary-500 paragraph-bold">Sign in</p>
+            <Link href="/signup">
+              <p className="text-primary-500 paragraph-bold">Sign up</p>
             </Link>
           </div>
         </div>
@@ -73,4 +66,4 @@ const Signup = () => {
   );
 };
 
-export default Signup;
+export default ForgetPassword;

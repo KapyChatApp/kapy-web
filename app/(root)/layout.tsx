@@ -2,7 +2,7 @@
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { checkTokenFrontend } from "@/lib/services/message/check-toke";
+import { checkTokenFrontend } from "@/lib/services/auth/check-token";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
 import { getPusherClient } from "@/lib/pusher";
@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { OnlineEvent } from "./chat/page";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import StreamVideoProvider from "@/providers/StreamClientProvider";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { dataChat } = useChatContext();
@@ -131,19 +132,19 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      const token = localStorage.getItem("token"); // Lấy token từ localStorage
-      await getMyProfile(setAdminInfo, setError);
+      const token = localStorage.getItem("token");
 
       if (token) {
         const result = await checkTokenFrontend(token);
         console.log(result);
         if (result && typeof result === "object" && result.isAuthenticated) {
+          await getMyProfile(setAdminInfo, setError);
           router.push("/chat");
         } else {
-          router.push("/");
+          router.push("/signin");
         }
       } else {
-        router.push("/");
+        router.push("/signin");
       }
     };
 
@@ -153,7 +154,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <main className="background-light850_dark200 flex flex-row overflow-scroll scrollable w-full cursor-default h-screen min-w-[492px]">
       <LeftSidebar />
       <section className="bg-transparent w-full flex flex-row h-full overflow-y-hidden">
-        <div className="h-full w-full cursor-default ">{children}</div>
+        <div className="h-full w-full cursor-default ">
+          <StreamVideoProvider>{children}</StreamVideoProvider>
+        </div>
       </section>
     </main>
   );

@@ -120,7 +120,9 @@ const RightMiddle = ({
           {messagesToDisplay.map((group, index) => {
             //Get info receiver
             const targetId = group[0].createBy;
-            const foundItem = receiverInfo.find((item) => item.id === targetId);
+            const foundItem = receiverInfo.find(
+              (item) => item._id === targetId
+            );
 
             const prevGroup = messagesToDisplay[index - 1];
             let timeDifference = 0;

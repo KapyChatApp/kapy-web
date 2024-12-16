@@ -1,16 +1,17 @@
 // useSearch.ts
+import { FriendResponseDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
 import { HistoryFindFriend, StrangeFriend } from "@/types/friends";
-import { User } from "@/types/object";
 import { useState } from "react";
 
 const useSearch = (
-  friendList: User[] | HistoryFindFriend[] | StrangeFriend[]
+  friendList: FriendResponseDTO[] | RequestedResponseDTO[]
 ) => {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredFriends = friendList.filter((fr) =>
-    fr.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredFriends = friendList.filter((fr) => {
+    const name = fr.firstName + fr.lastName;
+    return name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
 
   return { searchTerm, setSearchTerm, filteredFriends };
 };

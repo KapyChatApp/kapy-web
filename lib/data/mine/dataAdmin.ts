@@ -29,6 +29,6 @@ export const getMyProfile = async (
     setMyProfile(adminInfo);
   } catch (err: any) {
     setError(err.message);
-    console.error("Error fetching messages:", err);
+    console.error("Error fetching your profile:", err);
   }
 };

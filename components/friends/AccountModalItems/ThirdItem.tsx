@@ -1,4 +1,5 @@
 "use client";
+import { FriendProfileResponseDTO } from "@/lib/DTO/friend";
 import { HistoryFindFriend } from "@/types/friends";
 import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -6,7 +7,7 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 
 interface ThirdItemProps {
-  user: User | HistoryFindFriend;
+  user: FriendProfileResponseDTO;
 }
 
 const ThirdItem = ({ user }: ThirdItemProps) => {
@@ -26,7 +27,7 @@ const ThirdItem = ({ user }: ThirdItemProps) => {
         Pictures
       </p>
       <div className="flex flex-row flex-wrap justify-between items-center w-full h-fit cursor-pointer">
-        {user.image.slice(0, imagesToShow).map((item, index) => (
+        {/* {user.image.slice(0, imagesToShow).map((item, index) => (
           <div key={index} className="relative">
             <Image
               src={item.path}
@@ -48,7 +49,7 @@ const ThirdItem = ({ user }: ThirdItemProps) => {
               </div>
             )}
           </div>
-        ))}
+        ))} */}
       </div>
     </div>
   );

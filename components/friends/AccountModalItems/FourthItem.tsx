@@ -1,24 +1,26 @@
 import { Switch } from "@/components/ui/switch";
+import { useChatContext } from "@/context/ChatContext";
+import { FriendProfileResponseDTO } from "@/lib/DTO/friend";
 import { HistoryFindFriend } from "@/types/friends";
 import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 
 interface FourthItemProps {
-  user: User | HistoryFindFriend;
+  user: FriendProfileResponseDTO;
 }
 
 const FourthItem = ({ user }: FourthItemProps) => {
   return (
     <div className="flex flex-col items-start justify-start gap-3 w-full h-fit">
-      <div className="flex flex-row items-center justify-start h-fit w-full gap-2">
+      {/* <div className="flex flex-row items-center justify-start h-fit w-full gap-2">
         <p className="text-dark100_light900 paragraph-15-regular">
           Mutual group
         </p>
         <p className="text-dark100_light900 paragraph-15-light">
           ({user.mutualGroup})
         </p>
-      </div>
+      </div> */}
 
       <div className="flex flex-row items-center justify-between h-fit w-full">
         <div className="flex flex-row gap-3 w-fit h-fit items-center">
