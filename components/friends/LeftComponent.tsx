@@ -1,11 +1,7 @@
 "use client";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
-import { Button } from "../ui/button";
 import { usePathname } from "next/navigation";
 import ButtonLeft from "./ButtonLeft";
-import { user } from "@/constants/object";
-import FindFriendModal from "./FindFriendModal";
 import { useFriendContext } from "@/context/FriendContext";
 
 const LeftComponent = () => {
@@ -47,7 +43,7 @@ const LeftComponent = () => {
     isPathname: containsBestFriend,
     route: "best-friend"
   };
-  const inviteButton = {
+  const requestButton = {
     isClick: isList,
     setClick: setList,
     label: "Friend requests",
@@ -104,7 +100,7 @@ const LeftComponent = () => {
           </div>
 
           <div className="flex w-full h-fit">
-            <ButtonLeft buttonLeft={inviteButton} />
+            <ButtonLeft buttonLeft={requestButton} />
           </div>
 
           <div className="flex w-full h-fit">
@@ -112,8 +108,6 @@ const LeftComponent = () => {
           </div>
         </div>
       </div>
-
-      {/* {isAdd && <FindFriendModal setFind={setAdd} />} */}
     </>
   );
 };

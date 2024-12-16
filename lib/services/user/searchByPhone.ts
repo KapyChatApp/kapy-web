@@ -8,6 +8,7 @@ export const defaultFindUser: FindUserDTO = {
   nickName: "",
   avatar: "",
   relation: "",
+  status: false,
   mutualFriends: 0
 };
 

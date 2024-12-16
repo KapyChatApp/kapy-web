@@ -1,15 +1,14 @@
 "use client";
-import { User } from "@/types/object";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import LocalSearch from "../shared/search/localSearchbar";
-import VerticalBox from "./VerticalBox";
 import FriendBox from "./FriendBox";
-import useSearch from "@/hooks/use-search";
 import LeftComponent from "./LeftComponent";
 import { useFriendContext } from "@/context/FriendContext";
 import useSearchFriendByPhone from "@/hooks/use-search-friend-by-phone";
 import { FindUserDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
+import VerticalRequestBox from "./VerticalRequestBox";
+import VerticalSuggestBox from "./VerticalSuggestBox";
 
 const RightComponent = () => {
   const {
@@ -88,7 +87,9 @@ const RightComponent = () => {
           <div className="flex md:flex-row flex-col md:justify-between justify-start items-center md:flex-wrap md:gap-3 gap-1 overflow-scroll scrollable">
             {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
+                (fr) =>
+                  listFriend.some((friend) => friend._id === fr._id) &&
+                  fr._id !== isIndex
               )
               .map((item) => (
                 <div
@@ -104,14 +105,36 @@ const RightComponent = () => {
           <div className="flex flex-col md:justify-between justify-start items-center md:flex-wrap gap-3 overflow-scroll scrollable">
             {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) => fr.relation === "stranger" || fr.relation === "block"
+                (fr) =>
+                  (fr.relation === "stranger" || fr.relation === "block") &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
               )
               .map((item) => (
                 <div
                   className="flex md:flex-row lg:w-[48.6%] xl:w-[49%] w-full h-fit"
                   key={item._id}
                 >
-                  <VerticalBox request={item} setIndex={setIndex} />
+                  <VerticalSuggestBox request={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+        {(matchedPath === "best-friend" || matchedPath === "all-friend") && (
+          <div className="flex flex-col md:justify-between justify-start items-center md:flex-wrap gap-3 overflow-scroll scrollable">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) =>
+                  fr.relation === "friend" &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
+              )
+              .map((item) => (
+                <div
+                  className="flex md:flex-row lg:w-[48.6%] xl:w-[49%] w-full h-fit"
+                  key={item._id}
+                >
+                  <VerticalRequestBox request={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
@@ -121,24 +144,45 @@ const RightComponent = () => {
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
             {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) => fr.relation === "stranger" || fr.relation === "block"
+                (fr) =>
+                  fr.relation === "friend" &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
               )
               .map((item) => (
                 <div className="flex flex-row w-fit h-fit" key={item._id}>
-                  <VerticalBox request={item} setIndex={setIndex} />
+                  <VerticalRequestBox request={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
         )}
         {matchedPath === "request" && (
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
-            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+            {(filteredFriends as FindUserDTO[])
               .filter(
-                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
+                (fr) =>
+                  fr._id !== isIndex &&
+                  listFriend.some((friend) => friend._id === fr._id)
               )
               .map((item) => (
                 <div className="flex flex-row w-fit h-fit" key={item._id}>
                   <FriendBox friend={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+        {matchedPath === "request" && (
+          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit">
+            {(filteredFriends as FindUserDTO[])
+              .filter(
+                (fr) =>
+                  (fr.relation === "stranger" || fr.relation === "block") &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
+              )
+              .map((item) => (
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <VerticalSuggestBox request={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
@@ -148,11 +192,14 @@ const RightComponent = () => {
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap xl:gap-x-3 xl:gap-y-6 gap-3 overflow-scroll scrollable h-fit">
             {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) => fr.relation === "stranger" || fr.relation === "block"
+                (fr) =>
+                  (fr.relation === "stranger" || fr.relation === "block") &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
               )
               .map((item) => (
                 <div className="flex flex-row w-fit h-fit" key={item._id}>
-                  <VerticalBox request={item} setIndex={setIndex} />
+                  <VerticalSuggestBox request={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>
@@ -161,11 +208,29 @@ const RightComponent = () => {
           <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap xl:gap-x-3 xl:gap-y-6 gap-3 overflow-scroll scrollable h-fit">
             {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
               .filter(
-                (fr) => fr.relation !== "stranger" && fr.relation !== "block"
+                (fr) =>
+                  fr._id !== isIndex &&
+                  listFriend.some((friend) => friend._id === fr._id)
               )
               .map((item) => (
                 <div className="flex flex-row w-fit h-fit" key={item._id}>
                   <FriendBox friend={item} setIndex={setIndex} />
+                </div>
+              ))}
+          </div>
+        )}
+        {matchedPath === "suggestion" && (
+          <div className="flex flex-row xl:justify-start justify-between items-center flex-wrap xl:gap-x-3 xl:gap-y-6 gap-3 overflow-scroll scrollable h-fit">
+            {(filteredFriends as FindUserDTO[] | RequestedResponseDTO[])
+              .filter(
+                (fr) =>
+                  fr.relation === "friend" &&
+                  fr._id !== isIndex &&
+                  !listFriend.some((friend) => friend._id === fr._id)
+              )
+              .map((item) => (
+                <div className="flex flex-row w-fit h-fit" key={item._id}>
+                  <VerticalRequestBox request={item} setIndex={setIndex} />
                 </div>
               ))}
           </div>

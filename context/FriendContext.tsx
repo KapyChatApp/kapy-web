@@ -17,6 +17,7 @@ export const defaultFriendRequestedDTO: RequestedResponseDTO = {
   lastName: "",
   avatar: "",
   relation: "",
+  status: false,
   createAt: "",
   mutualFriends: 0
 };
@@ -27,8 +28,10 @@ interface FriendContextType {
   setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>;
   listBestFriend: FriendResponseDTO[];
   setListBestFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>;
-  listBlockFriend: FriendResponseDTO[];
-  setListBlockFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>;
+  listBlockedFriend: FriendResponseDTO[];
+  setListBlockedFriend: React.Dispatch<
+    React.SetStateAction<FriendResponseDTO[]>
+  >;
   listSuggestedFriend: FriendResponseDTO[];
   setListSuggestedFriend: React.Dispatch<
     React.SetStateAction<FriendResponseDTO[]>
@@ -54,9 +57,9 @@ export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({
   const [listBestFriend, setListBestFriend] = useState<FriendResponseDTO[]>([
     defaultFriendResponseDTO
   ]);
-  const [listBlockFriend, setListBlockFriend] = useState<FriendResponseDTO[]>([
-    defaultFriendResponseDTO
-  ]);
+  const [listBlockedFriend, setListBlockedFriend] = useState<
+    FriendResponseDTO[]
+  >([defaultFriendResponseDTO]);
   const [listSuggestedFriend, setListSuggestedFriend] = useState<
     FriendResponseDTO[]
   >([defaultFriendResponseDTO]);
@@ -71,8 +74,8 @@ export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({
         setListFriend,
         listBestFriend,
         setListBestFriend,
-        listBlockFriend,
-        setListBlockFriend,
+        listBlockedFriend,
+        setListBlockedFriend,
         listSuggestedFriend,
         setListSuggestedFriend,
         listRequestedFriend,

@@ -35,6 +35,7 @@ export interface RequestedResponseDTO {
   lastName: string;
   avatar: string;
   relation: string;
+  status: boolean;
   createAt: string;
   mutualFriends: number;
 }
@@ -46,6 +47,7 @@ export interface FindUserDTO {
   nickName: string;
   avatar: string;
   relation: string;
+  status: boolean;
   mutualFriends: number;
 }
 

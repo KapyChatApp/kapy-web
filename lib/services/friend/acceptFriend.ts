@@ -1,6 +1,6 @@
 import { FriendRequestDTO, FriendResponseDTO } from "@/lib/DTO/friend";
 
-async function acceptFriend(param: FriendRequestDTO) {
+export async function acceptFriend(param: FriendRequestDTO) {
   try {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
