@@ -8,10 +8,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { otherBox } from "@/constants/friends";
 import OtherBoxButton from "./OtherBoxButton";
 import AccountModal from "./AccountModal";
-import { FriendResponseDTO } from "@/lib/DTO/friend";
+import {
+  FindUserDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 
 interface FriendBoxProps {
-  friend: FriendResponseDTO;
+  friend: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 

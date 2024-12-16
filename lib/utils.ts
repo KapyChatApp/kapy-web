@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow, format, isValid } from "date-fns";
-import { admin } from "@/constants/object";
 import { UserInfo } from "os";
 import { ResponseMessageDTO, UserInfoBox } from "./DTO/message";
 
@@ -229,7 +228,7 @@ export const contentBox = (
     box.senderName = "You:";
   } else {
     if (recievers) {
-      const info = recievers.find((obj) => obj.id === message.createBy);
+      const info = recievers.find((obj) => obj._id === message.createBy);
       box.senderName = info ? info.firstName + " " + info.lastName + ":" : "";
     } else box.senderName = "";
   }

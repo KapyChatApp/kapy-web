@@ -1,10 +1,11 @@
 // useSearch.ts
-import { FriendResponseDTO } from "@/lib/DTO/friend";
+import { FriendResponseDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
 import { HistoryFindFriend, StrangeFriend } from "@/types/friends";
-import { User } from "@/types/object";
 import { useState } from "react";
 
-const useSearch = (friendList: FriendResponseDTO[]) => {
+const useSearch = (
+  friendList: FriendResponseDTO[] | RequestedResponseDTO[]
+) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredFriends = friendList.filter((fr) => {

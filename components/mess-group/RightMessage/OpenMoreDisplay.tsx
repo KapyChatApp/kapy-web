@@ -32,29 +32,28 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
   let detail: MessageBoxInfo = {
     id: "",
     receiverInfo: {
-      id: "",
+      _id: "",
       firstName: "",
       lastName: "",
       nickName: "",
       avatar: "",
-      phone: "",
       isOnline: false
     },
     memberInfo: [
       {
-        id: "",
+        _id: "",
         firstName: "",
         lastName: "",
         nickName: "",
         avatar: "",
-        phone: "",
         isOnline: false
       }
     ],
     groupName: "",
     groupAva: "",
     pin: false,
-    readStatus: true
+    readStatus: true,
+    stranger: false
   };
   if (detailByBox) {
     detail = detailByBox;

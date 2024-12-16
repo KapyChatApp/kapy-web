@@ -6,6 +6,8 @@ const nextConfig = {
     domains: ["res.cloudinary.com"]
   },
 
+  productionBrowserSourceMaps: false,
+
   webpack: (config, { isServer }) => {
     // Tắt caching
     config.cache = false;

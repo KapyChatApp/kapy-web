@@ -28,3 +28,28 @@ export interface FriendProfileResponseDTO {
   relation: string;
   mutualFriends: number;
 }
+
+export interface RequestedResponseDTO {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  avatar: string;
+  relation: string;
+  createAt: string;
+  mutualFriends: number;
+}
+
+export interface FindUserDTO {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  nickName: string;
+  avatar: string;
+  relation: string;
+  mutualFriends: number;
+}
+
+export interface FriendRequestDTO {
+  sender: string;
+  receiver: string;
+}

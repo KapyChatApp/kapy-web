@@ -5,11 +5,12 @@ import { toast } from "@/hooks/use-toast";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React, { useState } from "react";
-import { UserRegisterDTO } from "@/lib/DTO/user";
+import { UserLoginDTO, UserRegisterDTO } from "@/lib/DTO/user";
 import { registerUser } from "@/lib/services/user/register";
 import { SignInSchema } from "@/lib/validation";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { useUserContext } from "@/context/UserContext";
+import { loginUser } from "@/lib/services/auth/login";
 
 const Signup = () => {
   const { adminInfo, setAdminInfo } = useUserContext();
@@ -102,21 +103,38 @@ const Signup = () => {
         birthDay: birth
       };
 
-      console.log(params);
-
       // Gửi yêu cầu đăng ký
       const response = await registerUser(params);
-      console.log(response);
-      if (response.flag) {
+      if (response) {
         toast({
           title: "Success",
           description: "You have successfully signed up!",
           className:
             "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
         });
+        const loginInfo: UserLoginDTO = {
+          phoneNumber,
+          password
+        };
+        const result = await loginUser(loginInfo);
+
+        if (result.token === "") {
+          setError("Login failed");
+          toast({
+            title: "Error",
+            description: error,
+            className:
+              "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center"
+          });
+          return;
+        }
+        const token = result.token;
+        localStorage.setItem("token", token);
+
+        await getMyProfile(setAdminInfo, setError);
+
+        window.location.href = "/chat";
       }
-      await getMyProfile(setAdminInfo, setError);
-      window.location.href = "/chat";
     } catch (error: any) {
       const errorMessage =
         error?.message || "An unexpected error occurred during sign-up.";

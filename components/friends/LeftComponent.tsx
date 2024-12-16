@@ -6,18 +6,19 @@ import { usePathname } from "next/navigation";
 import ButtonLeft from "./ButtonLeft";
 import { user } from "@/constants/object";
 import FindFriendModal from "./FindFriendModal";
+import { useFriendContext } from "@/context/FriendContext";
 
 const LeftComponent = () => {
-  const bestUser = user.filter((item) => item.status === "best");
-
   const [isList, setList] = useState(true);
+  const { listBestFriend, listFriend, listSuggestedFriend } =
+    useFriendContext();
 
   const pathname = usePathname();
   const containsAllFriend = /^\/friends\/all-friend(\/.*)?$/.test(pathname);
   const containsBestFriend = /^\/friends\/best-friend(\/.*)?$/.test(pathname);
   const containsListFriend = containsAllFriend || containsBestFriend;
   const containsSuggestion = /^\/friends\/suggestion(\/.*)?$/.test(pathname);
-  const containsInvitation = /^\/friends\/invitation(\/.*)?$/.test(pathname);
+  const containsRequest = /^\/friends\/request(\/.*)?$/.test(pathname);
 
   const listButton = {
     isClick: isList,
@@ -32,8 +33,7 @@ const LeftComponent = () => {
     isClick: isList,
     setClick: setList,
     label: "All",
-    number: user.filter((fr) => fr.status === "" || fr.status === "best")
-      .length,
+    number: listFriend.length,
     icon: "",
     isPathname: containsAllFriend,
     route: "all-friend"
@@ -42,7 +42,7 @@ const LeftComponent = () => {
     isClick: isList,
     setClick: setList,
     label: "Best",
-    number: bestUser.length,
+    number: listBestFriend.length,
     icon: "",
     isPathname: containsBestFriend,
     route: "best-friend"
@@ -50,16 +50,16 @@ const LeftComponent = () => {
   const inviteButton = {
     isClick: isList,
     setClick: setList,
-    label: "Friend invitations",
+    label: "Friend requests",
     number: 0,
     icon: "",
-    isPathname: containsInvitation,
-    route: "invitation"
+    isPathname: containsRequest,
+    route: "request"
   };
   const suggestButton = {
     isClick: isList,
     setClick: setList,
-    label: "Sugested friends",
+    label: "Suggested friends",
     number: 0,
     icon: "",
     isPathname: containsSuggestion,
@@ -78,7 +78,7 @@ const LeftComponent = () => {
           <p className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
             Your friends
           </p>
-          <Button
+          {/* <Button
             className="flex h-full w-fit bg-transparent border-none shadow-none hover:bg-transparent p-0 items"
             onClick={handleIconAdd}
           >
@@ -88,7 +88,7 @@ const LeftComponent = () => {
               height={30}
               className="text-dark-500 dark:text-light-900 lg:h-[30px] lg:w-[30px] md:w-[22px] md:h-[22px] "
             />
-          </Button>
+          </Button> */}
         </div>
         <div className="flex flex-col h-full w-full">
           <div className="flex flex-col gap-1 w-full h-fit ">
@@ -113,7 +113,7 @@ const LeftComponent = () => {
         </div>
       </div>
 
-      {isAdd && <FindFriendModal setFind={setAdd} />}
+      {/* {isAdd && <FindFriendModal setFind={setAdd} />} */}
     </>
   );
 };

@@ -44,7 +44,7 @@ const SeeAllMember: React.FC<SeeAllProps> = ({
           ? memberList.map((item) => (
               <div
                 className="flex flex-row items-center justify-start w-full gap-[12px]"
-                key={item.id}
+                key={item._id}
               >
                 <div className="relative flex-shrink-0 w-fit">
                   <Image

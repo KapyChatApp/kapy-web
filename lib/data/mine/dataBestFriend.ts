@@ -12,7 +12,7 @@ export const getMyListBestFriend = async (
   }
 
   try {
-    const response = await fetch(`${process.env.BASE_URL}mine/friends`, {
+    const response = await fetch(`${process.env.BASE_URL}mine/bffs`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",

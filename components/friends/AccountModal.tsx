@@ -8,7 +8,11 @@ import FirstItem from "./AccountModalItems/FirstItem";
 import SecondItem from "./AccountModalItems/SecondItem";
 import ThirdItem from "./AccountModalItems/ThirdItem";
 import FourthItem from "./AccountModalItems/FourthItem";
-import { FriendProfileResponseDTO, FriendResponseDTO } from "@/lib/DTO/friend";
+import {
+  FriendProfileResponseDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 import {
   defaultFriendProfileResponseDTO,
   fetchFriendProfile
@@ -16,7 +20,7 @@ import {
 import { defaultFriendResponseDTO } from "@/context/FriendContext";
 
 interface AccountProps {
-  user: FriendResponseDTO;
+  user: FriendResponseDTO | RequestedResponseDTO;
   setAccount: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface Account {

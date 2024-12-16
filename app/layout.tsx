@@ -7,6 +7,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { ChatProvider } from "@/context/ChatContext";
 import { UserProvider } from "@/context/UserContext";
 import { FriendProvider } from "@/context/FriendContext";
+import "@stream-io/video-react-sdk/dist/css/styles.css";
 
 const lexend = Lexend({
   subsets: ["latin"],

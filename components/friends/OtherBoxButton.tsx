@@ -5,10 +5,10 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { User } from "@/types/object";
 import { useParams, usePathname } from "next/navigation";
-import { FriendResponseDTO } from "@/lib/DTO/friend";
+import { FriendResponseDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
 
 interface OtherButton {
-  account: FriendResponseDTO;
+  account: FriendResponseDTO | RequestedResponseDTO;
   other: OtherBoxButtonProps;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }

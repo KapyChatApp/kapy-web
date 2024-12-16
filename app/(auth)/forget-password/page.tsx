@@ -1,6 +1,5 @@
 import InputCustom from "@/components/auth/InputCustom";
 import { Button } from "@/components/ui/button";
-import { inputCustomItems } from "@/constants/auth";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
 import React from "react";
@@ -16,11 +15,11 @@ const ForgetPassword = () => {
       </div>
 
       <div className="flex flex-col w-full h-fit gap-3">
-        <div className="flex flex-col gap-6 w-full h-fit">
+        {/* <div className="flex flex-col gap-6 w-full h-fit">
           {inputCustomItems.slice(0, 2).map((item) => (
             <InputCustom placeholder={item.placeholder} value={item.value} />
           ))}
-        </div>
+        </div> */}
         <Link
           href="/forget-password"
           className="flex items-center justify-end w-full h-fit "

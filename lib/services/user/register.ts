@@ -3,7 +3,7 @@ import { UserRegisterDTO } from "@/lib/DTO/user";
 
 export const registerUser = async (params: UserRegisterDTO) => {
   try {
-    const response = await fetch(`${process.env.BASE_URL}user/register-web`, {
+    const response = await fetch(`${process.env.BASE_URL}user/register`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -17,8 +17,7 @@ export const registerUser = async (params: UserRegisterDTO) => {
     }
 
     const data = await response.json();
-    localStorage.setItem("token", data.token);
-    return data.newUser;
+    return data;
   } catch (error) {
     console.error("Error registering user:", error);
     return defaultUserResponseDTO;

@@ -1,3 +1,4 @@
+"use client";
 import RightComponent from "@/components/friends/RightComponent";
 import { useFriendContext } from "@/context/FriendContext";
 import { getMyListBestFriend } from "@/lib/data/mine/dataBestFriend";

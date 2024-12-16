@@ -58,12 +58,11 @@ const FileSegment: React.FC<FileSegmentProps> = ({
       {/* Hiển thị tên file */}
       <div
         onClick={handleDownload}
-        className={cn(
-          "text-dark300_light800 flex-wrap md:text-[14px] text-[12px] font-semibold cursor-pointer text-decoration-none hover:text-decoration-none hover:no-underline",
-          textClassName
-        )}
+        className={cn(" flex flex-wrap cursor-pointer", textClassName)}
       >
-        {fileName}
+        <p className="text-dark300_light800  md:text-[14px] text-[12px] font-semibold text-decoration-none hover:text-decoration-none hover:no-underline">
+          {fileName}
+        </p>
       </div>
     </div>
   );

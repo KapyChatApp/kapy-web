@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { OnlineEvent } from "./chat/page";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import StreamVideoProvider from "@/providers/StreamClientProvider";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   const { dataChat } = useChatContext();
@@ -153,7 +154,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     <main className="background-light850_dark200 flex flex-row overflow-scroll scrollable w-full cursor-default h-screen min-w-[492px]">
       <LeftSidebar />
       <section className="bg-transparent w-full flex flex-row h-full overflow-y-hidden">
-        <div className="h-full w-full cursor-default ">{children}</div>
+        <div className="h-full w-full cursor-default ">
+          <StreamVideoProvider>{children}</StreamVideoProvider>
+        </div>
       </section>
     </main>
   );

@@ -1,5 +1,5 @@
 "use client";
-import { FriendResponseDTO } from "@/lib/DTO/friend";
+import { FriendResponseDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
 import { UserResponseDTO } from "@/lib/DTO/user";
 import { createContext, useContext, useState } from "react";
 export const defaultFriendResponseDTO: FriendResponseDTO = {
@@ -8,6 +8,16 @@ export const defaultFriendResponseDTO: FriendResponseDTO = {
   lastName: "",
   nickName: "",
   avatar: "",
+  mutualFriends: 0
+};
+
+export const defaultFriendRequestedDTO: RequestedResponseDTO = {
+  _id: "",
+  firstName: "",
+  lastName: "",
+  avatar: "",
+  relation: "",
+  createAt: "",
   mutualFriends: 0
 };
 
@@ -22,6 +32,10 @@ interface FriendContextType {
   listSuggestedFriend: FriendResponseDTO[];
   setListSuggestedFriend: React.Dispatch<
     React.SetStateAction<FriendResponseDTO[]>
+  >;
+  listRequestedFriend: RequestedResponseDTO[];
+  setListRequestedFriend: React.Dispatch<
+    React.SetStateAction<RequestedResponseDTO[]>
   >;
   mutualGroup: number;
   setMutualGroup: React.Dispatch<React.SetStateAction<number>>;
@@ -46,6 +60,9 @@ export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({
   const [listSuggestedFriend, setListSuggestedFriend] = useState<
     FriendResponseDTO[]
   >([defaultFriendResponseDTO]);
+  const [listRequestedFriend, setListRequestedFriend] = useState<
+    RequestedResponseDTO[]
+  >([defaultFriendRequestedDTO]);
   const [mutualGroup, setMutualGroup] = useState<number>(0);
   return (
     <FriendContext.Provider
@@ -58,6 +75,8 @@ export const FriendProvider: React.FC<{ children: React.ReactNode }> = ({
         setListBlockFriend,
         listSuggestedFriend,
         setListSuggestedFriend,
+        listRequestedFriend,
+        setListRequestedFriend,
         mutualGroup,
         setMutualGroup
       }}

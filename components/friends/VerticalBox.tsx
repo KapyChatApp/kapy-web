@@ -7,29 +7,37 @@ import { StrangeFriend } from "@/types/friends";
 import { usePathname } from "next/navigation";
 import ConfirmModal from "./ConfirmModal";
 import AccountModal from "./AccountModal";
+import {
+  FindUserDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 
 interface VerticalBoxProps {
-  invitation: StrangeFriend;
+  request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
+const VerticalBox: React.FC<VerticalBoxProps> = ({ request, setIndex }) => {
   const pathname = usePathname();
   const getPathNameMatch = () => {
-    const paths = ["all-friend", "best-friend", "suggestion", "invitation"];
+    const paths = ["all-friend", "best-friend", "suggestion", "request"];
     return paths.find((path) =>
       new RegExp(`^/friends/${path}(\\/.*)?$`).test(pathname)
     );
   };
   const matchedPath = getPathNameMatch();
-  const label = matchedPath === "invitation" ? "Accept" : "Add friend";
+  const label =
+    (request as RequestedResponseDTO | FindUserDTO).relation === "friend"
+      ? "Accept"
+      : "Add friend";
 
-  const list = invitation;
+  const list = request;
 
   const [status, setStatus] = useState("");
   const handleButton = () => {
     if (label === "Accept") {
-      setIndex(list.id);
+      setIndex(list._id);
     }
     setStatus("cancel");
   };
@@ -50,8 +58,8 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
   const confirm = {
     setConfirm: setRemove,
     setIndex: setIndex,
-    listId: list.id,
-    name: list.name,
+    listId: list._id,
+    name: list.firstName + " " + list.lastName,
     action: "remove"
   };
   const account = {
@@ -66,7 +74,7 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
         onClick={handleClick}
       >
         <Image
-          src={list.ava}
+          src={list.avatar}
           alt="ava"
           width={172}
           height={166}
@@ -74,10 +82,12 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
         />
 
         <div className="flex flex-col gap-1 w-full h-fit justify-center items-start mt-3">
-          <p className="text-dark100_light900 base-medium">{list.name}</p>
-          {list.mutualFriend > 0 && (
+          <p className="text-dark100_light900 base-medium">
+            {list.firstName + " " + list.lastName}
+          </p>
+          {list.mutualFriends > 0 && (
             <p className="text-dark100_light900 body-regular">
-              Mutual friends: {list.mutualFriend}
+              Mutual friends: {list.mutualFriends}
             </p>
           )}
         </div>
@@ -86,7 +96,7 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
           {status === "" ? (
             <Button
               className={`${
-                matchedPath === "invitation" ? "px-12" : "px-7"
+                matchedPath === "request" ? "px-12" : "px-7"
               } flex flex-row gap-[6px] py-1 bg-primary-500 hover:bg-primary-500 border-none shadow-none w-full rounded-lg`}
               onClick={(e) => {
                 e.stopPropagation();
@@ -106,7 +116,7 @@ const VerticalBox: React.FC<VerticalBoxProps> = ({ invitation, setIndex }) => {
           ) : (
             <Button
               className={`${
-                matchedPath === "invitation" ? "px-12" : "px-7"
+                matchedPath === "request" ? "px-12" : "px-7"
               } flex flex-row gap-[6px] py-1 bg-primary-500 hover:bg-primary-500 border-none shadow-none w-full rounded-lg`}
               onClick={(e) => {
                 e.stopPropagation();
