@@ -1,13 +1,15 @@
 // useSearch.ts
-import { HistoryFindFriend, StrangeFriend } from "@/types/friends";
-import { MememberGroup, User } from "@/types/object";
+import { UserInfoBox } from "@/lib/DTO/message";
 import { useState } from "react";
 
-const useSearchMember = (friendList: MememberGroup[]) => {
+const useSearchMember = (friendList: UserInfoBox[]) => {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredMembers = friendList.filter((fr) =>
-    fr.username.toLowerCase().includes(searchTerm.toLowerCase())
+    (fr.firstName + fr.lastName)
+      .trim()
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
   );
 
   return { searchTerm, setSearchTerm, filteredMembers };

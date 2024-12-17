@@ -1,9 +1,13 @@
-import { User } from "@/types/object";
 import React from "react";
 import BlockMessages from "./BlockMessages";
+import {
+  FindUserDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 
 interface ThirdFrameProps {
-  userBlock: User[];
+  userBlock: FriendResponseDTO[] | RequestedResponseDTO[] | FindUserDTO[];
   unBlock: boolean;
   setUnBlock: React.Dispatch<React.SetStateAction<boolean>>;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
@@ -24,7 +28,7 @@ const ThirdFrame = ({
         <p className="text-dark100_light900 body-light">({userBlock.length})</p>
       </div>
       {userBlock
-        .filter((bl) => bl.id !== isIndex)
+        .filter((bl) => bl._id !== isIndex)
         .map((item) => {
           return (
             <BlockMessages

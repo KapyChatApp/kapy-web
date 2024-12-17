@@ -15,6 +15,9 @@ import { isTexting } from "@/lib/services/message/isTexting";
 import { disableTexting } from "@/lib/services/message/disableTexting";
 import { ResponseUserInfo } from "@/lib/DTO/user";
 import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
+import { handleSendRecorder } from "@/lib/services/message/send/sendRecord";
+import { handleSendTextMessage } from "@/lib/services/message/send/sendText";
+import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipleFiles";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -40,6 +43,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
   >([]);
   const [record, setRecord] = useState(false);
   const [audioUrl, setAudioUrl] = useState("");
+  const [error, setError] = useState("");
 
   const handleInputChange = (value: string) => {
     setMessageContent(value);
@@ -84,207 +88,45 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     setFile(null);
   };
 
-  const handleSendTextMessage = async () => {
-    const newMessageSegment: ResponseMessageDTO = {
-      id: "",
-      flag: true,
-      readedId: adminId ? [adminId] : [],
-      contentId: {
-        fileName: "",
-        url: "",
-        publicId: "",
-        bytes: "",
-        width: "",
-        height: "",
-        format: "",
-        type: ""
-      },
-      text: messageContent,
-      boxId: boxId ? boxId : "",
-      createAt: new Date().toISOString(),
-      createBy: adminId ? adminId : ""
-    };
-
-    // Tạo đối tượng SegmentMessageDTO
-    const recipientId = recipientIds ? recipientIds : [];
-    const messageData = {
-      boxId: boxId,
-      content: messageContent
-    };
-
-    if (!messageData.boxId || recipientId.length === 0) {
-      console.error("Missing required fields in message data");
-      return;
-    }
-
-    // Gửi request đến API để gửi tin nhắn với file đã chọn
-    if (messageContent !== "") {
-      const formData = new FormData();
-      formData.append("boxId", messageData.boxId);
-      formData.append("content", JSON.stringify(messageData.content));
-
-      // Gửi API
-      try {
-        const storedToken = localStorage.getItem("token");
-        if (!storedToken) return;
-
-        const response = await axios.post(
-          process.env.BASE_URL + "message/send",
-          formData,
-          {
-            headers: {
-              Authorization: `${storedToken}`
-            }
-          }
-        );
-        setMessageContent("");
-      } catch (error) {
-        console.error("Error sending message: ", error);
-      }
-    } else console.log("No text in input bar");
-  };
-
-  const handleSendMultipleFiles = async (files: File[]) => {
-    if (!files.length || !boxId) return;
-
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) return;
-
-    try {
-      // Tạo danh sách fileContent và message tạm thời để hiển thị trước
-      const tempMessages: ResponseMessageDTO[] = files.map((file) => ({
-        id: "",
-        flag: true,
-        readedId: [adminId || ""],
-        contentId: {
-          fileName: file.name,
-          url: URL.createObjectURL(file), // Preview URL tạm thời
-          publicId: "",
-          bytes: file.size.toString(),
-          width: "0",
-          height: "0",
-          format: getFileFormat(file.type, file.name),
-          type: file.type.split("/")[0]
-        },
-        text: "",
-        boxId: boxId ? boxId : "",
-        createAt: new Date().toISOString(),
-        createBy: adminId || ""
-      }));
-
-      // Gửi từng file lên server
-      for (const file of files) {
-        const fileContent: FileContent = {
-          fileName: file.name,
-          url: "",
-          publicId: "", // Cloudinary Public ID
-          bytes: file.size.toString(),
-          width: "0",
-          height: "0",
-          format: getFileFormat(file.type, file.name),
-          type: file.type.split("/")[0]
-        };
-
-        const formData = new FormData();
-        console.log(file);
-        formData.append("boxId", boxId);
-        formData.append("content", JSON.stringify(fileContent));
-        formData.append("file", file);
-
-        await axios.post(`${process.env.BASE_URL}message/send`, formData, {
-          headers: {
-            Authorization: storedToken,
-            "Content-Type": "multipart/form-data"
-          }
-        });
-      }
-    } catch (error) {
-      console.error("Error sending files:", error);
-    }
-  };
-
-  const handleSendRecorder = async (record: File) => {
-    if (!boxId) return;
-    setRecord(false);
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) return;
-
-    try {
-      // Tạo danh sách fileContent và message tạm thời để hiển thị trước
-      const tempMessages: ResponseMessageDTO = {
-        id: "",
-        flag: true,
-        readedId: [adminId || ""],
-        contentId: {
-          fileName: record.name,
-          url: URL.createObjectURL(record), // Preview URL tạm thời
-          publicId: "",
-          bytes: record.size.toString(),
-          width: "0",
-          height: "0",
-          format: getFileFormat(record.type, record.name),
-          type: record.type.split("/")[0]
-        },
-        text: "",
-        boxId: boxId ? boxId : "",
-        createAt: new Date().toISOString(),
-        createBy: adminId || ""
-      };
-
-      const fileContent: FileContent = {
-        fileName: record.name,
-        url: "",
-        publicId: "", // Cloudinary Public ID
-        bytes: record.size.toString(),
-        width: "0",
-        height: "0",
-        format: getFileFormat(record.type, record.name),
-        type: record.type.split("/")[0]
-      };
-
-      const formData = new FormData();
-      console.log(record);
-      formData.append("boxId", boxId);
-      formData.append("content", JSON.stringify(fileContent));
-      formData.append("file", record);
-
-      const response = await axios.post(
-        `${process.env.BASE_URL}message/send`,
-        formData,
-        {
-          headers: {
-            Authorization: storedToken,
-            "Content-Type": "multipart/form-data"
-          }
-        }
-      );
-      if (response.status === 200) {
-        setFile(null);
-        setAudioUrl("");
-        setRecord(false);
-      }
-    } catch (error) {
-      console.error("Error sending files:", error);
-    }
-  };
-
   const handleAction = async () => {
-    if (record && recorderRef.current && !audioUrl) {
-      try {
-        const [buffer, blob] = await recorderRef.current.stop().getMp3();
-        const newFile = new File([blob], "recording.mp3", {
-          type: "audio/mp3"
-        });
-        setFile(newFile);
-        setRecord(false);
-        await handleSendRecorder(newFile);
-      } catch (err) {
-        console.error("Error stopping and sending recording:", err);
+    if (boxId && boxId !== " ") {
+      if (record && recorderRef.current && !audioUrl) {
+        try {
+          const [buffer, blob] = await recorderRef.current.stop().getMp3();
+          const newFile = new File([blob], "recording.mp3", {
+            type: "audio/mp3"
+          });
+          setFile(newFile);
+          setRecord(false);
+          await handleSendRecorder(
+            newFile,
+            boxId,
+            setFile,
+            setAudioUrl,
+            setRecord,
+            setError
+          );
+        } catch (err) {
+          console.error("Error stopping and sending recording:", err);
+        }
+      } else if (file) {
+        await handleSendRecorder(
+          file,
+          boxId,
+          setFile,
+          setAudioUrl,
+          setRecord,
+          setError
+        );
+      } else {
+        await handleSendTextMessage(
+          messageContent,
+          boxId,
+          recipientIds,
+          setMessageContent,
+          setError
+        );
       }
-    } else if (file) {
-      await handleSendRecorder(file);
-    } else {
-      await handleSendTextMessage();
     }
   };
 
@@ -298,7 +140,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       const box = dataChat.filter((item) => item.id === boxId);
       if (isTyping) {
         if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          const user = box[0].memberInfo.filter((item) => item._id === adminId);
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
@@ -312,7 +154,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         }
       } else {
         if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item.id === adminId);
+          const user = box[0].memberInfo.filter((item) => item._id === adminId);
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
@@ -437,8 +279,12 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         style={{ display: "none" }}
         multiple
         onChange={(e) => {
-          if (e.target.files) {
-            handleSendMultipleFiles(Array.from(e.target.files));
+          if (e.target.files && boxId) {
+            handleSendMultipleFiles(
+              Array.from(e.target.files),
+              boxId,
+              setError
+            );
           }
         }}
       />

@@ -1,12 +1,17 @@
-import ConfirmModal from "@/components/friends/ConfirmModal";
+import ConfirmModal, {
+  ConfirmModalProps
+} from "@/components/friends/ConfirmModal";
 import { Button } from "@/components/ui/button";
-import { ConfirmModalProps } from "@/types/friends";
-import { User } from "@/types/object";
+import {
+  FindUserDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 import Image from "next/image";
 import React from "react";
 
 interface BlockMessagesProps {
-  block: User;
+  block: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
   unBlock: boolean;
   setUnBlock: React.Dispatch<React.SetStateAction<boolean>>;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
@@ -20,9 +25,8 @@ const BlockMessages = ({
 }: BlockMessagesProps) => {
   const confirm: ConfirmModalProps = {
     setConfirm: setUnBlock,
-    setIndex: setIndex,
-    listId: block.id,
-    name: block.name,
+    handleAction: () => {},
+    name: block.firstName + " " + block.lastName,
     action: "unblock"
   };
 
@@ -35,13 +39,15 @@ const BlockMessages = ({
         <div className="flex flex-row justify-between items-center w-full h-fit">
           <div className="flex flex-row h-fit w-fit gap-3 items-center justify-start">
             <Image
-              src={block.ava === "" ? "/assets/ava/default.png" : block.ava}
+              src={block.avatar ? block.avatar : "/assets/ava/default.png"}
               alt="ava"
               width={36}
               height={36}
               className="rounded-full"
             />
-            <p className="text-dark100_light900 body-regular">{block.name}</p>
+            <p className="text-dark100_light900 body-regular">
+              {block.firstName + " " + block.lastName}
+            </p>
           </div>
 
           <Button

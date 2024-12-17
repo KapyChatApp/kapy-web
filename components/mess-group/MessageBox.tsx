@@ -96,7 +96,15 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
           <div className="flex flex-row bg-transparent lg:gap-[12px] gap-2 min-w-0 items-center pr-1">
             <div className="relative flex-shrink-0 w-fit">
               <Image
-                src={isGroup ? groupAva : receiverInfo.avatar}
+                src={
+                  isGroup
+                    ? groupAva
+                      ? groupAva
+                      : "/assets/images/icon.png"
+                    : receiverInfo.avatar
+                    ? receiverInfo.avatar
+                    : "/assets/ava/default.png"
+                }
                 alt="ava"
                 width={48}
                 height={48}
@@ -112,6 +120,8 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 <p className="lg:paragraph-15-regular body-regular text-dark100_light900 overflow-hidden text-ellipsis whitespace-nowrap">
                   {isGroup
                     ? groupName
+                      ? groupName
+                      : "Group Chat"
                     : receiverInfo.firstName + " " + receiverInfo.lastName}
                 </p>
               </div>

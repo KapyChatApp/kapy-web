@@ -43,7 +43,7 @@ export default function Page() {
     };
 
     fetchData();
-  }, [dataChat, adminInfo]);
+  }, []);
 
   const handleChatEvent = async (
     message: ResponseMessageDTO | PusherRevoke | PusherDelete,

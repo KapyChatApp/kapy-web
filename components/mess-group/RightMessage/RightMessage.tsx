@@ -64,8 +64,10 @@ const RightMessage = ({
   if (boxId && detailByBox) {
     top = isGroup
       ? {
-          ava: detailByBox.groupAva,
-          name: detailByBox.groupName,
+          ava: detailByBox.groupAva
+            ? detailByBox.groupAva
+            : "/assets/images/icon.png",
+          name: detailByBox.groupName ? detailByBox.groupName : "Group Chat",
           membersGroup: detailByBox.memberInfo.length,
           onlineGroup: 0,
           openMore: openMore,

@@ -18,13 +18,17 @@ export interface MessageBoxInfo {
   stranger: boolean;
 }
 
+export interface RequestCreateGroup {
+  membersIds: string[];
+  groupName: string;
+}
 // Interface Response
 export interface MessageBoxDTO {
   _id: string;
   senderId: string;
   receiverIds: UserInfoBox[];
   groupName: string;
-  groupAva: string[];
+  groupAva: string;
   flag: boolean;
   pin: boolean;
   readStatus: boolean;

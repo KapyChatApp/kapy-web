@@ -1,6 +1,11 @@
-import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { FriendRequestDTO, FriendResponseDTO } from "@/lib/DTO/friend";
 
-async function unBlock(param: FriendRequestDTO) {
+export async function unBlock(
+  param: FriendRequestDTO,
+  setListBlockedFriend: React.Dispatch<
+    React.SetStateAction<FriendResponseDTO[]>
+  >
+) {
   try {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
@@ -21,6 +26,9 @@ async function unBlock(param: FriendRequestDTO) {
     }
 
     const data = await response.json();
+    setListBlockedFriend((prev) =>
+      prev.filter((friend) => friend._id !== param.receiver)
+    );
     return data;
   } catch (error) {
     console.error("Error:", error);

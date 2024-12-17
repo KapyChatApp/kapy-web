@@ -12,52 +12,37 @@ import { UserUpdateRequest } from "@/lib/DTO/user";
 interface Props {
   setUpdateAva: React.Dispatch<React.SetStateAction<boolean>>;
   editorRef: React.RefObject<AvatarEditor>;
+  setGroupAva: React.Dispatch<React.SetStateAction<File | undefined>>;
+  setGroupAvaTemporary: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
+const UpdateGroupAva = ({
+  setUpdateAva,
+  editorRef,
+  setGroupAva,
+  setGroupAvaTemporary
+}: Props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const { setNewAva } = useUserContext();
   const handleBack = () => {
     setUpdateAva(false);
   };
 
   const handleUpdate = () => {
     if (editorRef.current) {
-      const canvas = editorRef.current.getImageScaledToCanvas(); // Lấy canvas của ảnh đã cắt
+      const canvas = editorRef.current.getImageScaledToCanvas();
       canvas.toBlob(async (blob) => {
         if (blob) {
-          // Xác định loại file dựa trên blob
-          const fileType = blob.type || "image/*"; // Mặc định là "image/*" nếu không xác định được
-
-          // Tạo File với loại dynamic
-          const file = new File([blob], "avatar", { type: fileType });
-
-          const result = await uploadAvatarClient(file);
-
-          if (result.status) {
-            const temporaryUrl = URL.createObjectURL(blob);
-            setNewAva(temporaryUrl);
-            setPreviewUrl("");
-            setUpdateAva(false);
-            toast({
-              title: "Your avatar is updated successfully!",
-              className:
-                "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
-            });
-          } else {
-            toast({
-              title: "Your avatar is not updated successfully!",
-              className:
-                "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
-            });
-          }
-        } else {
+          const file = new File([blob], "groupAva.png", { type: "image/png" });
+          setGroupAva(file);
+          const temporaryUrl = URL.createObjectURL(blob);
+          setGroupAvaTemporary(temporaryUrl);
+          setPreviewUrl("");
+          setUpdateAva(false);
           toast({
-            title: "Failed to process the cropped image.",
+            title: "Your avatar is updated successfully!",
             className:
-              "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+              "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
           });
         }
       }, "image/*"); // Định nghĩa loại MIME là "image/*"
@@ -76,7 +61,6 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
       if (
         ["image/png", "image/jpeg", "image/jpg"].includes(selectedFile.type)
       ) {
-        setFile(selectedFile);
         setPreviewUrl(URL.createObjectURL(selectedFile)); // Tạo URL để xem trước ảnh
       } else {
         alert("Please select a valid PNG, JPEG, or JPG file.");
@@ -193,4 +177,4 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
   );
 };
 
-export default PersonalUpdateAva;
+export default UpdateGroupAva;

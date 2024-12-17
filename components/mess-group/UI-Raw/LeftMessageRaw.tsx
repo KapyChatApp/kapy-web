@@ -3,7 +3,6 @@ import GlobalSearch from "../../shared/search/globalSearch";
 import MessageBox from "../MessageBox";
 import useSearchMessageBox from "@/hooks/use-search-message-box";
 import { usePathname } from "next/navigation";
-import { boxGroup } from "@/constants/groups";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useChatContext } from "@/context/ChatContext";
@@ -29,23 +28,23 @@ const LeftMessageRaw = () => {
     ? "New group chat will appear here"
     : "New message will appear here";
   //CREATE BOX GROUP
-  const [boxCreated, setBoxCreated] = useState(boxGroup);
-  const handleAddGroup = () => {
-    const newGroup = {
-      otherId: (boxCreated.length + 1).toString(),
-      otherName: `New Group ${boxCreated.length + 1}`,
-      ava: "/assets/images/icon.png",
-      sender: "",
-      content: "This is a new group message.",
-      pin: false,
-      time: "just now",
-      isOnline: false,
-      isSeen: false
-    };
+  // const [boxCreated, setBoxCreated] = useState(boxGroup);
+  // const handleAddGroup = () => {
+  //   const newGroup = {
+  //     otherId: (boxCreated.length + 1).toString(),
+  //     otherName: `New Group ${boxCreated.length + 1}`,
+  //     ava: "/assets/images/icon.png",
+  //     sender: "",
+  //     content: "This is a new group message.",
+  //     pin: false,
+  //     time: "just now",
+  //     isOnline: false,
+  //     isSeen: false
+  //   };
 
-    setBoxCreated([...boxCreated, newGroup]);
-    console.log(boxCreated);
-  };
+  //   setBoxCreated([...boxCreated, newGroup]);
+  //   console.log(boxCreated);
+  // };
 
   return (
     <>

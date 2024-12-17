@@ -1,18 +1,25 @@
 import React from "react";
 import { Button } from "../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { ConfirmModalProps } from "@/types/friends";
+
+export interface ConfirmModalProps {
+  setConfirm: React.Dispatch<React.SetStateAction<boolean>>;
+  handleAction: () => void;
+  name: string;
+  action: string;
+}
 
 interface Confirm {
   confirm: ConfirmModalProps;
 }
 
 const ConfirmModal: React.FC<Confirm> = ({ confirm }) => {
-  const { setConfirm, setIndex, listId, name, action } = confirm;
+  const { setConfirm, name, action, handleAction } = confirm;
   const handleBack = () => {
     setConfirm(false);
   };
   const handleConfirm = () => {
+    handleAction();
     console.log("Handle successfully!");
     handleBack();
   };

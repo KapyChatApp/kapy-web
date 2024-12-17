@@ -1,6 +1,9 @@
-import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { FriendRequestDTO, FriendResponseDTO } from "@/lib/DTO/friend";
 
-async function unBestFriend(param: FriendRequestDTO) {
+export async function unBestFriend(
+  param: FriendRequestDTO,
+  setListBestFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>
+) {
   try {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
@@ -21,6 +24,9 @@ async function unBestFriend(param: FriendRequestDTO) {
     }
 
     const data = await response.json();
+    setListBestFriend((prev) =>
+      prev.filter((friend) => friend._id !== param.receiver)
+    );
     return data;
   } catch (error) {
     console.error("Error:", error);

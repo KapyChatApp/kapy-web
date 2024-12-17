@@ -1,14 +1,13 @@
 "use client";
-import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
-import { HistoryFindFriend } from "@/types/friends";
 import FirstItem from "./AccountModalItems/FirstItem";
 import SecondItem from "./AccountModalItems/SecondItem";
 import ThirdItem from "./AccountModalItems/ThirdItem";
 import FourthItem from "./AccountModalItems/FourthItem";
 import {
+  FindUserDTO,
   FriendProfileResponseDTO,
   FriendResponseDTO,
   RequestedResponseDTO
@@ -17,10 +16,9 @@ import {
   defaultFriendProfileResponseDTO,
   fetchFriendProfile
 } from "@/lib/services/friend/getFriendProfile";
-import { defaultFriendResponseDTO } from "@/context/FriendContext";
 
 interface AccountProps {
-  user: FriendResponseDTO | RequestedResponseDTO;
+  user: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
   setAccount: React.Dispatch<React.SetStateAction<boolean>>;
 }
 interface Account {

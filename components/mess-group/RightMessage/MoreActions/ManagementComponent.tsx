@@ -1,13 +1,31 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { manage } from "@/constants/groups";
 import { ActiveComponentProps } from "@/types/mess-group";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { use, useState } from "react";
 import ChangeLeader from "./ChangeLeader";
 import ModalConfirm from "./ModalConfirm";
 import { Switch } from "@/components/ui/switch";
+
+export interface ManagementGroup {
+  id: string;
+  label: string;
+}
+const manage: ManagementGroup[] = [
+  {
+    id: "Change",
+    label: "Change avatar and name of group"
+  },
+  {
+    id: "send",
+    label: "Send message"
+  },
+  {
+    id: "add",
+    label: "Add members"
+  }
+];
 const ManagementComponent: React.FC<ActiveComponentProps> = ({
   setActiveComponent
 }) => {

@@ -6,6 +6,7 @@ interface UserCheckboxProps {
   id: string;
   ava: string;
   name: string;
+  onChange: (id: string, isChecked: boolean) => void;
 }
 
 interface UserList {
@@ -13,7 +14,10 @@ interface UserList {
 }
 
 const UserCheckbox: React.FC<UserList> = ({ user }) => {
-  const { id, ava, name } = user;
+  const { id, ava, name, onChange } = user;
+  const handleChange = (isChecked: boolean) => {
+    onChange(id, isChecked);
+  };
   return (
     <label
       htmlFor={id} // liên kết label với id của checkbox
@@ -22,6 +26,7 @@ const UserCheckbox: React.FC<UserList> = ({ user }) => {
       <Checkbox
         value={id}
         id={id} // Đây là id được sử dụng để liên kết với label
+        onCheckedChange={handleChange}
         className="data-[state=checked]:bg-primary-500 border-light-600 dark:border-dark-500 border data-[state=checked]:text-light-900 data-[state=checked]:border-none h-5 w-5 rounded-full dark:data-[state=checked]:bg-primary-500 dark:data-[state=checked]:text-light-900"
       />
       <div className="flex flex-row gap-3 items-center justify-start">

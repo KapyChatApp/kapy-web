@@ -1,11 +1,9 @@
 "use client";
-import { User } from "@/types/object";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import Image from "next/image";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { otherBox } from "@/constants/friends";
 import OtherBoxButton from "./OtherBoxButton";
 import AccountModal from "./AccountModal";
 import {
@@ -13,6 +11,29 @@ import {
   FriendResponseDTO,
   RequestedResponseDTO
 } from "@/lib/DTO/friend";
+
+export interface OtherBoxButtonProps {
+  icon: string;
+  label: string;
+  value: string;
+}
+const otherBox: OtherBoxButtonProps[] = [
+  {
+    icon: "tabler:message-circle",
+    label: "Message",
+    value: "message"
+  },
+  {
+    icon: "tabler:friends-off",
+    label: "Unfriend",
+    value: "unfriend"
+  },
+  {
+    icon: "material-symbols:block",
+    label: "Block",
+    value: "block"
+  }
+];
 
 interface FriendBoxProps {
   friend: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
