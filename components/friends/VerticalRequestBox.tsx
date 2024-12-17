@@ -13,6 +13,8 @@ import {
 import { useUserContext } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { acceptFriend } from "@/lib/services/friend/acceptFriend";
+import { useFriendContext } from "@/context/FriendContext";
+import { acceptBestFriend } from "@/lib/services/friend/accepBff";
 
 interface VerticalBoxProps {
   request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
@@ -24,32 +26,53 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
   setIndex
 }) => {
   const { adminInfo } = useUserContext();
-  const label = "Accept";
+  const { setListRequestedFriend } = useFriendContext();
 
-  const list = request;
+  const object = request as RequestedResponseDTO;
+  const label = object.relation === "friend" ? "Accept" : "Accept Bff";
 
   const handleButton = async () => {
-    try {
-      const friendRequest: FriendRequestDTO = {
-        sender: list._id,
-        receiver: adminInfo._id
-      };
-      const result = await acceptFriend(friendRequest);
-      setIndex(list._id);
-    } catch (error) {
-      console.error("Failed to send friend request", error);
-      toast({
-        title: `Error in accept new friend`,
-        description: error instanceof Error ? error.message : "Unknown error",
-        className:
-          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
-      });
+    if (object.relation === "friend") {
+      try {
+        const friendRequest: FriendRequestDTO = {
+          sender: object._id,
+          receiver: adminInfo._id
+        };
+        const result = await acceptFriend(
+          friendRequest,
+          setListRequestedFriend
+        );
+        setIndex(object._id);
+      } catch (error) {
+        console.error("Failed to accept friend request", error);
+        toast({
+          title: `Error in accept new friend`,
+          description: error instanceof Error ? error.message : "Unknown error",
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
+      }
+    } else if (object.relation === "bff") {
+      try {
+        const friendRequest: FriendRequestDTO = {
+          sender: object._id,
+          receiver: adminInfo._id
+        };
+        const result = await acceptBestFriend(
+          friendRequest,
+          setListRequestedFriend
+        );
+        setIndex(object._id);
+      } catch (error) {
+        console.error("Failed to accept best friend request", error);
+        toast({
+          title: `Error in accept best friend`,
+          description: error instanceof Error ? error.message : "Unknown error",
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
+      }
     }
-  };
-
-  const [isRemove, setRemove] = useState(false);
-  const handleRemove = () => {
-    setRemove(!isRemove);
   };
 
   const [isClick, setClick] = useState(false);
@@ -57,15 +80,8 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
     setClick(!isClick);
   };
 
-  const confirm = {
-    setConfirm: setRemove,
-    setIndex: setIndex,
-    listId: list._id,
-    name: list.firstName + " " + list.lastName,
-    action: "remove"
-  };
   const account = {
-    user: list,
+    user: object,
     setAccount: setClick
   };
 
@@ -76,7 +92,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
         onClick={handleClick}
       >
         <Image
-          src={list.avatar}
+          src={object.avatar}
           alt="ava"
           width={172}
           height={166}
@@ -85,11 +101,11 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
 
         <div className="flex flex-col gap-1 w-full h-fit justify-center items-start mt-3">
           <p className="text-dark100_light900 base-medium">
-            {list.firstName + " " + list.lastName}
+            {object.firstName + " " + object.lastName}
           </p>
-          {list.mutualFriends > 0 && (
+          {object.mutualFriends > 0 && (
             <p className="text-dark100_light900 body-regular">
-              Mutual friends: {list.mutualFriends}
+              Mutual friends: {object.mutualFriends}
             </p>
           )}
         </div>
@@ -104,7 +120,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
           >
             <p className="text-light-900 body-regular">{label}</p>
           </Button>
-          <Button
+          {/* <Button
             className="flex flex-row px-7 bg-light-700 hover:bg-light-700 bg-opacity-80 hover:bg-opacity-80 dark:bg-dark-200 dark:hover:bg-dark-200 dark:bg-opacity-50 dark:hover:bg-opacity-50 border-none shadow-none w-full rounded-lg"
             onClick={(e) => {
               e.stopPropagation();
@@ -112,11 +128,11 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
             }}
           >
             <p className="text-dark100_light900 body-regular">Remove</p>
-          </Button>
+          </Button> */}
         </div>
       </Button>
 
-      {isRemove && <ConfirmModal confirm={confirm} />}
+      {/* {isRemove && <ConfirmModal confirm={confirm} />} */}
 
       {isClick && <AccountModal account={account} />}
     </>

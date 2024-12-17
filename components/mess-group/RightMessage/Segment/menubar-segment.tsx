@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Menubar,
   MenubarContent,
@@ -97,6 +97,13 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
     const handleDeleteMessage = (data: PusherDelete) => {
       console.log("Successfully delete message: ", data);
       if (adminId && data.createBy === adminId) {
+        // Kiểm tra điều kiện cần thiết
+        if (!messagesByBox) {
+          console.warn(
+            `Box ID ${data.boxId} không tồn tại trong messagesByBox`
+          );
+          return; // Không thực hiện tiếp nếu boxId không hợp lệ
+        }
         const fileDelete = messagesByBox[data.boxId].find(
           (item) => item.id === data.id
         );

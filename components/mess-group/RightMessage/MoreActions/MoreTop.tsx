@@ -1,10 +1,47 @@
 "use client";
-import { actionsButton } from "@/constants/moreActions";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import ActionButton from "./ActionButton";
 import { usePathname } from "next/navigation";
 import { Icon } from "@iconify/react/dist/iconify.js";
+
+export interface Actions {
+  icon: string;
+  label: string;
+  click: string;
+}
+const actionsButton: Actions[] = [
+  {
+    icon: "clarity:notification-solid",
+    label: "Turn off",
+    click: "notified"
+  },
+  {
+    icon: "ic:baseline-search",
+    label: "Find",
+    click: "find"
+  },
+  {
+    icon: "ri:shake-hands-fill",
+    label: "Best friend",
+    click: "best"
+  },
+  {
+    icon: "solar:user-block-bold",
+    label: "Block",
+    click: "block"
+  },
+  {
+    icon: "weui:add-friends-filled",
+    label: "Add mems",
+    click: "add"
+  },
+  {
+    icon: "lets-icons:setting-fill",
+    label: "Manage",
+    click: "manage"
+  }
+];
 
 interface MoreTopProps {
   ava: string;

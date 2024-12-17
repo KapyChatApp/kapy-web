@@ -1,26 +1,50 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useToast } from "@/hooks/use-toast";
 import LocalSearch from "@/components/shared/search/localSearchbar";
 import { usePathname } from "next/navigation";
-import { group } from "@/constants/object";
 import { RadioGroup } from "@/components/ui/radio-group";
 import MemberRadio from "./MemberRadio";
 import useSearchMember from "@/hooks/use-search-member-group";
+import { useChatContext } from "@/context/ChatContext";
+import { MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 
 interface ChangeLeaderProps {
   setIsChange: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
-  const pathname = usePathname();
-  const id = pathname.split("/").pop();
-  const memberList = group
-    .filter((item) => item.id === id)
-    .map((groupItem) => groupItem.members)
-    .flat();
+  const [boxId, setBoxId] = useState<string>("");
+  const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
+  const { dataChat } = useChatContext();
+  //boxId
+  useEffect(() => {
+    // Lấy đường dẫn hiện tại từ URL
+    const path = window.location.pathname;
+    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
+    const parts = path.split("/");
+    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
+
+    if (id) {
+      setBoxId(id); // Set boxId là chuỗi
+    }
+  }, [boxId]);
+
+  useEffect(() => {
+    if (boxId !== "") {
+      const detail = dataChat.find((box) => box.id === boxId);
+      if (detail) {
+        setDetailByBox(detail);
+      }
+    }
+  }, [boxId, dataChat, setDetailByBox]);
+
+  let memberList: UserInfoBox[] = [];
+  if (boxId && detailByBox) {
+    memberList = detailByBox.memberInfo;
+  }
 
   const { toast } = useToast();
   const handleBack = () => {
@@ -72,9 +96,9 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
           >
             {filteredMembers.map((item) => {
               const member = {
-                id: item.id,
-                ava: item.ava,
-                name: item.username
+                id: item._id,
+                ava: item.avatar,
+                name: item.firstName + " " + item.lastName
               };
               return <MemberRadio member={member} />;
             })}

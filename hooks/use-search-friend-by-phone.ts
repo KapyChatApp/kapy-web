@@ -20,7 +20,7 @@ const useSearchFriendByPhone = (
       // Kiểm tra nếu searchTerm là số điện thoại
       const isPhoneNumber = /^\d+$/.test(searchTerm.trim());
 
-      if (isPhoneNumber) {
+      if (isPhoneNumber && searchTerm != "") {
         setIsSearching(true);
         try {
           // Gọi API tìm kiếm số điện thoại
@@ -49,6 +49,7 @@ const useSearchFriendByPhone = (
     } else {
       setFilteredFriends(friendList); // Reset khi không có từ khóa
     }
+    console.log(filteredFriends);
   }, [searchTerm, friendList]);
 
   return { searchTerm, setSearchTerm, filteredFriends, isSearching };

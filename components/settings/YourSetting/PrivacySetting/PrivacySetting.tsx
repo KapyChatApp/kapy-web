@@ -1,17 +1,18 @@
 "use client";
 import { LeftSidbarSettingProps } from "@/types/settings";
 import React, { useState } from "react";
-import { user } from "@/constants/object";
 import FirstFrame from "./FirstFrame";
 import SecondFrame from "./SecondFrame";
 import ThirdFrame from "./ThirdFrame";
+import { useFriendContext } from "@/context/FriendContext";
 
 const PrivacySetting = ({ setRenderRight }: LeftSidbarSettingProps) => {
   const [isSelectedMessage, setSelectedMessage] = useState("everyone");
   const [isSelectedCalling, setSelectedCalling] = useState("everyone");
+  const { listBlockedFriend } = useFriendContext();
 
+  const userBlock = listBlockedFriend;
   const [unBlock, setUnBlock] = useState(false);
-  const userBlock = user.filter((item) => item.status === "block");
   const [isIndex, setIndex] = useState("");
 
   return (

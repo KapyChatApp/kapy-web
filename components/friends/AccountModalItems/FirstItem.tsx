@@ -10,6 +10,8 @@ interface FirstItemProps {
   user: FriendProfileResponseDTO;
 }
 
+// relation: friend / bff / sent_friend/ received_friend/  sent_bff / received_bff
+
 const FirstItem = ({ user }: FirstItemProps) => {
   const { listBestFriend, listFriend } = useFriendContext();
 

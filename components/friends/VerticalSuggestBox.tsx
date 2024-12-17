@@ -15,6 +15,8 @@ import {
 import { useUserContext } from "@/context/UserContext";
 import { addFriendRequest } from "@/lib/services/friend/addFriend";
 import { toast } from "@/hooks/use-toast";
+import { useFriendContext } from "@/context/FriendContext";
+import { unFriend } from "@/lib/services/friend/unfriend";
 
 interface VerticalBoxProps {
   request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
@@ -26,14 +28,7 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
   setIndex
 }) => {
   const { adminInfo } = useUserContext();
-  const pathname = usePathname();
-  const getPathNameMatch = () => {
-    const paths = ["all-friend", "best-friend", "suggestion", "request"];
-    return paths.find((path) =>
-      new RegExp(`^/friends/${path}(\\/.*)?$`).test(pathname)
-    );
-  };
-  const matchedPath = getPathNameMatch();
+  const { setListFriend } = useFriendContext();
   const label = "Add friend";
   const list = request;
 
@@ -45,7 +40,6 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
         receiver: list._id
       };
       const result = await addFriendRequest(friendRequest);
-      setIndex(list._id);
       setStatus("cancel");
     } catch (error) {
       console.error("Failed to send friend request", error);
@@ -57,13 +51,23 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
       });
     }
   };
-  const handleCancel = () => {
-    setStatus("");
-  };
-
-  const [isRemove, setRemove] = useState(false);
-  const handleRemove = () => {
-    setRemove(!isRemove);
+  const handleCancel = async () => {
+    try {
+      const friendRequest: FriendRequestDTO = {
+        sender: adminInfo._id,
+        receiver: list._id
+      };
+      const result = await unFriend(friendRequest, setListFriend);
+      setStatus("");
+    } catch (error) {
+      console.error("Failed to unfriend request", error);
+      toast({
+        title: `Error in unfriend`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
+    }
   };
 
   const [isClick, setClick] = useState(false);
@@ -71,13 +75,6 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
     setClick(!isClick);
   };
 
-  const confirm = {
-    setConfirm: setRemove,
-    setIndex: setIndex,
-    listId: list._id,
-    name: list.firstName + " " + list.lastName,
-    action: "remove"
-  };
   const account = {
     user: list,
     setAccount: setClick
@@ -143,7 +140,7 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
             </Button>
           )}
 
-          <Button
+          {/* <Button
             className="flex flex-row px-7 bg-light-700 hover:bg-light-700 bg-opacity-80 hover:bg-opacity-80 dark:bg-dark-200 dark:hover:bg-dark-200 dark:bg-opacity-50 dark:hover:bg-opacity-50 border-none shadow-none w-full rounded-lg"
             onClick={(e) => {
               e.stopPropagation();
@@ -151,11 +148,11 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
             }}
           >
             <p className="text-dark100_light900 body-regular">Remove</p>
-          </Button>
+          </Button> */}
         </div>
       </Button>
 
-      {isRemove && <ConfirmModal confirm={confirm} />}
+      {/* {isRemove && <ConfirmModal confirm={confirm} />} */}
 
       {isClick && <AccountModal account={account} />}
     </>

@@ -1,6 +1,15 @@
-import { FriendRequestDTO, FriendResponseDTO } from "@/lib/DTO/friend";
+import {
+  FriendRequestDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "@/lib/DTO/friend";
 
-export async function acceptFriend(param: FriendRequestDTO) {
+export async function acceptFriend(
+  param: FriendRequestDTO,
+  setListRequestedFriend: React.Dispatch<
+    React.SetStateAction<RequestedResponseDTO[]>
+  >
+) {
   try {
     const storedToken = localStorage.getItem("token");
     if (!storedToken) {
@@ -24,6 +33,9 @@ export async function acceptFriend(param: FriendRequestDTO) {
     }
 
     const data = await response.json();
+    setListRequestedFriend((prev) =>
+      prev.filter((friend) => friend._id !== param.receiver)
+    );
     return data;
   } catch (error) {
     console.error("Error:", error);

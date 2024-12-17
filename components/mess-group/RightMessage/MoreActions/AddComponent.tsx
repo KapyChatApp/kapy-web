@@ -1,6 +1,5 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { user } from "@/constants/object";
 import { useToast } from "@/hooks/use-toast";
 import { ActiveComponentProps } from "@/types/mess-group";
 import React from "react";
@@ -8,14 +7,13 @@ import LocalSearch from "@/components/shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import UserCheckbox from "./UserCheckbox";
 import useSearch from "@/hooks/use-search";
+import { useFriendContext } from "@/context/FriendContext";
+import useSearchFriendByPhone from "@/hooks/use-search-friend-by-phone";
 
 const AddComponent: React.FC<ActiveComponentProps> = ({
   setActiveComponent
 }) => {
-  const userList = user
-    .filter((fr) => fr.status !== "block" && fr.status !== "unfriend")
-    .map((item) => item);
-
+  const { listFriend } = useFriendContext();
   const { toast } = useToast();
   const handleBack = () => {
     setActiveComponent("");
@@ -29,7 +27,8 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
     setActiveComponent("");
   };
 
-  const { searchTerm, setSearchTerm, filteredFriends } = useSearch(userList);
+  const { searchTerm, setSearchTerm, filteredFriends } =
+    useSearchFriendByPhone(listFriend);
 
   return (
     <div className="modal-overlay">
@@ -62,9 +61,9 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
           <div className="flex flex-col w-full h-fit justify-start items-start gap-4 ">
             {filteredFriends.map((item) => {
               const user = {
-                id: item.id,
-                ava: item.ava,
-                name: item.name
+                id: item._id,
+                ava: item.avatar,
+                name: item.firstName + " " + item.lastName
               };
               return <UserCheckbox user={user} />;
             })}

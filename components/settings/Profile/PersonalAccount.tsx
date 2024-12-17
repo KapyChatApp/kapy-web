@@ -44,7 +44,7 @@ export const PersonalAccount = ({ setPersonal }: PersonalProps) => {
           <PersonalFirst personal={adminInfo} setEdit={setEdit} />
 
           <div className="flex flex-col gap-4 w-full h-fit px-4">
-            <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
+            <span className="flex w-full h-[0.5px] background-light500ac_dark400"></span>
 
             {/*Information*/}
             <PersonalSecond personal={adminInfo} setEdit={setEdit} />
