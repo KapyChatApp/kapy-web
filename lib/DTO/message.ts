@@ -17,11 +17,11 @@ export interface MessageBoxInfo {
   readStatus: boolean;
   stranger: boolean;
 }
-
 export interface RequestCreateGroup {
   membersIds: string[];
   groupName: string;
 }
+
 // Interface Response
 export interface MessageBoxDTO {
   _id: string;
@@ -60,6 +60,7 @@ export interface ResponseMessageDTO {
   boxId: string;
   createAt: string;
   createBy: string;
+  isReact: string[];
 }
 
 export interface PusherRevoke {
@@ -88,4 +89,10 @@ export interface TextingEvent {
   userId: string;
   avatar: string;
   texting: boolean;
+}
+
+export interface ResponseReactMessageDTO {
+  id: string;
+  boxId: string;
+  isReact: string[];
 }

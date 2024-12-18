@@ -24,6 +24,12 @@ interface ChatContextType {
   >;
   isTyping: boolean;
   setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
+  isReactedByMessage: Record<string, boolean>;
+  setIsReactedByMessage: React.Dispatch<Record<string, boolean>>;
+  isDeleted: boolean;
+  setIsDeleted: React.Dispatch<React.SetStateAction<boolean>>;
+  isRevoked: boolean;
+  setIsRevoked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Tạo context
@@ -42,7 +48,12 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
     Record<string, boolean>
   >({});
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [isReactedByMessage, setIsReactedByMessage] = useState<
+    Record<string, boolean>
+  >({});
 
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
+  const [isRevoked, setIsRevoked] = useState<boolean>(false);
   return (
     <ChatContext.Provider
       value={{
@@ -55,7 +66,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         readStatusByBox,
         setReadStatusByBox,
         isTyping,
-        setIsTyping
+        setIsTyping,
+        isReactedByMessage,
+        setIsReactedByMessage,
+        isDeleted,
+        setIsDeleted,
+        isRevoked,
+        setIsRevoked
       }}
     >
       {children}

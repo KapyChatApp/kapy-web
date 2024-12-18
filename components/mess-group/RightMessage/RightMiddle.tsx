@@ -185,7 +185,7 @@ const RightMiddle = ({
                       {group.map((item, itemIndex) => (
                         <div
                           key={itemIndex}
-                          className="relative group h-full flex flex-row gap-2 items-center justify-start" // Thêm lớp để nhóm hover
+                          className={`relative group h-full flex flex-row  items-center justify-start`} // Thêm lớp để nhóm hover
                         >
                           {item.createBy === adminId && item.flag === true && (
                             <MenubarSegment

@@ -24,7 +24,6 @@ const RightMessage = ({
   openMore,
   setOpenMore
 }: RightMessageProps) => {
-  const { messagesByBox } = useChatContext();
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
@@ -32,7 +31,7 @@ const RightMessage = ({
   const [recipientId, setRecipientId] = useState<string[]>();
   const [boxId, setBoxId] = useState<string>("");
   const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
-  const { dataChat } = useChatContext();
+  const { dataChat, setIsReactedByMessage, messagesByBox } = useChatContext();
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
 
@@ -55,6 +54,13 @@ const RightMessage = ({
       if (detail) {
         setDetailByBox(detail);
         setRecipientId(detail.memberInfo.map((item: any) => item.id));
+      }
+      if (messagesByBox && messagesByBox[boxId]) {
+        const reactMap: Record<string, boolean> = {};
+        for (const msg of messagesByBox[boxId]) {
+          reactMap[msg.id] = msg.isReact.length > 0;
+        }
+        setIsReactedByMessage(reactMap);
       }
     }
   }, [boxId, dataChat, setDetailByBox]);

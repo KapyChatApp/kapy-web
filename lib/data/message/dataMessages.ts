@@ -31,7 +31,8 @@ export const fetchMessages = async (
             text: msg.text,
             boxId: msg.boxId,
             createAt: msg.createAt || "",
-            createBy: msg.createBy
+            createBy: msg.createBy,
+            isReact: msg.isReact
           };
         })
       );

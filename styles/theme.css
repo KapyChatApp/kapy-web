@@ -480,4 +480,23 @@
       padding-left: 16px;
     }
   }
+
+  /*React message*/
+  .segment-mess {
+    position: relative;
+  }
+
+  .segment-mess .heart-icon {
+    position: absolute;
+    bottom: -18px;
+    right: 6px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.2s;
+  }
+
+  .segment-mess.pb-6 .heart-icon {
+    visibility: visible;
+    opacity: 1;
+  }
 }

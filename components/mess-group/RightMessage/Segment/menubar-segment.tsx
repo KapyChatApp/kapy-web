@@ -29,8 +29,13 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
   const [isConfirm, setConfirm] = useState(false);
   const [action, setAction] = useState("");
   const { toast } = useToast();
-  const { setMessagesByBox, messagesByBox, setFileList, fileList } =
-    useChatContext();
+  const {
+    setMessagesByBox,
+    messagesByBox,
+    setFileList,
+    fileList,
+    isReactedByMessage
+  } = useChatContext();
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
 
@@ -198,7 +203,11 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
 
   return (
     <>
-      <div className="flex flex-row gap-2 items-center justify-start w-fit h-full group">
+      <div
+        className={`flex flex-row gap-2 items-center justify-start w-fit h-full group ${
+          isReactedByMessage[messageId] ? "mb-5" : ""
+        }`}
+      >
         {admin && (
           <div className="text-dark100_light900 small-regular flex h-fit w-fit items-center justify-center opacity-0 group-hover:opacity-100 text-nowrap">
             {createAt}
