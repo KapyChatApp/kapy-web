@@ -6,7 +6,11 @@ import VideoSegment from "./RightMessage/Segment/VideoSegment";
 import AudioSegment from "./RightMessage/Segment/AudioSegment";
 import OtherSegment from "./RightMessage/Segment/OtherSegment";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { ResponseMessageDTO, ResponseReactMessageDTO } from "@/lib/DTO/message";
+import {
+  ResponseMessageDTO,
+  ResponseReactMessageDTO,
+  UserInfoBox
+} from "@/lib/DTO/message";
 import { useUserContext } from "@/context/UserContext";
 import QuantityReact from "./RightMessage/Segment/QuantityReact";
 import { useChatContext } from "@/context/ChatContext";
@@ -17,10 +21,16 @@ interface SegmentMessage {
   segments: ResponseMessageDTO;
   index: number;
   length: number;
+  recieverInfo: UserInfoBox[];
 }
 
-const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
-  const { createBy, contentId, text, id } = segments;
+const SegmentMess: React.FC<SegmentMessage> = ({
+  segments,
+  index,
+  length,
+  recieverInfo
+}) => {
+  const { createBy, contentId, text, id, isReact } = segments;
   const { adminInfo } = useUserContext();
   const { setIsReactedByMessage, isReactedByMessage } = useChatContext();
   const adminId = adminInfo._id;
@@ -38,6 +48,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   const [isReacted, setIsReacted] = useState(false);
   const [showQuantity, setShowQuantity] = useState(false);
   const [isCount, setIsCount] = useState(segments.isReact.length);
+  const [listReact, setListReact] = useState<string[]>(segments.isReact);
 
   const handleReact = async () => {
     const reactMap: Record<string, boolean> = { ...isReactedByMessage };
@@ -60,12 +71,14 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
   };
 
   const handleShowQuantity = () => {
-    setShowQuantity(true);
+    setShowQuantity(!showQuantity);
   };
 
   const showHeart = segments.flag && (isHovered || isReacted);
   const params = {
-    setShowQuantity
+    setShowQuantity,
+    recieverInfo,
+    isReact: listReact
   };
 
   useEffect(() => {
@@ -75,6 +88,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({ segments, index, length }) => {
       if (quantity > 0 && data.id === segments.id) {
         setIsReacted(true);
         setIsCount(quantity);
+        setListReact(data.isReact);
       } else if (data.id === segments.id) {
         setIsReacted(false);
         setIsCount(0);

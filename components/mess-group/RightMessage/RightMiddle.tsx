@@ -205,6 +205,7 @@ const RightMiddle = ({
                             segments={item}
                             index={itemIndex}
                             length={group.length}
+                            recieverInfo={receiverInfo}
                           />
                           {item.createBy !== adminId && item.flag === true && (
                             <MenubarSegment
