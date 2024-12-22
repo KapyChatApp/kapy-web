@@ -65,7 +65,7 @@ const OtherBoxButton: React.FC<OtherButton> = ({
       //param, groupAva, setDataChat, setError
       handleMessage(param, undefined, setDataChat, setError, router);
     } else {
-      router.push(`/chat/${boxId}`);
+      router.push(`/${boxId}`);
     }
   };
 

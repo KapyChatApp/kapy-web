@@ -1,15 +1,12 @@
 "use client";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
-import { useChatContext } from "@/context/ChatContext";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { MessageBoxInfo } from "@/lib/DTO/message";
-import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
-import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
 
-const GroupMessContent = () => {
+const MessageContent = () => {
   const [error, setError] = useState("");
 
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
@@ -22,16 +19,14 @@ const GroupMessContent = () => {
       const adminId = localStorage.getItem("adminId");
       if (!adminId) return;
       try {
-        const data: MessageBoxInfo[] = await fetchMessageBoxGroup(setError);
+        const data: MessageBoxInfo[] = await fetchMessageBox(adminId, setError);
         console.log("API data:", data);
         setDataChat(data);
 
-        // Sử dụng trực tiếp `data` thay vì `dataChat`
         if (!id && data.length > 0) {
-          router.push(`/group-chat/${data[0].id}`); // Điều hướng sang chat đầu tiên
+          router.push(`/${data[0].id}`);
         } else if (data.length === 0) {
-          // Nếu không có chat nào, điều hướng về trang chính
-          router.push("/group-chat");
+          router.push("/");
         }
       } catch (error) {
         console.error("Error loading chats:", error);
@@ -50,11 +45,7 @@ const GroupMessContent = () => {
   }
   const chatItem = dataChat.find((chat) => chat.id === id);
 
-  if (!dataChat.length) {
-    return <RightMessageRaw />;
-  }
-
   return <RightMessage chatItem={chatItem} />;
 };
 
-export default GroupMessContent;
+export default MessageContent;

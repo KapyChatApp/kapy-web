@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import RightTop from "./RightTop";
 import RightBottom from "./RightBottom";
 import RightMiddle from "./RightMiddle";
@@ -8,91 +8,68 @@ import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
-import RightMessageRaw from "../UI-Raw/RightMessageRaw";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
 
 interface RightMessageProps {
-  setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
-  setClickOtherRight: React.Dispatch<React.SetStateAction<boolean>>;
-  isClickOtherRight?: boolean;
-  openMore: boolean;
-  setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
+  chatItem: MessageBoxInfo | undefined;
 }
 
-const RightMessage = ({
-  setClickBox,
-  setClickOtherRight,
-  isClickOtherRight,
-  openMore,
-  setOpenMore
-}: RightMessageProps) => {
+const RightMessage = ({ chatItem }: RightMessageProps) => {
   const pathname = usePathname();
+  const [openMore, setOpenMore] = useState(false);
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
   //FetchMessage Backend
-  const [recipientId, setRecipientId] = useState<string[]>();
-  const [boxId, setBoxId] = useState<string>("");
-  const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
-  const { dataChat, setIsReactedByMessage, messagesByBox } = useChatContext();
+  const { id } = useParams();
+  const [message, setMessage] = useState<ResponseMessageDTO[]>();
+
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
 
-  //boxId
   useEffect(() => {
-    // Lấy đường dẫn hiện tại từ URL
-    const path = window.location.pathname;
-    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
-    const parts = path.split("/");
-    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
-
-    if (id) {
-      setBoxId(id); // Set boxId là chuỗi
-    }
-  }, [boxId]);
-
-  useEffect(() => {
-    if (boxId !== "") {
-      const detail = dataChat.find((box) => box.id === boxId);
-      if (detail) {
-        setDetailByBox(detail);
-        setRecipientId(detail.memberInfo.map((item: any) => item.id));
-      }
-      if (messagesByBox && messagesByBox[boxId]) {
-        const reactMap: Record<string, boolean> = {};
-        for (const msg of messagesByBox[boxId]) {
-          reactMap[msg.id] = msg.isReact.length > 0;
+    const getMessage = async () => {
+      try {
+        if (id) {
+          // Kiểm tra nếu boxId tồn tại
+          const boxMessages = await fetchMessages(id.toString());
+          setMessage(boxMessages);
+        } else {
+          console.warn("boxId is undefined");
         }
-        setIsReactedByMessage(reactMap);
+      } catch (error) {
+        console.log(error);
       }
-    }
-  }, [boxId, dataChat, setDetailByBox]);
+    };
+    getMessage();
+  }, []);
 
   //RightTop
   let top: any;
-  if (boxId && detailByBox) {
+  if (id && chatItem) {
     top = isGroup
       ? {
-          ava: detailByBox.groupAva
-            ? detailByBox.groupAva
+          ava: chatItem.groupAva
+            ? chatItem.groupAva
             : "/assets/images/icon.png",
-          name: detailByBox.groupName ? detailByBox.groupName : "Group Chat",
-          membersGroup: detailByBox.memberInfo.length,
+          name: chatItem.groupName ? chatItem.groupName : "Group Chat",
+          membersGroup: chatItem.memberInfo.length,
           onlineGroup: 0,
           openMore: openMore,
           setOpenMore: setOpenMore
         }
       : {
           ava:
-            detailByBox.receiverInfo && detailByBox.receiverInfo.avatar
-              ? detailByBox.receiverInfo.avatar
+            chatItem.receiverInfo && chatItem.receiverInfo.avatar
+              ? chatItem.receiverInfo.avatar
               : "/assets/ava/default.png",
 
           name:
-            detailByBox.receiverInfo &&
-            detailByBox.receiverInfo.firstName !== "" &&
-            detailByBox.receiverInfo.lastName !== ""
-              ? detailByBox.receiverInfo.firstName +
+            chatItem.receiverInfo &&
+            chatItem.receiverInfo.firstName !== "" &&
+            chatItem.receiverInfo.lastName !== ""
+              ? chatItem.receiverInfo.firstName +
                 " " +
-                detailByBox.receiverInfo.lastName
+                chatItem.receiverInfo.lastName
               : "Unknown name",
 
           membersGroup: 0,
@@ -120,79 +97,47 @@ const RightMessage = ({
         };
   }
   //filterSegment
-  let message: ResponseMessageDTO[] = [];
-  if (boxId && messagesByBox && messagesByBox[boxId]) {
-    message = messagesByBox[boxId];
-  }
-  const filteredSegmentAdmin = message.filter(
-    (item) => item.createBy === adminId
-  );
-  const filteredSegmentOther = message.filter(
-    (item) => item.createBy !== adminId
-  );
+  const filteredSegmentAdmin = message
+    ? message.filter((item) => item.createBy === adminId)
+    : [];
+  const filteredSegmentOther = message
+    ? message.filter((item) => item.createBy !== adminId)
+    : [];
 
   //OpenMoreDisplay
   const display = {
-    detailByBox,
+    detailByBox: chatItem,
     openMore,
-    setOpenMore,
-    isClickOtherRight,
-    setClickOtherRight
+    setOpenMore
   };
-
-  //Open More Responsive
-  const [isMdScreen, setIsMdScreen] = useState(false);
-  useEffect(() => {
-    const handleResize = () => {
-      // Kiểm tra kích thước cửa sổ
-      const otherRight = sessionStorage.getItem("otherRight");
-      if (window.innerWidth >= 768 && window.innerWidth < 878) {
-        setIsMdScreen(true);
-      } else {
-        setIsMdScreen(false);
-      }
-    };
-    // Kiểm tra kích thước ngay khi component render lần đầu
-    handleResize();
-    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
-    window.addEventListener("resize", handleResize);
-    // Hủy lắng nghe sự kiện khi component unmount
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
+  if (!chatItem) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="loader"></div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-row w-full h-full">
       <div
         className={`${
-          isMdScreen && openMore
-            ? "w-0"
-            : openMore
-            ? "xl:w-[66%] lg:w-[60%] md:w-[66%] w-full"
-            : "w-full"
-        } ${
-          isClickOtherRight ? "hidden" : "flex"
-        }  background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
+          openMore ? "w-[65%]" : "w-full"
+        } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
       >
         <div
-          className={` ${
-            isMdScreen && openMore
-              ? "hidden"
-              : "flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pl-0 pr-[12px] justify-between"
-          }`}
+          className={`flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pl-0 pr-[12px] justify-between`}
         >
-          <RightTop
-            top={top}
-            setClickBox={setClickBox}
-            setClickOtherRight={setClickOtherRight}
-          />
+          <RightTop top={top} />
 
           <RightMiddle
             filteredSegmentAdmin={filteredSegmentAdmin}
             filteredSegmentOther={filteredSegmentOther}
-            receiverInfo={detailByBox ? detailByBox.memberInfo : []}
+            receiverInfo={chatItem ? chatItem.memberInfo : []}
           />
 
-          <RightBottom recipientIds={recipientId} />
+          <RightBottom
+            recipientIds={chatItem.memberInfo.map((item: any) => item.id)}
+          />
         </div>
       </div>
       <OpenMoreDisplay display={display} />

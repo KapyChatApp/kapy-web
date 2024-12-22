@@ -9,7 +9,7 @@ export const themes = [
 export const sidebarLinks: SidebarLink[] = [
   {
     icon: "tabler:message-circle-filled",
-    route: "/chat",
+    route: "/",
     label: "Message"
   },
   {

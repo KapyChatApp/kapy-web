@@ -1,3 +1,4 @@
+"use client";
 import React, { useCallback, useEffect, useState } from "react";
 import GlobalSearch from "../../shared/search/globalSearch";
 import MessageBox from "../MessageBox";
@@ -12,6 +13,8 @@ import { useUserContext } from "@/context/UserContext";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
 import LeftMessageRaw from "../UI-Raw/LeftMessageRaw";
+import { ResponseMessageDTO } from "@/lib/DTO/message";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,13 +23,10 @@ export interface LeftMessageProps {
 
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const { dataChat } = useChatContext();
+  const isGroup = /^\/group-chat/.test(pathname);
+  const { dataChat, setDataChat, setMessagesByBox } = useChatContext();
   const { adminInfo } = useUserContext();
   const [error, setError] = useState("");
-
-  const { searchTerm, setSearchTerm, filteredBox } =
-    useSearchMessageBox(dataChat);
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
   const handleCreated = () => {
@@ -53,9 +53,47 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   //   console.log(boxCreated);
   // };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = isGroup
+          ? await fetchMessageBoxGroup(setError)
+          : await fetchMessageBox(adminInfo._id, setError);
+        setDataChat(data);
+      } catch (err) {
+        setError("Failed to fetch data.");
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const { searchTerm, setSearchTerm, filteredBox } =
+    useSearchMessageBox(dataChat);
+
+  //Fetch messages
+  useEffect(() => {
+    const fetchMessagesForBoxes = async () => {
+      const messagesMap: Record<string, ResponseMessageDTO[]> = {};
+
+      for (const box of dataChat) {
+        const boxMessages = await fetchMessages(box.id);
+        messagesMap[box.id] = boxMessages;
+      }
+      setMessagesByBox(messagesMap);
+    };
+
+    fetchMessagesForBoxes();
+  }, [dataChat]);
+
+  if (!dataChat.length) {
+    return <LeftMessageRaw />;
+  }
+
   return (
     <>
-      <div className="flex flex-col background-light900_dark400 w-full h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[12px] rounded-br-[12px] lg:rounded-tr-[0px] lg:rounded-br-[0px] md:rounded-tr-[0px] md:rounded-br-[0px]">
+      <div className="flex flex-col background-light900_dark400 h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[12px] rounded-br-[12px] lg:rounded-tr-[0px] lg:rounded-br-[0px] md:rounded-tr-[0px] md:rounded-br-[0px] w-full">
         <p className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900 px-2">
           {isGroup ? "Groups" : "Messages"}
         </p>

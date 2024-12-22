@@ -19,31 +19,17 @@ interface RightTopProps {
 
 interface rightTop {
   top: RightTopProps;
-  setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
-  setClickOtherRight: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const RightTop: React.FC<rightTop> = ({
-  top,
-  setClickBox,
-  setClickOtherRight
-}) => {
+const RightTop: React.FC<rightTop> = ({ top }) => {
   const { ava, name, membersGroup, onlineGroup, openMore, setOpenMore } = top;
 
   const pathname = usePathname();
   const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
 
-  const handleBack = () => {
-    if (setClickBox) {
-      setClickBox(false); //Responsive
-    }
-  };
-
   const handleOpenMore = () => {
     const newOpenMore = !openMore;
     setOpenMore(!openMore);
-    sessionStorage.setItem("openMore", JSON.stringify(newOpenMore));
-    setClickOtherRight(true); //Responsive
   };
 
   const client = useStreamVideoClient();
@@ -105,17 +91,6 @@ const RightTop: React.FC<rightTop> = ({
   return (
     <div className="flex flex-row h-fit w-full lg:pl-[6px] pl-0 justify-between items-center">
       <div className="flex flex-row h-full">
-        <div
-          className="lg:hidden md:hidden flex w-fit h-full items-center justify-start cursor-pointer mr-4"
-          onClick={handleBack}
-        >
-          <Icon
-            icon="eva:arrow-back-fill"
-            width={30}
-            height={30}
-            className="text-primary-500"
-          />
-        </div>
         <div className="flex flex-row items-center justify-start">
           <Image
             src={ava}

@@ -6,7 +6,7 @@ import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Box {
@@ -18,7 +18,7 @@ interface Box {
 const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { id, receiverInfo, pin, groupName, groupAva, memberInfo } = box;
   const pathname = usePathname();
-  const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
+  const isActive = pathname.includes(id) || pathname === `/${id}`;
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
   const { adminInfo, isOnlineChat } = useUserContext();
@@ -52,10 +52,10 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
+
+  const router = useRouter();
   const handleClickLink = () => {
-    if (setClickBox) {
-      setClickBox(true); //Click box for responsive
-    }
+    router.push(`/${id}`);
   };
 
   // Cập nhật createAt mỗi phút
@@ -79,9 +79,8 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   }, [createAt]);
 
   return (
-    <Link
+    <div
       key={id}
-      href={isGroup ? `/group-chat/${id}` : `/chat/${id}`}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
@@ -170,7 +169,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

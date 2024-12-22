@@ -77,9 +77,10 @@ const ActionButton: React.FC<ActionButtonProps> = ({
 
   return (
     <div
-      className={`${
-        isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-[57px]"
-      } flex flex-col items-center justify-center gap-[8px]`}
+      // className={`${
+      //   isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-[57px]"
+      // } flex flex-col items-center justify-center gap-[8px]`}
+      className={`w-fit flex flex-col items-center justify-center gap-[8px]`}
     >
       <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
         <div

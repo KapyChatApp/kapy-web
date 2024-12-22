@@ -1,5 +1,5 @@
 import React from "react";
-import GroupMessContent from "./[id]/page";
+import MessageContent from "./[id]/page";
 const Page = () => {
   return (
     <React.Suspense
@@ -9,7 +9,7 @@ const Page = () => {
         </div>
       }
     >
-      <GroupMessContent />
+      <MessageContent />
     </React.Suspense>
   );
 };

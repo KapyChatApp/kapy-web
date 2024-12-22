@@ -291,7 +291,7 @@ export const handleMessage = async (
   const result = await createGroup(param, groupAva, setDataChat, setError);
   const { success, newBox } = result;
   if (success) {
-    router.push(`/chat/${newBox._id}`);
+    router.push(`/${newBox._id}`);
   } else {
     toast({
       title: "You can't create message box. Try again please!",

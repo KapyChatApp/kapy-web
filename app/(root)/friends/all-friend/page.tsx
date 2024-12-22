@@ -20,8 +20,6 @@ const page = () => {
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -37,16 +35,18 @@ const page = () => {
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!listBestFriend || !listFriend) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="loader"></div>
+      </div>
+    );
   }
   return <RightComponent />;
 };
