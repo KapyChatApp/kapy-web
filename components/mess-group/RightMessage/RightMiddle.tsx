@@ -88,12 +88,21 @@ const RightMiddle = ({
       console.log("Successfully received texting-status:", data);
 
       if (adminId !== "" && data.userId !== adminId) {
-        setIsTexting((prevState) => ({
-          ...prevState, // Giữ lại các trạng thái trước đó
-          [data.userId]: data // Cập nhật trạng thái mới
-        }));
+        setIsTexting((prevState) => {
+          const updatedState = { ...prevState };
+
+          // Cập nhật hoặc xóa trạng thái texting
+          if (data.texting) {
+            updatedState[data.userId] = data; // Ghi đè trạng thái mới
+          } else {
+            delete updatedState[data.userId]; // Xóa trạng thái nếu texting là false
+          }
+
+          return updatedState;
+        });
       }
     };
+
     const pusherClient = getPusherClient();
     if (boxId) {
       const channel = pusherClient.subscribe(`private-${boxId}`);
@@ -108,7 +117,7 @@ const RightMiddle = ({
         pusherClient.unsubscribe(`private-${boxId}`);
       }
     };
-  }, [isTyping, adminId]);
+  }, [adminId, boxId]);
 
   return (
     <div

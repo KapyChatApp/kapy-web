@@ -103,7 +103,7 @@ const Signup = () => {
         birthDay: birth
       };
 
-      // Gửi yêu cầu đăng ký
+      //Gửi yêu cầu đăng ký
       const response = await registerUser(params);
       if (response) {
         toast({

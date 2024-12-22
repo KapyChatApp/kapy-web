@@ -1,37 +1,72 @@
+"use client";
 import ConfirmModal, {
   ConfirmModalProps
 } from "@/components/friends/ConfirmModal";
 import { Button } from "@/components/ui/button";
+import { useFriendContext } from "@/context/FriendContext";
+import { useUserContext } from "@/context/UserContext";
+import { toast } from "@/hooks/use-toast";
 import {
   FindUserDTO,
+  FriendRequestDTO,
   FriendResponseDTO,
   RequestedResponseDTO
 } from "@/lib/DTO/friend";
+import { unBlockFr } from "@/lib/services/friend/unblock";
 import Image from "next/image";
-import React from "react";
+import React, { useState } from "react";
 
 interface BlockMessagesProps {
   block: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
-  unBlock: boolean;
-  setUnBlock: React.Dispatch<React.SetStateAction<boolean>>;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const BlockMessages = ({
-  block,
-  unBlock,
-  setUnBlock,
-  setIndex
-}: BlockMessagesProps) => {
-  const confirm: ConfirmModalProps = {
-    setConfirm: setUnBlock,
+const BlockMessages = ({ block, setIndex }: BlockMessagesProps) => {
+  const { adminInfo } = useUserContext();
+  const { setListFriend } = useFriendContext();
+
+  const [isConfirm, setIsConfirm] = useState(false);
+  const [confirm, setConfirm] = useState<ConfirmModalProps>({
+    setConfirm: () => {},
     handleAction: () => {},
-    name: block.firstName + " " + block.lastName,
-    action: "unblock"
+    name: "",
+    action: ""
+  });
+  const handleUnblock = async () => {
+    try {
+      const friendRequest: FriendRequestDTO = {
+        sender: adminInfo._id,
+        receiver: block._id
+      };
+      const result = await unBlockFr(friendRequest, setListFriend);
+      setIndex(block._id);
+      toast({
+        title: `Unblock successfully`,
+        description: `You and ${
+          block.firstName + " " + block.lastName
+        } are friend again`,
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
+    } catch (error) {
+      console.error("Failed to unblock", error);
+      toast({
+        title: `Error in unblock`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
+    }
   };
 
-  const handleUnBlock = () => {
-    setUnBlock(!unBlock);
+  const confirmHandleUnBlock = async () => {
+    setIsConfirm(true);
+    setConfirm({
+      setConfirm: setIsConfirm,
+      handleAction: handleUnblock,
+      name: block.firstName + " " + block.lastName,
+      action: "unblock"
+    });
   };
   return (
     <>
@@ -52,14 +87,14 @@ const BlockMessages = ({
 
           <Button
             className="flex border border-accent-red text-accent-red shadow-none bg-transparent hover:bg-accent-red hover:bg-opacity-20 hover:border-accent-red hover:border-opacity-0  body-regular rounded-lg px-3 py-[10px]"
-            onClick={handleUnBlock}
+            onClick={confirmHandleUnBlock}
           >
             Unblock
           </Button>
         </div>
       </div>
 
-      {unBlock && <ConfirmModal confirm={confirm} />}
+      {isConfirm && <ConfirmModal confirm={confirm} />}
     </>
   );
 };

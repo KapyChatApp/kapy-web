@@ -80,7 +80,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
 
   return (
     <Link
-      key=""
+      key={id}
       href={isGroup ? `/group-chat/${id}` : `/chat/${id}`}
       className={`${
         isActive

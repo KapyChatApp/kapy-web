@@ -1,6 +1,6 @@
 import { FriendRequestDTO, FriendResponseDTO } from "@/lib/DTO/friend";
 
-export async function unBlock(
+export async function unBlockFr(
   param: FriendRequestDTO,
   setListBlockedFriend: React.Dispatch<
     React.SetStateAction<FriendResponseDTO[]>

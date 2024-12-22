@@ -50,6 +50,8 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   const [isCount, setIsCount] = useState(segments.isReact.length);
   const [listReact, setListReact] = useState<string[]>(segments.isReact);
 
+  useEffect(() => {}, [isCount, listReact]);
+
   const handleReact = async () => {
     const reactMap: Record<string, boolean> = { ...isReactedByMessage };
     try {
@@ -96,6 +98,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${segments.boxId}`);
+    pusherClient.subscribe(`private-${adminInfo._id}`);
 
     // Bind sự kiện với handler
     pusherClient.bind("react-message", reactMessage);
@@ -103,7 +106,8 @@ const SegmentMess: React.FC<SegmentMessage> = ({
     //Cleanup khi component bị unmount hoặc boxId thay đổi
     return () => {
       pusherClient.unsubscribe(`private-${segments.boxId}`);
-      pusherClient.unbind("react-message");
+      pusherClient.unsubscribe(`private-${adminInfo._id}`);
+      pusherClient.unbind("react-message", reactMessage);
     };
   }, []);
 

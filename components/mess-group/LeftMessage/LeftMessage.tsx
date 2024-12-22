@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import GlobalSearch from "../../shared/search/globalSearch";
 import MessageBox from "../MessageBox";
 import useSearchMessageBox from "@/hooks/use-search-message-box";
@@ -9,6 +9,9 @@ import CreateGroup from "./CreateGroup";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
 import { useUserContext } from "@/context/UserContext";
+import { fetchMessageBox } from "@/lib/data/message/dataBox";
+import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
+import LeftMessageRaw from "../UI-Raw/LeftMessageRaw";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,10 +22,11 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { dataChat } = useChatContext();
+  const { adminInfo } = useUserContext();
+  const [error, setError] = useState("");
 
   const { searchTerm, setSearchTerm, filteredBox } =
     useSearchMessageBox(dataChat);
-
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
   const handleCreated = () => {

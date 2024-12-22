@@ -8,6 +8,7 @@ import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import RightMessageRaw from "../UI-Raw/RightMessageRaw";
 
 interface RightMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;

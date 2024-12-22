@@ -3,6 +3,7 @@ import {
   MessageBoxInfo,
   RequestCreateGroup
 } from "@/lib/DTO/message";
+import axios from "axios";
 
 function transformToMessageBoxInfo(dto: MessageBoxDTO): MessageBoxInfo {
   return {
@@ -36,6 +37,7 @@ export async function createGroup(
       setError("No token found");
       return { success: false, message: "No token found" };
     }
+
     const formData = new FormData();
     formData.append("membersIds", JSON.stringify(param.membersIds));
     formData.append("groupName", param.groupName);
@@ -45,28 +47,32 @@ export async function createGroup(
       formData.append("file", groupAva);
     }
 
-    const response = await fetch(
+    const response = await axios.post(
       `${process.env.BASE_URL}message/create-group`,
+      formData,
       {
-        method: "POST",
         headers: {
-          Authorization: storedToken
-        },
-        body: formData
+          Authorization: storedToken,
+          "Content-Type": "multipart/form-data"
+        }
       }
     );
 
-    if (!response.ok) {
-      throw new Error(`Server error: ${response.statusText}`);
-    }
-
-    const result = await response.json();
+    const result = response.data.result;
     console.log(result);
-    const data: MessageBoxInfo = transformToMessageBoxInfo(result.data.newBox);
-    setDataChat((prev) => [...prev, data]);
+    if (result && result.success) {
+      const data: MessageBoxInfo = transformToMessageBoxInfo(result.newBox);
+      setDataChat((prev) => [...prev, data]);
+    }
     return result;
-  } catch (error) {
-    console.error("Error creating group:", error);
-    return { success: false, message: "Failed to create group" }; // Trả về thông báo lỗi phù hợp
+  } catch (error: any) {
+    if (axios.isAxiosError(error) && error.response) {
+      console.error("Error response from server:", error.response.data);
+      setError(error.response.data.message || "Unknown error");
+    } else {
+      console.error("Error creating group:", error.message);
+      setError("An unexpected error occurred");
+    }
+    return { success: false, message: "Failed to create group" };
   }
 }

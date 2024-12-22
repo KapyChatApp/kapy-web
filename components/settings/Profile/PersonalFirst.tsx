@@ -106,32 +106,38 @@ const PersonalFirst = ({ personal, setEdit }: PersonalItemProps) => {
         <div className="w-fit flex items-end justify-start relative h-[184px]">
           {/* Avatar */}
           <div className="absolute top-[100px] h-auto w-fit cursor-pointer z-10">
-            <a
-              href={
-                user.avatar !== ""
-                  ? newAva
-                    ? newAva
-                    : user.avatar
-                  : "/assets/ava/default.png"
-              }
-              data-fancybox="ava"
-              className={` max-w-full h-auto cursor-pointer `}
-            >
-              <Image
-                src={
-                  user.avatar !== ""
-                    ? newAva
-                      ? newAva
-                      : user.avatar
-                    : "/assets/ava/default.png"
-                }
-                alt="ava"
-                width={80}
-                height={80}
-                className="rounded-full"
-                objectFit="cover"
-              />
-            </a>
+            {newAva ? (
+              <a
+                href={newAva}
+                data-fancybox="ava"
+                className={` max-w-full h-auto cursor-pointer `}
+              >
+                <Image
+                  src={newAva}
+                  alt="ava"
+                  width={80}
+                  height={80}
+                  className="rounded-full"
+                  objectFit="cover"
+                />
+              </a>
+            ) : (
+              <a
+                href={user.avatar ? user.avatar : "/assets/ava/default.png"}
+                data-fancybox="ava"
+                className={` max-w-full h-auto cursor-pointer `}
+              >
+                <Image
+                  src={user.avatar ? user.avatar : "/assets/ava/default.png"}
+                  alt="ava"
+                  width={80}
+                  height={80}
+                  className="rounded-full"
+                  objectFit="cover"
+                />
+              </a>
+            )}
+
             <div
               className="absolute bottom-0 right-0 p-[6px] background-light800_dark500 rounded-full shadow-lg"
               onClick={handleUpdateAva}

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import MessageInput from "../MessageInput";
 import { Button } from "../../ui/button";
 import axios from "axios";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
 import { getFileFormat } from "@/lib/utils";
@@ -30,14 +30,20 @@ const tempSenderInfo = {
   avatar: "defaultAvatarUrl"
 } as ResponseUserInfo;
 const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { setMessagesByBox, setFileList, dataChat, isTyping, setIsTyping } =
-    useChatContext();
+  const {
+    setMessagesByBox,
+    setFileList,
+    dataChat,
+    isTyping,
+    setIsTyping,
+    setDataChat
+  } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const { adminId } = useUserContext();
+  const { adminInfo } = useUserContext();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -139,8 +145,10 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       if (!storedToken) return;
       const box = dataChat.filter((item) => item.id === boxId);
       if (isTyping) {
-        if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item._id === adminId);
+        if (dataChat && adminInfo._id && box.length > 0) {
+          const user = box[0].memberInfo.filter(
+            (item) => item._id === adminInfo._id
+          );
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
@@ -153,8 +161,10 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
           console.error("Error texting event:", error);
         }
       } else {
-        if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item._id === adminId);
+        if (dataChat && adminInfo._id && box.length > 0) {
+          const user = box[0].memberInfo.filter(
+            (item) => item._id === adminInfo._id
+          );
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
@@ -169,12 +179,27 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     };
 
     createTextingEvent();
-  }, [isTyping, avatar]);
+  }, [isTyping, avatar, dataChat]);
 
   //Send Message
+  const router = useRouter();
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
       console.log("Successfully received message: ", data);
+      if (!boxId) return;
+      if (boxId !== data.boxId) {
+        setDataChat((prev) => {
+          // Cập nhật lại dataChat với thông tin mới của data.boxId
+          return prev.map((item) => {
+            if (item.id === boxId) {
+              return { ...item, boxId: data.boxId }; // Cập nhật lại boxId
+            }
+            return item;
+          });
+        });
+        // Chuyển hướng tới trang chat mới
+        router.push(`/chat`);
+      }
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];
         // Chỉ cập nhật nếu tin nhắn thực sự mới
@@ -204,6 +229,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
+    pusherClient.subscribe(`private-${adminInfo._id}`);
 
     // Bind sự kiện với handler
     pusherClient.bind("new-message", handleNewMessage);
@@ -211,6 +237,8 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     //Cleanup khi component bị unmount hoặc boxId thay đổi
     return () => {
       pusherClient.unsubscribe(`private-${boxId}`);
+      pusherClient.unsubscribe(`private-${adminInfo._id}`);
+
       pusherClient.unbind("new-message", handleNewMessage);
     };
   }, [isTyping]);

@@ -67,7 +67,9 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
     };
     console.log(param);
     const result = await createGroup(param, groupAva, setDataChat, setError);
-    if (result.success) {
+    const { success, newBox } = result;
+    console.log(success);
+    if (success) {
       toast({
         title: "You created group successfully!",
         className:

@@ -2,7 +2,32 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { formatDistanceToNow, format, isValid } from "date-fns";
 import { UserInfo } from "os";
-import { ResponseMessageDTO, UserInfoBox } from "./DTO/message";
+import {
+  MessageBoxInfo,
+  RequestCreateGroup,
+  ResponseMessageDTO,
+  UserInfoBox
+} from "./DTO/message";
+import { ConfirmModalProps } from "@/components/friends/ConfirmModal";
+import {
+  FindUserDTO,
+  FriendProfileResponseDTO,
+  FriendRequestDTO,
+  FriendResponseDTO,
+  RequestedResponseDTO
+} from "./DTO/friend";
+import { unFriend } from "./services/friend/unfriend";
+import { unBestFriend } from "./services/friend/unBff";
+import { addFriendRequest } from "./services/friend/addFriend";
+import { addBestFriendRequest } from "./services/friend/addBff";
+import { acceptFriend } from "./services/friend/acceptFriend";
+import { acceptBestFriend } from "./services/friend/accepBff";
+import { toast } from "@/hooks/use-toast";
+import { blockFriend } from "./services/friend/block";
+import { useUserContext } from "@/context/UserContext";
+import { UserResponseDTO } from "./DTO/user";
+import { useRouter } from "next/navigation";
+import { createGroup } from "./services/message/createGroup";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -252,5 +277,270 @@ export const getDefaultIcon = (type: string) => {
       return "bxs:file-pdf";
     default:
       return "basil:document-solid"; // Icon mặc định
+  }
+};
+
+export const handleMessage = async (
+  param: RequestCreateGroup,
+  groupAva: File | undefined,
+  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
+  setError: React.Dispatch<React.SetStateAction<string>>,
+  router: ReturnType<typeof useRouter>
+) => {
+  console.log(param);
+  const result = await createGroup(param, groupAva, setDataChat, setError);
+  const { success, newBox } = result;
+  if (success) {
+    router.push(`/chat/${newBox._id}`);
+  } else {
+    toast({
+      title: "You can't create message box. Try again please!",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+
+export const confirmHandleUnfr = (
+  setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>,
+  setConfirm: React.Dispatch<React.SetStateAction<ConfirmModalProps>>,
+  user:
+    | FriendProfileResponseDTO
+    | RequestedResponseDTO
+    | FindUserDTO
+    | FriendResponseDTO,
+  param: FriendRequestDTO,
+  setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  console.log("Called confirmHandleUnfr");
+  setIsConfirm(true);
+  console.log("isConfirm set to true");
+
+  const confirm: ConfirmModalProps = {
+    setConfirm: setIsConfirm,
+    handleAction: () => handleUnfr(param, setListFriend, setRelation),
+    name: user.firstName + " " + user.lastName,
+    action: "unfriend"
+  };
+  setConfirm(confirm);
+  console.log("Confirm modal data:", confirm);
+};
+export const confirmHandleUnBff = (
+  setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>,
+  setConfirm: React.Dispatch<React.SetStateAction<ConfirmModalProps>>,
+  user:
+    | FriendProfileResponseDTO
+    | RequestedResponseDTO
+    | FindUserDTO
+    | FriendResponseDTO,
+  param: FriendRequestDTO,
+  setListBestFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  setIsConfirm(true);
+  const confirm: ConfirmModalProps = {
+    setConfirm: setIsConfirm,
+    handleAction: () => handleUnBff(param, setListBestFriend, setRelation),
+    name: user.firstName + " " + user.lastName,
+    action: "unbff"
+  };
+  setConfirm(confirm);
+};
+export const confirmHandleBlock = (
+  setIsConfirm: React.Dispatch<React.SetStateAction<boolean>>,
+  setConfirm: React.Dispatch<React.SetStateAction<ConfirmModalProps>>,
+  user:
+    | FriendProfileResponseDTO
+    | RequestedResponseDTO
+    | FindUserDTO
+    | FriendResponseDTO,
+  param: FriendRequestDTO,
+  setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  setIsConfirm(true);
+  const confirm: ConfirmModalProps = {
+    setConfirm: setIsConfirm,
+    handleAction: () => handleBlockFr(param, setListFriend, setRelation),
+    name: user.firstName + " " + user.lastName,
+    action: "block"
+  };
+  setConfirm(confirm);
+};
+
+export const handleUnfr = async (
+  param: FriendRequestDTO,
+  setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    await unFriend(param, setListFriend);
+    if (setRelation) {
+      setRelation("");
+    }
+    toast({
+      title: `Unfriend successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Error in handleUnfr:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleUnBff = async (
+  param: FriendRequestDTO,
+  setListBestFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    await unBestFriend(param, setListBestFriend);
+    if (setRelation) {
+      setRelation("friend");
+    }
+    toast({
+      title: `UnBff successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Failed to unbest friend:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleAddfr = async (
+  param: FriendRequestDTO,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    const response = await addFriendRequest(param);
+    if (setRelation) {
+      setRelation("sent_friend");
+    }
+    toast({
+      title: `Add friend successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Failed to send friend request:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleAddBff = async (
+  param: FriendRequestDTO,
+  setRelation: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    const result = await addBestFriendRequest(param);
+    setRelation("sent_bff");
+    toast({
+      title: `Add Bff successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Failed to add best friend:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleAcceptFr = async (
+  param: FriendRequestDTO,
+  setListRequestedFriend: React.Dispatch<
+    React.SetStateAction<RequestedResponseDTO[]>
+  >,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    await acceptFriend(param, setListRequestedFriend);
+    if (setRelation) {
+      setRelation("friend");
+    }
+    toast({
+      title: `Accept friend request successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Failed to accept friend request:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleAcceptBff = async (
+  param: FriendRequestDTO,
+  setListRequestedFriend: React.Dispatch<
+    React.SetStateAction<RequestedResponseDTO[]>
+  >,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    await acceptBestFriend(param, setListRequestedFriend);
+    if (setRelation) {
+      setRelation("bff");
+    }
+    toast({
+      title: `Accept best friend request successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+  } catch (error) {
+    console.error("Failed to accept best friend request:", error);
+    toast({
+      title: `Error in unfriend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
+  }
+};
+export const handleBlockFr = async (
+  param: FriendRequestDTO,
+  setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setRelation?: React.Dispatch<React.SetStateAction<string>>
+) => {
+  try {
+    await blockFriend(param, setListFriend);
+    toast({
+      title: `Blocked successfully`,
+      className:
+        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+    });
+    if (setRelation) {
+      setRelation("block");
+    }
+  } catch (error) {
+    console.error("Failed to block friend", error);
+    toast({
+      title: `Error in blocking friend`,
+      description: error instanceof Error ? error.message : "Unknown error",
+      className:
+        "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+    });
   }
 };

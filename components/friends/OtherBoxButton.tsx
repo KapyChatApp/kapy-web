@@ -1,6 +1,6 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
   FriendRequestDTO,
@@ -15,6 +15,11 @@ import { unBestFriend } from "@/lib/services/friend/unBff";
 import { toast } from "@/hooks/use-toast";
 import { unFriend } from "@/lib/services/friend/unfriend";
 import { blockFriend } from "@/lib/services/friend/block";
+import { handleMessage } from "@/lib/utils";
+import { useChatContext } from "@/context/ChatContext";
+import { useRouter } from "next/navigation";
+import { findBoxChat } from "@/lib/services/message/findBoxChat";
+import { RequestCreateGroup } from "@/lib/DTO/message";
 
 interface OtherButton {
   account: FriendResponseDTO | RequestedResponseDTO;
@@ -31,7 +36,7 @@ const OtherBoxButton: React.FC<OtherButton> = ({
   const { icon, label, value } = other;
   const { adminInfo } = useUserContext();
   const { setListFriend } = useFriendContext();
-
+  const { dataChat, setDataChat } = useChatContext();
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -39,6 +44,30 @@ const OtherBoxButton: React.FC<OtherButton> = ({
     name: "",
     action: ""
   });
+  const router = useRouter();
+  const [error, setError] = useState("");
+
+  const [boxId, setBoxId] = useState("");
+
+  const findBoxId = async () => {
+    const response = await findBoxChat(info._id);
+    if (response) {
+      setBoxId(response);
+    }
+  };
+  const handleRouteMessage = () => {
+    findBoxId();
+    if (!boxId) {
+      const param: RequestCreateGroup = {
+        membersIds: [info._id],
+        groupName: ""
+      };
+      //param, groupAva, setDataChat, setError
+      handleMessage(param, undefined, setDataChat, setError, router);
+    } else {
+      router.push(`/chat/${boxId}`);
+    }
+  };
 
   const handleUnfriend = async () => {
     try {
@@ -49,7 +78,7 @@ const OtherBoxButton: React.FC<OtherButton> = ({
       const result = await unFriend(friendRequest, setListFriend);
       setIndex(info._id);
       toast({
-        title: `Error in unfriend`,
+        title: `Unfriend successfully`,
         description: `You and ${
           info.firstName + " " + info.lastName
         } are not friend`,
@@ -67,17 +96,16 @@ const OtherBoxButton: React.FC<OtherButton> = ({
     }
   };
   const handleBlockFriend = async () => {
-    setIsConfirm(true);
     try {
       const friendRequest: FriendRequestDTO = {
-        sender: info._id,
-        receiver: adminInfo._id
+        sender: adminInfo._id,
+        receiver: info._id
       };
       const result = await blockFriend(friendRequest, setListFriend);
       setIndex(info._id);
       toast({
-        title: `Error in unfriend`,
-        description: `You are blocked ${info.firstName + " " + info.lastName}`,
+        title: `Block Successfully`,
+        description: `You blocked ${info.firstName + " " + info.lastName}`,
         className:
           "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
       });
@@ -91,8 +119,6 @@ const OtherBoxButton: React.FC<OtherButton> = ({
       });
     }
   };
-
-  const handleMessage = () => {};
 
   const handleButton = () => {
     switch (value) {
@@ -115,7 +141,8 @@ const OtherBoxButton: React.FC<OtherButton> = ({
         });
         break;
       default:
-        handleMessage();
+        console.log("hello");
+        handleRouteMessage();
         break;
     }
   };

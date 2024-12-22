@@ -1,6 +1,5 @@
 "use client";
 import RightComponent from "@/components/friends/RightComponent";
-import { strangeFriend } from "@/constants/friends";
 import { useFriendContext } from "@/context/FriendContext";
 import { getMyListRequestedFriend } from "@/lib/data/mine/dataRequestFriend";
 import React, { useEffect, useState } from "react";
