@@ -19,7 +19,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { id, receiverInfo, pin, groupName, groupAva, memberInfo } = box;
   const pathname = usePathname();
   const isActive = pathname.includes(id) || pathname === `/${id}`;
-  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const isGroup = /^\/group-chat/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
   const { adminInfo, isOnlineChat } = useUserContext();
   const adminId = adminInfo._id;
@@ -55,7 +55,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
 
   const router = useRouter();
   const handleClickLink = () => {
-    router.push(`/${id}`);
+    isGroup ? router.push(`/group-chat/${id}`) : router.push(`/${id}`);
   };
 
   // Cập nhật createAt mỗi phút

@@ -57,7 +57,7 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
       <div className="flex flex-row shadow-none border-[0.5px] bg-transparent border-light-500 dark:border-dark-200 dark:border-opacity-50 rounded-lg p-4 items-center justify-between w-full h-fit">
         <div className="flex flex-row justify-start items-center gap-3 w-fit h-fit">
           <Image
-            src={info.avatar}
+            src={info.avatar ? info.avatar : "/assets/ava/default.png"}
             alt="ava"
             width={80}
             height={80}

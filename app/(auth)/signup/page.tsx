@@ -43,7 +43,7 @@ const Signup = () => {
     }
   ];
 
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     try {
       const result = SignInSchema.safeParse({
         firstName,
@@ -103,6 +103,7 @@ const Signup = () => {
         birthDay: birth
       };
 
+      console.log(params);
       //Gửi yêu cầu đăng ký
       const response = await registerUser(params);
       if (response) {
@@ -196,7 +197,7 @@ const Signup = () => {
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
         <Button
           className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-full py-4 rounded-[20px]"
-          onClick={handleSignIn}
+          onClick={handleSignUp}
         >
           <div className="w-full h-[30px] items-center justify-center flex">
             <p className="text-[20px] font-bold text-light-900 ">

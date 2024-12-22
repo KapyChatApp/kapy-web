@@ -21,23 +21,21 @@ import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipl
 
 interface BottomProps {
   recipientIds: string[] | undefined;
+  relation: string;
+  setMessage: React.Dispatch<
+    React.SetStateAction<ResponseMessageDTO[] | undefined>
+  >;
+  message: ResponseMessageDTO[] | undefined;
 }
-const tempSenderInfo = {
-  id: "",
-  firstName: "Default",
-  lastName: " User",
-  nickName: "defaultNick",
-  avatar: "defaultAvatarUrl"
-} as ResponseUserInfo;
-const RightBottom = ({ recipientIds }: BottomProps) => {
-  const {
-    setMessagesByBox,
-    setFileList,
-    dataChat,
-    isTyping,
-    setIsTyping,
-    setDataChat
-  } = useChatContext();
+
+const RightBottom = ({
+  recipientIds,
+  relation,
+  setMessage,
+  message
+}: BottomProps) => {
+  const { dataChat, isTyping, setIsTyping, setFileList, setMessagesByBox } =
+    useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -185,21 +183,16 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
   const router = useRouter();
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
-      console.log("Successfully received message: ", data);
-      if (!boxId) return;
-      if (boxId !== data.boxId) {
-        setDataChat((prev) => {
-          // Cập nhật lại dataChat với thông tin mới của data.boxId
-          return prev.map((item) => {
-            if (item.id === boxId) {
-              return { ...item, boxId: data.boxId }; // Cập nhật lại boxId
-            }
-            return item;
-          });
-        });
-        // Chuyển hướng tới trang chat mới
-        router.push(`/chat`);
-      }
+      setMessage((prev) => {
+        const currentMessages = prev || [];
+        // Chỉ cập nhật nếu tin nhắn thực sự mới
+        if (!currentMessages.some((msg) => msg.id === data.id)) {
+          const updated = [...currentMessages, data]; // Thêm tin nhắn mới
+          console.log("Updated messages: ", updated);
+          return updated;
+        }
+        return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+      });
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];
         // Chỉ cập nhật nếu tin nhắn thực sự mới
@@ -213,13 +206,10 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       });
       if (data.contentId) {
         setFileList((prev) => {
-          const fileContent = prev[data.boxId] || [];
+          const fileContent = prev || [];
           // Chỉ cập nhật nếu tin nhắn thực sự mới
-          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
-            const updated = {
-              ...prev,
-              [data.boxId]: [...fileContent, data.contentId]
-            };
+          if (!fileContent.some((file) => file.url === data.contentId.url)) {
+            const updated = [...fileContent, data.contentId]; // Thêm phần tử mới
             console.log("Updated fileList: ", updated);
             return updated;
           }
@@ -246,7 +236,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
 
-    setMessagesByBox((prev: any) =>
+    setMessage((prev: any) =>
       prev.map((msg: any) => {
         const mapEntry = temporaryToCloudinaryMap.find(
           (entry) => msg.contentId[0].url === entry.tempUrl

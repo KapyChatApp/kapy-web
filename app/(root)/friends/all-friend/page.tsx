@@ -24,14 +24,13 @@ const page = () => {
     };
 
     fetchData();
-  }, []);
+  }, [setListFriend]);
 
   useEffect(() => {
     // Gọi API lấy danh sách bạn thân khi component mount
     const fetchData = async () => {
       try {
         await getMyListBestFriend(setListBestFriend, setError);
-        console.log(listBestFriend);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
@@ -39,7 +38,7 @@ const page = () => {
     };
 
     fetchData();
-  }, []);
+  }, [setListBestFriend]);
 
   if (!listBestFriend || !listFriend) {
     return (

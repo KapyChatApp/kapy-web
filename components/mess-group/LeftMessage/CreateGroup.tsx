@@ -173,7 +173,7 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
               {filteredFriends.map((item) => {
                 const user = {
                   id: item._id,
-                  ava: item.avatar,
+                  ava: item.avatar ? item.avatar : "/assets/ava/default.png",
                   name: item.firstName + " " + item.lastName,
                   onChange: handleCheckboxChange
                 };

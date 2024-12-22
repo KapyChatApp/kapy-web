@@ -1,14 +1,17 @@
 "use client";
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { MessageBoxInfo } from "@/lib/DTO/message";
+import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
+import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
 
 const MessageContent = () => {
   const [error, setError] = useState("");
-
+  const pathname = usePathname();
+  const isGroup = pathname.startsWith("/group-chat/");
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
   const { id } = useParams();
   const router = useRouter();
@@ -32,7 +35,6 @@ const MessageContent = () => {
         console.error("Error loading chats:", error);
       }
     };
-
     fetchChats();
   }, [id, router]);
 
@@ -42,6 +44,9 @@ const MessageContent = () => {
         <div className="loader"></div>
       </div>
     );
+  }
+  if (!dataChat.length) {
+    return <RightMessageRaw />;
   }
   const chatItem = dataChat.find((chat) => chat.id === id);
 

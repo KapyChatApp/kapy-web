@@ -46,6 +46,9 @@ const actionsButton: Actions[] = [
 interface MoreTopProps {
   ava: string;
   name: string;
+  id?: string;
+  relation: string;
+  setRelation: React.Dispatch<React.SetStateAction<string>>;
 }
 interface Top {
   top: MoreTopProps;
@@ -55,7 +58,7 @@ interface Top {
 const MoreTop: React.FC<Top> = ({ top, setActiveComponent }) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const { ava, name } = top;
+  const { ava, name, relation, setRelation, id } = top;
 
   return isGroup ? (
     <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[12px]">
@@ -107,6 +110,9 @@ const MoreTop: React.FC<Top> = ({ top, setActiveComponent }) => {
             <ActionButton
               action={item}
               setActiveComponent={setActiveComponent}
+              setRelation={setRelation}
+              relation={relation}
+              userId={id}
             />
           ))}
       </div>

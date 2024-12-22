@@ -19,12 +19,20 @@ interface RightMiddleProps {
   filteredSegmentAdmin: ResponseMessageDTO[];
   filteredSegmentOther: ResponseMessageDTO[];
   receiverInfo: UserInfoBox[];
+  relation?: string;
+  setMessage: React.Dispatch<
+    React.SetStateAction<ResponseMessageDTO[] | undefined>
+  >;
+  message: ResponseMessageDTO[] | undefined;
 }
 
 const RightMiddle = ({
   filteredSegmentAdmin,
   filteredSegmentOther,
-  receiverInfo
+  receiverInfo,
+  relation,
+  message,
+  setMessage
 }: RightMiddleProps) => {
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
@@ -119,9 +127,21 @@ const RightMiddle = ({
     };
   }, [adminId, boxId]);
 
+  useEffect(() => {
+    // Cuộn đến đáy khi component được render
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
+  }, [messagesToDisplay]);
+
   return (
     <div
-      className="flex flex-col flex-grow overflow-scroll scrollable h-[591px]"
+      className={`"flex flex-col flex-grow overflow-scroll scrollable ${
+        relation === "blocked" || relation === "blockedBy"
+          ? "h-[530px]"
+          : "h-[591px]"
+      } `}
       ref={messageContainerRef}
     >
       <div className="flex-grow">
@@ -208,6 +228,8 @@ const RightMiddle = ({
                               admin={adminId}
                               messageId={item.id}
                               boxId={item.boxId}
+                              setMessage={setMessage}
+                              message={message}
                             />
                           )}
                           <SegmentMess
@@ -227,6 +249,8 @@ const RightMiddle = ({
                               })}
                               messageId={item.id}
                               boxId={item.boxId}
+                              setMessage={setMessage}
+                              message={message}
                             />
                           )}
                         </div>

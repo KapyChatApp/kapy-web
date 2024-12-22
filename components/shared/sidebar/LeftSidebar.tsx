@@ -75,6 +75,7 @@ const Leftsidebar = () => {
 
       if (response.ok) {
         localStorage.removeItem("token");
+        localStorage.removeItem("adminId");
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);

@@ -37,6 +37,7 @@ export const getMyListBestFriend = async (
         mutualFriends: item.mutualFriends
       };
     });
+    console.log(data);
     setListBestFriend(data);
     return data;
   } catch (err: any) {

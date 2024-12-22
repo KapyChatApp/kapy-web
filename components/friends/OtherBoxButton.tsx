@@ -47,17 +47,9 @@ const OtherBoxButton: React.FC<OtherButton> = ({
   const router = useRouter();
   const [error, setError] = useState("");
 
-  const [boxId, setBoxId] = useState("");
-
-  const findBoxId = async () => {
+  const handleRouteMessage = async () => {
     const response = await findBoxChat(info._id);
-    if (response) {
-      setBoxId(response);
-    }
-  };
-  const handleRouteMessage = () => {
-    findBoxId();
-    if (!boxId) {
+    if (!response) {
       const param: RequestCreateGroup = {
         membersIds: [info._id],
         groupName: ""
@@ -65,7 +57,7 @@ const OtherBoxButton: React.FC<OtherButton> = ({
       //param, groupAva, setDataChat, setError
       handleMessage(param, undefined, setDataChat, setError, router);
     } else {
-      router.push(`/${boxId}`);
+      router.push(`/${response}`);
     }
   };
 

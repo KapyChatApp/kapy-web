@@ -93,7 +93,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
       <div className="flex flex-row h-full">
         <div className="flex flex-row items-center justify-start">
           <Image
-            src={ava}
+            src={ava ? ava : "/assets/ava/default.png"}
             alt="ava"
             width={48}
             height={48}

@@ -33,12 +33,7 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
     receiver: list._id
   };
 
-  const [status, setStatus] = useState(
-    () => localStorage.getItem("status") || ""
-  );
-  useEffect(() => {
-    localStorage.setItem("status", status);
-  }, [status]);
+  const [status, setStatus] = useState("");
   const label = status === "" ? "Add friend" : "Cancel Request";
   const handleButton = () => {
     switch (label) {
@@ -70,7 +65,7 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
         onClick={handleClick}
       >
         <Image
-          src={list.avatar}
+          src={list.avatar ? list.avatar : "/assets/ava/default.png"}
           alt="ava"
           width={172}
           height={166}

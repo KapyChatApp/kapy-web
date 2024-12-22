@@ -87,7 +87,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
         onClick={handleClick}
       >
         <Image
-          src={object.avatar}
+          src={object.avatar ? object.avatar : "/assets/ava/default.png"}
           alt="ava"
           width={172}
           height={166}

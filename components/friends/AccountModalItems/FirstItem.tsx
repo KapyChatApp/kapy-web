@@ -29,6 +29,10 @@ import {
   handleUnBff,
   handleUnfr
 } from "@/lib/utils";
+import { findBoxChat } from "@/lib/services/message/findBoxChat";
+import { RequestCreateGroup } from "@/lib/DTO/message";
+import { useRouter } from "next/navigation";
+import { useChatContext } from "@/context/ChatContext";
 
 interface FirstItemProps {
   user: FriendProfileResponseDTO;
@@ -52,6 +56,8 @@ const FirstItem = ({ user }: FirstItemProps) => {
   } = useFriendContext();
   const [relation, setRelation] = useState(user.relation);
   const [isConfirm, setIsConfirm] = useState(false);
+  const [error, setError] = useState("");
+  const { dataChat, setDataChat } = useChatContext();
   const [confirm, setConfirm] = useState<ConfirmModalProps>(defaultConfirm);
   const param: FriendRequestDTO = {
     sender: adminInfo._id,
@@ -60,6 +66,22 @@ const FirstItem = ({ user }: FirstItemProps) => {
   const friendRequest: FriendRequestDTO = {
     sender: user._id,
     receiver: adminInfo._id
+  };
+
+  const router = useRouter();
+  const handleRouteMessage = async () => {
+    console.log("hello");
+    const response = await findBoxChat(user._id);
+    if (!response) {
+      const param: RequestCreateGroup = {
+        membersIds: [user._id],
+        groupName: ""
+      };
+      //param, groupAva, setDataChat, setError
+      handleMessage(param, undefined, setDataChat, setError, router);
+    } else {
+      router.push(`/${response}`);
+    }
   };
 
   useEffect(() => {
@@ -174,7 +196,7 @@ const FirstItem = ({ user }: FirstItemProps) => {
           icon: "",
           colorBackground: "background-light700_dark400",
           colorText: "text-dark100_light900",
-          handleAction: () => handleMessage
+          handleAction: () => handleRouteMessage()
         };
 
         return (
@@ -245,7 +267,7 @@ const FirstItem = ({ user }: FirstItemProps) => {
           icon: "",
           colorBackground: "background-light700_dark400",
           colorText: "text-dark100_light900",
-          handleAction: () => handleMessage
+          handleAction: () => handleRouteMessage()
         };
 
         return (

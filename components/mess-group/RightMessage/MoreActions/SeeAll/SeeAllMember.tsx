@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { UserInfoBox } from "@/lib/DTO/message";
 import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
-import { MememberGroup } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React from "react";
@@ -48,7 +47,7 @@ const SeeAllMember: React.FC<SeeAllProps> = ({
               >
                 <div className="relative flex-shrink-0 w-fit">
                   <Image
-                    src={item.avatar}
+                    src={item.avatar ? item.avatar : "/assets/ava/default.png"}
                     alt="ava"
                     width={42}
                     height={42}

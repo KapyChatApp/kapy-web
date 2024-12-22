@@ -39,7 +39,7 @@ const GroupMessContent = () => {
     };
 
     fetchChats();
-  }, [id, router]);
+  }, [id, router, setDataChat]);
 
   if (!dataChat) {
     return (
@@ -48,11 +48,11 @@ const GroupMessContent = () => {
       </div>
     );
   }
-  const chatItem = dataChat.find((chat) => chat.id === id);
 
   if (!dataChat.length) {
     return <RightMessageRaw />;
   }
+  const chatItem = dataChat.find((chat) => chat.id === id);
 
   return <RightMessage chatItem={chatItem} />;
 };

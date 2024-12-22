@@ -14,13 +14,23 @@ interface OpenMoreDisplayProps {
   detailByBox: MessageBoxInfo | undefined;
   openMore: boolean;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
+  setRelation: React.Dispatch<React.SetStateAction<string>>;
+  relation: string;
+  fileList: FileContent[] | undefined;
 }
 interface MoreDisplay {
   display: OpenMoreDisplayProps;
 }
 
 const OpenMoreDisplay = ({ display }: MoreDisplay) => {
-  const { openMore, setOpenMore, detailByBox } = display;
+  const {
+    openMore,
+    setOpenMore,
+    detailByBox,
+    setRelation,
+    relation,
+    fileList
+  } = display;
   let detail: MessageBoxInfo = {
     id: "",
     receiverInfo: {
@@ -71,7 +81,12 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
         return (
           <>
             <AddComponent setActiveComponent={setActiveComponent} />
-            <MoreActions propsAll={propsAll} setOpenMore={setOpenMore} />
+            <MoreActions
+              propsAll={propsAll}
+              setOpenMore={setOpenMore}
+              relation={relation}
+              setRelation={setRelation}
+            />
           </>
         );
       case "member":
@@ -111,7 +126,14 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
           />
         );
       default:
-        return <MoreActions propsAll={propsAll} setOpenMore={setOpenMore} />;
+        return (
+          <MoreActions
+            propsAll={propsAll}
+            setOpenMore={setOpenMore}
+            relation={relation}
+            setRelation={setRelation}
+          />
+        );
     }
   };
   return (
@@ -124,7 +146,12 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       </div>
     ) : (
       <div className="md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[20%] h-full">
-        <MoreActions propsAll={propsAll} setOpenMore={setOpenMore} />
+        <MoreActions
+          propsAll={propsAll}
+          setOpenMore={setOpenMore}
+          relation={relation}
+          setRelation={setRelation}
+        />
       </div>
     ))
   );

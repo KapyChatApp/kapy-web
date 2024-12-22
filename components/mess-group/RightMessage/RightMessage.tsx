@@ -7,8 +7,18 @@ import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import {
+  FileContent,
+  MessageBoxInfo,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
 import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { unBlockFr } from "@/lib/services/friend/unblock";
+import { useFriendContext } from "@/context/FriendContext";
+import { checkRelation } from "@/lib/services/user/checkRelation";
+import ReportCard from "@/components/shared/ReportCard";
+import { getFileList } from "@/lib/data/message/dataFileList";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -17,14 +27,21 @@ interface RightMessageProps {
 const RightMessage = ({ chatItem }: RightMessageProps) => {
   const pathname = usePathname();
   const [openMore, setOpenMore] = useState(false);
-  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const [isReport, setReport] = useState(false);
+  const isGroup = pathname.startsWith("/group-chat");
 
   //FetchMessage Backend
   const { id } = useParams();
   const [message, setMessage] = useState<ResponseMessageDTO[]>();
-
+  const [relation, setRelation] = useState("");
   const { adminInfo } = useUserContext();
+  const { setListBlockedFriend } = useFriendContext();
+  const { setFileList, fileList } = useChatContext();
   const adminId = adminInfo._id;
+
+  const onclose = () => {
+    setReport(false);
+  };
 
   useEffect(() => {
     const getMessage = async () => {
@@ -40,7 +57,21 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
         console.log(error);
       }
     };
+    const fetchImageList = async () => {
+      try {
+        if (id) {
+          // Kiểm tra nếu boxId tồn tại
+          const list: FileContent[] = await getFileList(id.toString());
+          setFileList(list);
+        } else {
+          console.warn("boxId is undefined");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
     getMessage();
+    fetchImageList();
   }, []);
 
   //RightTop
@@ -55,7 +86,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           membersGroup: chatItem.memberInfo.length,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          fileList: fileList
         }
       : {
           ava:
@@ -75,7 +107,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          fileList: fileList
         };
   } else {
     top = isGroup
@@ -108,8 +141,89 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   const display = {
     detailByBox: chatItem,
     openMore,
-    setOpenMore
+    setOpenMore,
+    relation,
+    setRelation,
+    fileList
   };
+  const handleUnBlockChat = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("adminId");
+
+      // Kiểm tra xem receiverId và senderId có tồn tại hay không
+      if (!chatItem?.receiverInfo._id || !userId) {
+        alert("Lỗi: Không có ID người nhận hoặc người gửi.");
+        return;
+      }
+
+      // Tạo đối tượng params theo kiểu FriendRequestDTO
+      const params: FriendRequestDTO = {
+        sender: userId ? userId : "",
+        receiver: chatItem?.receiverInfo._id || ""
+      };
+
+      await unBlockFr(params, setListBlockedFriend);
+      setRelation("stranger"); // Hoặc bạn có thể thay thế với giá trị mới mà bạn muốn
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (!chatItem) {
+      return; // Nếu chưa có chatItem, không thực hiện gì
+    }
+    let isMounted = true;
+    const userId = localStorage.getItem("adminId");
+
+    const check = async () => {
+      try {
+        if (userId) {
+          const res: any = await checkRelation(
+            userId,
+            chatItem?.receiverInfo._id
+          );
+          if (isMounted) {
+            if (!res) {
+              setRelation("stranger");
+            } else {
+              const { relation, status, sender, receiver } = res;
+
+              if (relation === "bff") {
+                if (status) {
+                  setRelation("bff"); //
+                } else if (userId === sender) {
+                  setRelation("sent_bff"); //
+                } else if (userId === receiver) {
+                  setRelation("received_bff"); //
+                }
+              } else if (relation === "friend") {
+                setRelation("friend");
+              } else if (relation === "block") {
+                if (userId === sender) {
+                  setRelation("blocked"); //
+                } else if (userId === receiver) {
+                  setRelation("blockedBy");
+                }
+              } else {
+                setRelation("stranger"); //
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching relation:", error);
+      }
+    };
+    if (!isGroup) {
+      check();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [chatItem]);
+
   if (!chatItem) {
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-white">
@@ -118,30 +232,115 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
     );
   }
   return (
-    <div className="flex flex-row w-full h-full">
-      <div
-        className={`${
-          openMore ? "w-[65%]" : "w-full"
-        } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
-      >
+    <>
+      <div className="flex flex-row w-full h-full">
         <div
-          className={`flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pl-0 pr-[12px] justify-between`}
+          className={`${
+            openMore ? "w-[65%]" : "w-full"
+          } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
         >
-          <RightTop top={top} />
+          <div
+            className={`flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pr-[12px] justify-between h-full`}
+          >
+            {!isGroup ? (
+              relation === "" ? (
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  <div className="loader"></div>
+                  <p className="text-sm text-gray-500">Loading...</p>
+                </div>
+              ) : relation === "blockedBy" ? (
+                <>
+                  <RightTop top={top} />
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                  <div className="flex flex-col items-center justify-center w-full h-20 border-t border-border-color text-dark100_light900">
+                    <p className="text-sm">Your are blocked.</p>
+                  </div>
+                </>
+              ) : relation === "blocked" ? (
+                <>
+                  <RightTop top={top} />
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                  <div className="flex flex-col items-center justify-center w-full border-t border-border-color text-dark100_light900">
+                    <p className="text-sm p-4">You blocked this person.</p>
+                    <button
+                      className="text-sm cursor-pointer text-blue-500 hover:bg-opacity-30 hover:bg-border-color rounded-md shadow-none w-full p-2"
+                      onClick={handleUnBlockChat}
+                    >
+                      Unblock
+                    </button>
+                    <button
+                      className="text-sm cursor-pointer text-red-500 hover:bg-opacity-30 hover:bg-border-color rounded-md shadow-none w-full p-2"
+                      onClick={() => setReport(true)}
+                    >
+                      Report
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <RightTop top={top} />
 
-          <RightMiddle
-            filteredSegmentAdmin={filteredSegmentAdmin}
-            filteredSegmentOther={filteredSegmentOther}
-            receiverInfo={chatItem ? chatItem.memberInfo : []}
-          />
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    setMessage={setMessage}
+                    message={message}
+                  />
 
-          <RightBottom
-            recipientIds={chatItem.memberInfo.map((item: any) => item.id)}
-          />
+                  <RightBottom
+                    recipientIds={chatItem.memberInfo.map(
+                      (item: any) => item.id
+                    )}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                </>
+              )
+            ) : (
+              <>
+                <RightTop top={top} />
+
+                <RightMiddle
+                  filteredSegmentAdmin={filteredSegmentAdmin}
+                  filteredSegmentOther={filteredSegmentOther}
+                  receiverInfo={chatItem ? chatItem.memberInfo : []}
+                  setMessage={setMessage}
+                  message={message}
+                />
+
+                <RightBottom
+                  recipientIds={chatItem.memberInfo.map((item: any) => item.id)}
+                  relation={relation}
+                  setMessage={setMessage}
+                  message={message}
+                />
+              </>
+            )}
+          </div>
         </div>
+        <OpenMoreDisplay display={display} />
       </div>
-      <OpenMoreDisplay display={display} />
-    </div>
+
+      {isReport && (
+        <ReportCard onClose={onclose} type="Message" reportedId={chatItem.id} />
+      )}
+    </>
   );
 };
 

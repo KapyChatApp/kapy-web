@@ -9,9 +9,16 @@ import { SeeAllProps } from "@/types/mess-group";
 interface MoreActionsProps {
   propsAll: SeeAllProps;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
+  relation: string;
+  setRelation: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const MoreActions = ({ propsAll, setOpenMore }: MoreActionsProps) => {
+const MoreActions = ({
+  propsAll,
+  setOpenMore,
+  relation,
+  setRelation
+}: MoreActionsProps) => {
   const { detailByBox, setActiveComponent, setItemSent, itemSent } = propsAll;
   const pathname = usePathname();
 
@@ -22,12 +29,17 @@ const MoreActions = ({ propsAll, setOpenMore }: MoreActionsProps) => {
     name:
       detailByBox.receiverInfo.firstName +
       " " +
-      detailByBox.receiverInfo.lastName
+      detailByBox.receiverInfo.lastName,
+    id: detailByBox.receiverInfo._id,
+    relation,
+    setRelation
   };
 
   const topGroup = {
     ava: detailByBox.groupAva,
-    name: detailByBox.groupName
+    name: detailByBox.groupName,
+    relation,
+    setRelation
   };
 
   return (

@@ -23,8 +23,9 @@ export interface LeftMessageProps {
 
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat/.test(pathname);
-  const { dataChat, setDataChat, setMessagesByBox } = useChatContext();
+  const isGroup = pathname.startsWith("/group-chat");
+  const { dataChat, setDataChat, setMessagesByBox, messagesByBox } =
+    useChatContext();
   const { adminInfo } = useUserContext();
   const [error, setError] = useState("");
   //OPEN MODAL CreateGroup
@@ -56,9 +57,13 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const adminId = localStorage.getItem("adminId");
+        if (!adminId) return;
+
         const data = isGroup
           ? await fetchMessageBoxGroup(setError)
-          : await fetchMessageBox(adminInfo._id, setError);
+          : await fetchMessageBox(adminId, setError);
+
         setDataChat(data);
       } catch (err) {
         setError("Failed to fetch data.");
@@ -67,7 +72,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     };
 
     fetchData();
-  }, []);
+  }, [isGroup, setDataChat]);
 
   const { searchTerm, setSearchTerm, filteredBox } =
     useSearchMessageBox(dataChat);

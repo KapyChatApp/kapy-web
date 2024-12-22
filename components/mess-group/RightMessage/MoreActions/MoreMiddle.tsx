@@ -38,15 +38,15 @@ const MoreMiddle = ({
   }, [boxId]);
 
   useEffect(() => {
-    if (boxId !== "" && fileList[boxId]) {
-      const imageList = fileList[boxId].filter((item) => item.type === "Image");
-      const videoList = fileList[boxId].filter((item) => item.type === "Video");
-      const otherList = fileList[boxId].filter((item) => item.type === "Other");
+    if (boxId !== "" && fileList) {
+      const imageList = fileList.filter((item) => item.type === "Image");
+      const videoList = fileList.filter((item) => item.type === "Video");
+      const otherList = fileList.filter((item) => item.type === "Other");
       if (imageList) setImages(imageList);
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  }, [boxId, fileList[boxId]]);
+  }, [boxId, fileList]);
 
   //Show image in more
   useEffect(() => {

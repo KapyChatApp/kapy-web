@@ -1,5 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useFriendContext } from "@/context/FriendContext";
+import { toast } from "@/hooks/use-toast";
+import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { blockFriend } from "@/lib/services/friend/block";
+import { unBlockFr } from "@/lib/services/friend/unblock";
+import { handleAddBff } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -12,14 +18,21 @@ interface Actions {
 interface ActionButtonProps {
   action: Actions;
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+  relation?: string;
+  setRelation?: React.Dispatch<React.SetStateAction<string>>;
+  userId?: string;
 }
 
 const ActionButton: React.FC<ActionButtonProps> = ({
   action,
-  setActiveComponent
+  setActiveComponent,
+  relation,
+  setRelation,
+  userId
 }) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/\d+$/.test(pathname);
+  const isGroup = /^\/group-chat/.test(pathname);
+  const { setListBlockedFriend, setListFriend } = useFriendContext();
 
   const { icon, label, click } = action;
 
@@ -31,20 +44,69 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const [isManage, setIsManage] = useState(false);
 
   useEffect(() => {
-    const handleResize = () => {
-      // Kiểm tra kích thước màn hình
-      if (window.matchMedia("(min-width: 768px)").matches) {
-        setActiveComponent("");
-      } else {
-        setActiveComponent("");
+    if (relation && relation === "bff") {
+      if (click === "best") {
+        setIsBest(true);
       }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, [setActiveComponent]);
+    } else if (relation === "blocked" || relation === "blockedBy") {
+      if (click === "block") {
+        setIsBlock(true);
+      }
+    }
+  }, [relation, click]);
+
+  const handleUnBlockChat = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+
+      // Kiểm tra xem receiverId và senderId có tồn tại hay không
+      if (!userId || !adminId) {
+        alert("Lỗi: Không có ID người nhận hoặc người gửi.");
+        return;
+      }
+
+      // Tạo đối tượng params theo kiểu FriendRequestDTO
+      const params: FriendRequestDTO = {
+        sender: adminId ? adminId : "",
+        receiver: userId ? userId : ""
+      };
+
+      await unBlockFr(params, setListBlockedFriend);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleBlockFriend = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+
+      // Kiểm tra xem receiverId và senderId có tồn tại hay không
+      if (!userId || !adminId) {
+        console.log();
+        alert("Lỗi: Không có ID người nhận hoặc người gửi.");
+        return;
+      }
+      const friendRequest: FriendRequestDTO = {
+        sender: adminId,
+        receiver: userId
+      };
+      const result = await blockFriend(friendRequest, setListFriend);
+      toast({
+        title: `Block Successfully`,
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
+    } catch (error) {
+      console.error("Failed to block friend", error);
+      toast({
+        title: `Error in blocking friend`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
+    }
+  };
 
   const handleButton = () => {
     switch (click) {
@@ -56,7 +118,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         setActiveComponent(click);
         break;
       case "block":
-        setIsBlock((prev) => !prev);
+        if (isBlock) {
+          handleUnBlockChat();
+          setIsBlock(false);
+        } else {
+          handleBlockFriend();
+          setIsBlock(true);
+        }
         break;
       case "best":
         setIsBest((prev) => !prev);
