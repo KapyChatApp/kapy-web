@@ -1,15 +1,7 @@
-import React, { useEffect, useState } from "react";
-import GlobalSearch from "../../shared/search/globalSearch";
-import MessageBox from "../MessageBox";
-import useSearchMessageBox from "@/hooks/use-search-message-box";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useChatContext } from "@/context/ChatContext";
-import { getPusherClient } from "@/lib/pusher";
-import { useUserContext } from "@/context/UserContext";
-import { useFriendContext } from "@/context/FriendContext";
-import useSearchFriend from "@/hooks/use-search-list-friend";
 import CreateGroup from "../LeftMessage/CreateGroup";
 
 const LeftMessageRaw = () => {

@@ -92,7 +92,7 @@ const MoreTop: React.FC<Top> = ({ top, setActiveComponent }) => {
       <div className="flex items-start md:justify-center justify-start w-full h-fit">
         <div className="flex flex-col items-center justify-center w-full h-fit gap-[12px]">
           <Image
-            src={ava}
+            src={ava ? ava : "/assets/ava/default.png"}
             alt="ava"
             width={80}
             height={80}

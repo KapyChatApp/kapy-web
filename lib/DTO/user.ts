@@ -84,3 +84,9 @@ export interface UserLoginDTO {
   phoneNumber: string;
   password: string;
 }
+
+export interface OnlineEvent {
+  userId: string;
+  online: boolean;
+  updateTime: Date;
+}

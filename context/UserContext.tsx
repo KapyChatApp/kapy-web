@@ -39,6 +39,10 @@ interface UserContextType {
   setIsOnlineChat: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
   >;
+  timeOfflineChat: Record<string, Date>;
+  setTimeOfflineChat: React.Dispatch<
+    React.SetStateAction<Record<string, Date>>
+  >;
   adminInfo: UserResponseDTO;
   setAdminInfo: React.Dispatch<React.SetStateAction<UserResponseDTO>>;
   newAva: string;
@@ -54,6 +58,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [adminId, setAdminId] = useState<string>("");
   const [isOnlineChat, setIsOnlineChat] = useState<Record<string, boolean>>({});
+  const [timeOfflineChat, setTimeOfflineChat] = useState<Record<string, Date>>(
+    {}
+  );
   const [adminInfo, setAdminInfo] = useState<UserResponseDTO>(
     defaultUserResponseDTO
   );
@@ -65,6 +72,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         setAdminId,
         isOnlineChat,
         setIsOnlineChat,
+        timeOfflineChat,
+        setTimeOfflineChat,
         adminInfo,
         setAdminInfo,
         newAva,

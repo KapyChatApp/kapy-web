@@ -7,7 +7,6 @@ export async function checkRelation(stUser: string, ndUser: string) {
       throw new Error("Error fetching relation");
     }
     const data = await response.json();
-    console.log("relation:", data);
     return data;
   } catch (error) {
     console.error("Failed to fetch relation:", error);

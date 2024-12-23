@@ -5,17 +5,19 @@ export interface TextingEvent {
   texting: boolean;
 }
 export async function disableTexting(
-  token: string,
   boxId: string,
   avatar: string
 ): Promise<TextingEvent> {
   try {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken)
+      return { boxId: "", userId: "", avatar: "", texting: false };
     const response = await fetch(
       `${process.env.BASE_URL}message/disable-texting`,
       {
         method: "POST",
         headers: {
-          Authorization: token,
+          Authorization: storedToken,
           "Content-Type": "application/json"
         },
         body: JSON.stringify({ boxId, avatar })

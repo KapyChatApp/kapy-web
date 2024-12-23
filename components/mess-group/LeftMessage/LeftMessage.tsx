@@ -8,7 +8,6 @@ import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreateGroup from "./CreateGroup";
 import { useChatContext } from "@/context/ChatContext";
-import { getPusherClient } from "@/lib/pusher";
 import { useUserContext } from "@/context/UserContext";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
@@ -64,7 +63,15 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           ? await fetchMessageBoxGroup(setError)
           : await fetchMessageBox(adminId, setError);
 
+        const messagesMap: Record<string, ResponseMessageDTO[]> = {};
+
+        for (const box of data) {
+          const boxMessages = await fetchMessages(box.id);
+          messagesMap[box.id] = boxMessages;
+        }
+
         setDataChat(data);
+        setMessagesByBox(messagesMap);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
@@ -72,25 +79,10 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     };
 
     fetchData();
-  }, [isGroup, setDataChat]);
+  }, [isGroup]);
 
   const { searchTerm, setSearchTerm, filteredBox } =
     useSearchMessageBox(dataChat);
-
-  //Fetch messages
-  useEffect(() => {
-    const fetchMessagesForBoxes = async () => {
-      const messagesMap: Record<string, ResponseMessageDTO[]> = {};
-
-      for (const box of dataChat) {
-        const boxMessages = await fetchMessages(box.id);
-        messagesMap[box.id] = boxMessages;
-      }
-      setMessagesByBox(messagesMap);
-    };
-
-    fetchMessagesForBoxes();
-  }, [dataChat]);
 
   if (!dataChat.length) {
     return <LeftMessageRaw />;

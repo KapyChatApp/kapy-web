@@ -139,8 +139,6 @@ const RightBottom = ({
   useEffect(() => {
     const createTextingEvent = async () => {
       if (!boxId) return;
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) return;
       const box = dataChat.filter((item) => item.id === boxId);
       if (isTyping) {
         if (dataChat && adminInfo._id && box.length > 0) {
@@ -153,7 +151,7 @@ const RightBottom = ({
         }
         try {
           // Gọi API để thông báo người dùng đang nhập
-          const result = await isTexting(storedToken, boxId, avatar);
+          const result = await isTexting(boxId, avatar);
           console.log(result);
         } catch (error) {
           console.error("Error texting event:", error);
@@ -168,7 +166,7 @@ const RightBottom = ({
           }
         }
         try {
-          const result = await disableTexting(storedToken, boxId, avatar);
+          const result = await disableTexting(boxId, avatar);
           console.log(result);
         } catch (error) {
           console.error("Error texting event:", error);
@@ -177,7 +175,7 @@ const RightBottom = ({
     };
 
     createTextingEvent();
-  }, [isTyping, avatar, dataChat]);
+  }, [isTyping]);
 
   //Send Message
   const router = useRouter();
@@ -219,7 +217,6 @@ const RightBottom = ({
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
-    pusherClient.subscribe(`private-${adminInfo._id}`);
 
     // Bind sự kiện với handler
     pusherClient.bind("new-message", handleNewMessage);
@@ -227,7 +224,6 @@ const RightBottom = ({
     //Cleanup khi component bị unmount hoặc boxId thay đổi
     return () => {
       pusherClient.unsubscribe(`private-${boxId}`);
-      pusherClient.unsubscribe(`private-${adminInfo._id}`);
 
       pusherClient.unbind("new-message", handleNewMessage);
     };

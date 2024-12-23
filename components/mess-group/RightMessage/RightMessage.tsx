@@ -19,6 +19,7 @@ import { useFriendContext } from "@/context/FriendContext";
 import { checkRelation } from "@/lib/services/user/checkRelation";
 import ReportCard from "@/components/shared/ReportCard";
 import { getFileList } from "@/lib/data/message/dataFileList";
+import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -34,7 +35,13 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   const { id } = useParams();
   const [message, setMessage] = useState<ResponseMessageDTO[]>();
   const [relation, setRelation] = useState("");
-  const { adminInfo } = useUserContext();
+  const {
+    adminInfo,
+    isOnlineChat,
+    timeOfflineChat,
+    setTimeOfflineChat,
+    setIsOnlineChat
+  } = useUserContext();
   const { setListBlockedFriend } = useFriendContext();
   const { setFileList, fileList } = useChatContext();
   const adminId = adminInfo._id;
@@ -74,22 +81,73 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
     fetchImageList();
   }, []);
 
-  //RightTop
+  //Online Status
+  useEffect(() => {
+    if (!chatItem) {
+      return;
+    }
+
+    const fetchRealTimeData = async () => {
+      for (const user of chatItem.memberInfo) {
+        try {
+          const data = await getRealTimeOfUser(user._id);
+          if (data) {
+            if (!data.isOnline) {
+              setTimeOfflineChat((prev) => ({
+                ...prev,
+                [user._id]: data.updateTime // Lưu thời gian cập nhật
+              }));
+            }
+            setIsOnlineChat((prevState) => ({
+              ...prevState,
+              [user._id]: data.isOnline
+            }));
+          } else {
+            setIsOnlineChat((prevState) => ({
+              ...prevState,
+              [user._id]: false
+            }));
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch real-time data for user ${user._id}:`,
+            error
+          );
+        }
+      }
+    };
+
+    fetchRealTimeData();
+  }, []);
+
+  console.log(timeOfflineChat);
+  console.log(isOnlineChat);
+
+  //Right Top
   let top: any;
   if (id && chatItem) {
+    const isOnlineGroup = chatItem.memberInfo.some(
+      (member) => isOnlineChat[member._id]
+    );
+    const isOnline = isOnlineChat[chatItem.receiverInfo._id];
     top = isGroup
       ? {
+          _id: chatItem.id,
           ava: chatItem.groupAva
             ? chatItem.groupAva
             : "/assets/images/icon.png",
           name: chatItem.groupName ? chatItem.groupName : "Group Chat",
           membersGroup: chatItem.memberInfo.length,
-          onlineGroup: 0,
+          onlineGroup: chatItem.memberInfo.filter(
+            (member) => isOnlineChat[member._id]
+          ).length,
           openMore: openMore,
           setOpenMore: setOpenMore,
-          fileList: fileList
+          fileList: fileList,
+          isOnline: isOnlineGroup
         }
       : {
+          _id: chatItem.receiverInfo._id,
           ava:
             chatItem.receiverInfo && chatItem.receiverInfo.avatar
               ? chatItem.receiverInfo.avatar
@@ -108,7 +166,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           onlineGroup: 0,
           openMore: openMore,
           setOpenMore: setOpenMore,
-          fileList: fileList
+          fileList: fileList,
+          isOnline: isOnline
         };
   } else {
     top = isGroup
@@ -118,7 +177,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          isOnline: false
         }
       : {
           ava: "/assets/ava/default.png",
@@ -126,7 +186,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          isOnline: false
         };
   }
   //filterSegment

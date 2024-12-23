@@ -109,14 +109,14 @@ const SegmentMess: React.FC<SegmentMessage> = ({
       pusherClient.unsubscribe(`private-${adminInfo._id}`);
       pusherClient.unbind("react-message", reactMessage);
     };
-  }, []);
+  });
 
   useEffect(() => {
     if (segments.isReact.length > 0) {
       setIsReacted(true);
       setIsCount(segments.isReact.length);
     }
-  }, []);
+  });
 
   return (
     <>

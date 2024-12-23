@@ -84,10 +84,11 @@ const RightMiddle = ({
   });
   const messageContainerRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    // Cuộn đến đáy khi component được render
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
+      messageContainerRef.current.scrollTo({
+        top: messageContainerRef.current.scrollHeight,
+        behavior: "smooth" // Thêm hiệu ứng mượt mà
+      });
     }
   }, [messagesToDisplay]);
 
@@ -99,11 +100,10 @@ const RightMiddle = ({
         setIsTexting((prevState) => {
           const updatedState = { ...prevState };
 
-          // Cập nhật hoặc xóa trạng thái texting
           if (data.texting) {
-            updatedState[data.userId] = data; // Ghi đè trạng thái mới
+            updatedState[data.userId] = data;
           } else {
-            delete updatedState[data.userId]; // Xóa trạng thái nếu texting là false
+            delete updatedState[data.userId];
           }
 
           return updatedState;
@@ -116,16 +116,7 @@ const RightMiddle = ({
       const channel = pusherClient.subscribe(`private-${boxId}`);
       channel.bind("texting-status", handleTexting);
     }
-
-    // Cleanup subscriptions
-    return () => {
-      const channel = pusherClient.channel(`private-${boxId}`);
-      if (channel) {
-        channel.unbind("texting-status", handleTexting);
-        pusherClient.unsubscribe(`private-${boxId}`);
-      }
-    };
-  }, [adminId, boxId]);
+  });
 
   useEffect(() => {
     // Cuộn đến đáy khi component được render
@@ -137,176 +128,190 @@ const RightMiddle = ({
 
   return (
     <div
-      className={`"flex flex-col flex-grow overflow-scroll scrollable ${
-        relation === "blocked" || relation === "blockedBy"
-          ? "h-[530px]"
-          : "h-[591px]"
-      } `}
+      className="flex w-full h-fit overflow-scroll custom-scrollbar "
       ref={messageContainerRef}
     >
-      <div className="flex-grow">
-        <div className="flex flex-col justify-end items-center w-full h-full gap-[10px] py-4 ">
-          {messagesToDisplay.map((group, index) => {
-            //Get info receiver
-            const targetId = group[0].createBy;
-            const foundItem = receiverInfo.find(
-              (item) => item._id === targetId
-            );
+      <div
+        className={`flex flex-col flex-grow pr-2 ${
+          relation === "blocked" || relation === "blockedBy"
+            ? "h-[530px]"
+            : "h-[591px]"
+        } `}
+      >
+        <div className="flex-grow">
+          <div className="flex flex-col justify-end items-center w-full h-full gap-[10px] py-4 ">
+            {messagesToDisplay.map((group, index) => {
+              //Get info receiver
+              const targetId = group[0].createBy;
+              const foundItem = receiverInfo.find(
+                (item) => item._id === targetId
+              );
 
-            const prevGroup = messagesToDisplay[index - 1];
-            let timeDifference = 0;
+              const prevGroup = messagesToDisplay[index - 1];
+              let timeDifference = 0;
 
-            if (prevGroup) {
-              timeDifference =
-                group[0].createAt && prevGroup?.[prevGroup.length - 1]?.createAt
-                  ? Math.abs(
-                      new Date(group[0].createAt).getTime() -
-                        new Date(
-                          prevGroup[prevGroup.length - 1].createAt
-                        ).getTime()
-                    ) /
-                    (1000 * 60)
-                  : 0;
-            }
-            return (
-              <div
-                className={`flex flex-col w-full  ${
-                  (timeDifference >= 30 || !timeDifference) && "gap-[10px]"
-                }`}
-              >
-                {(timeDifference >= 30 || !timeDifference) && (
-                  <div className="md:body-regular small-regular text-dark100_light900 opacity-60 text-center">
-                    {formatTime(new Date(group[0].createAt))}
-                  </div>
-                )}
-                <div className="flex flex-col w-full">
-                  <div
-                    key={index}
-                    className={`flex w-full ${
-                      group[0].createBy === adminId
-                        ? "justify-end"
-                        : "justify-start"
-                    } gap-3`}
-                  >
-                    {group[0].createBy !== adminId && (
-                      <div className="flex items-end h-full w-7 flex-shrink-0 relative">
-                        <Image
-                          src={
-                            foundItem?.avatar
-                              ? foundItem?.avatar
-                              : "/assets/ava/default.png"
-                          }
-                          alt=""
-                          width={28}
-                          height={28}
-                          className="w-7 h-7 cursor-pointer rounded-full object-cover"
-                        />
-                      </div>
-                    )}
-
+              if (prevGroup) {
+                timeDifference =
+                  group[0].createAt &&
+                  prevGroup?.[prevGroup.length - 1]?.createAt
+                    ? Math.abs(
+                        new Date(group[0].createAt).getTime() -
+                          new Date(
+                            prevGroup[prevGroup.length - 1].createAt
+                          ).getTime()
+                      ) /
+                      (1000 * 60)
+                    : 0;
+              }
+              return (
+                <div
+                  className={`flex flex-col w-full  ${
+                    (timeDifference >= 30 || !timeDifference) && "gap-[10px]"
+                  }`}
+                >
+                  {(timeDifference >= 30 || !timeDifference) && (
+                    <div className="md:body-regular small-regular text-dark100_light900 opacity-60 text-center">
+                      {formatTime(new Date(group[0].createAt))}
+                    </div>
+                  )}
+                  <div className="flex flex-col w-full">
                     <div
-                      className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
+                      key={index}
+                      className={`flex w-full ${
                         group[0].createBy === adminId
-                          ? "items-end"
-                          : "items-start"
-                      }`}
+                          ? "justify-end"
+                          : "justify-start"
+                      } gap-3`}
                     >
-                      {group.map((item, itemIndex) => (
-                        <div
-                          key={itemIndex}
-                          className={`relative group h-full flex flex-row  items-center justify-start`} // Thêm lớp để nhóm hover
-                        >
-                          {item.createBy === adminId && item.flag === true && (
-                            <MenubarSegment
-                              createAt={new Date(
-                                item.createAt
-                              ).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true // Định dạng AM/PM
-                              })}
-                              admin={adminId}
-                              messageId={item.id}
-                              boxId={item.boxId}
-                              setMessage={setMessage}
-                              message={message}
-                            />
-                          )}
-                          <SegmentMess
-                            segments={item}
-                            index={itemIndex}
-                            length={group.length}
-                            recieverInfo={receiverInfo}
+                      {group[0].createBy !== adminId && (
+                        <div className="flex items-end h-full w-7 flex-shrink-0 relative">
+                          <Image
+                            src={
+                              foundItem?.avatar
+                                ? foundItem?.avatar
+                                : "/assets/ava/default.png"
+                            }
+                            alt=""
+                            width={28}
+                            height={28}
+                            className="w-7 h-7 cursor-pointer rounded-full object-cover"
                           />
-                          {item.createBy !== adminId && item.flag === true && (
-                            <MenubarSegment
-                              createAt={new Date(
-                                item.createAt
-                              ).toLocaleTimeString([], {
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                hour12: true // Định dạng AM/PM
-                              })}
-                              messageId={item.id}
-                              boxId={item.boxId}
-                              setMessage={setMessage}
-                              message={message}
-                            />
-                          )}
                         </div>
-                      ))}
+                      )}
+
+                      <div
+                        className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] ${
+                          group[0].createBy === adminId
+                            ? "items-end"
+                            : "items-start"
+                        }`}
+                      >
+                        {group.map((item, itemIndex) => (
+                          <div
+                            key={itemIndex}
+                            className={`relative group h-full flex flex-row  items-center justify-start`} // Thêm lớp để nhóm hover
+                          >
+                            {item.createBy === adminId &&
+                              item.flag === true && (
+                                <MenubarSegment
+                                  createAt={new Date(
+                                    item.createAt
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true // Định dạng AM/PM
+                                  })}
+                                  admin={adminId}
+                                  messageId={item.id}
+                                  boxId={item.boxId}
+                                  setMessage={setMessage}
+                                  message={message}
+                                />
+                              )}
+                            <SegmentMess
+                              segments={item}
+                              index={itemIndex}
+                              length={group.length}
+                              recieverInfo={receiverInfo}
+                            />
+                            {item.createBy !== adminId &&
+                              item.flag === true && (
+                                <MenubarSegment
+                                  createAt={new Date(
+                                    item.createAt
+                                  ).toLocaleTimeString([], {
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                    hour12: true // Định dạng AM/PM
+                                  })}
+                                  messageId={item.id}
+                                  boxId={item.boxId}
+                                  setMessage={setMessage}
+                                  message={message}
+                                />
+                              )}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
 
-        {Object.entries(isTexting).filter(([key, value]) => value.texting) // Lọc các entry có value.texting là true
-          .length > 0 && (
-          <div
-            className={`flex w-full justify-start items-center gap-3 pb-4 pt-1 h-auto`}
-          >
+          {Object.entries(isTexting).filter(([key, value]) => value.texting) // Lọc các entry có value.texting là true
+            .length > 0 && (
             <div
-              className="flex items-center w-7 h-7 justify-center flex-shrink-0 relative"
-              style={{
-                width: `calc(28px * ${Math.min(
-                  3,
-                  Object.entries(isTexting).filter(
-                    ([key, value]) => value.texting
-                  ).length
-                )} + 16px * ${Math.max(
-                  0,
-                  Math.min(
-                    2,
+              className={`flex w-full justify-start items-center gap-3 pb-4 pt-1 h-auto`}
+            >
+              <div
+                className="flex items-center w-7 h-7 justify-center flex-shrink-0 relative"
+                style={{
+                  width: `calc(28px * ${Math.min(
+                    3,
                     Object.entries(isTexting).filter(
                       ([key, value]) => value.texting
-                    ).length - 1
-                  )
-                )})`
-              }}
-            >
-              {Object.entries(isTexting)
-                .filter(([key, value]) => value.texting)
-                .slice(0, 3)
-                .map(([key, value], index) => (
-                  <div
-                    key={index}
-                    className={`absolute rounded-full bg-light-800 dark:bg-dark-500 ${
-                      index === 0 ? "left-0" : index === 1 ? "left-4" : "left-8"
-                    }`}
-                  >
-                    <Image
-                      src={value.avatar}
-                      alt="Avatar"
-                      width={28}
-                      height={28}
-                      className="w-7 h-7 cursor-pointer rounded-full object-cover"
-                    />
-                  </div>
-                ))}
-              {/* <div className={`absolute ${"left-0"}`}>
+                    ).length
+                  )} + 16px * ${Math.max(
+                    0,
+                    Math.min(
+                      2,
+                      Object.entries(isTexting).filter(
+                        ([key, value]) => value.texting
+                      ).length - 1
+                    )
+                  )})`
+                }}
+              >
+                {Object.entries(isTexting)
+                  .filter(([key, value]) => value.texting)
+                  .slice(0, 3)
+                  .map(([key, value], index) => (
+                    <div
+                      key={index}
+                      className={`absolute rounded-full bg-light-800 dark:bg-dark-500 ${
+                        index === 0
+                          ? "left-0"
+                          : index === 1
+                          ? "left-4"
+                          : "left-8"
+                      }`}
+                    >
+                      <Image
+                        src={
+                          value.avatar
+                            ? value.avatar
+                            : "/assets/ava/default.png"
+                        }
+                        alt="Avatar"
+                        width={28}
+                        height={28}
+                        className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                      />
+                    </div>
+                  ))}
+                {/* <div className={`absolute ${"left-0"}`}>
                 <Image
                   src="/assets/ava/ava1.jpg"
                   alt="Avatar"
@@ -315,21 +320,22 @@ const RightMiddle = ({
                   className="w-7 h-7 cursor-pointer rounded-full object-cover"
                 />
               </div> */}
-            </div>
+              </div>
 
-            <div
-              className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] items-start`}
-            >
-              <div className="relative group h-full flex flex-row gap-2 items-center justify-start">
-                <div className="flex w-fit h-9 items-center justify-center bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-2 rounded-[18px] gap-2 ">
-                  <span className="dot"></span>
-                  <span className="dot"></span>
-                  <span className="dot"></span>
+              <div
+                className={`flex flex-col h-full flex-grow gap-[2px] max-w-[46%] items-start`}
+              >
+                <div className="relative group h-full flex flex-row gap-2 items-center justify-start">
+                  <div className="flex w-fit h-9 items-center justify-center bg-light-800 dark:bg-dark-500 dark:bg-opacity-50 px-3 py-2 rounded-[18px] gap-2 ">
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                    <span className="dot"></span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

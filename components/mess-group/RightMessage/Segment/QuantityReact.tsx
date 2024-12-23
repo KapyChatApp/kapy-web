@@ -44,9 +44,7 @@ const QuantityReact = ({
           {isReactInfo.map((item) => (
             <div className="flex flex-row gap-3 items-center justify-start">
               <Image
-                src={
-                  item.avatar !== "" ? item.avatar : "/assets/ava/default.png"
-                }
+                src={item.avatar ? item.avatar : "/assets/ava/default.png"}
                 alt=""
                 width={36}
                 height={36}

@@ -21,7 +21,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const isActive = pathname.includes(id) || pathname === `/${id}`;
   const isGroup = /^\/group-chat/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
-  const { adminInfo, isOnlineChat } = useUserContext();
+  const { adminInfo, isOnlineChat, timeOfflineChat } = useUserContext();
   const adminId = adminInfo._id;
   const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member._id]);
   const [formattedCreateAt, setFormattedCreateAt] = useState("");
@@ -37,6 +37,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     }
     if (message.length > 0 && message[message.length - 1] && dataChat) {
       const detailByBox = dataChat.find((box) => box.id === id);
+
       const detail =
         isGroup && detailByBox && detailByBox.receiverInfo
           ? contentBox(
@@ -61,7 +62,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   // Cập nhật createAt mỗi phút
   useEffect(() => {
     // Cập nhật ngay khi render lần đầu
-    if (createAt !== "") {
+    if (createAt) {
       const updateCreateAt = () => {
         const now = new Date();
         const sendDate = new Date(createAt);

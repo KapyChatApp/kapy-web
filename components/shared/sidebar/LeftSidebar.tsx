@@ -26,6 +26,9 @@ import { PersonalAccount } from "@/components/settings/Profile/PersonalAccount";
 import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
 import { useUserContext } from "@/context/UserContext";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import { getPusherClient } from "@/lib/pusher";
+import { OnlineEvent } from "@/lib/DTO/user";
+import { useChatContext } from "@/context/ChatContext";
 
 const Leftsidebar = () => {
   const [isParagraphVisible, setIsParagraphVisible] = useState(true);
@@ -107,6 +110,7 @@ const Leftsidebar = () => {
     };
     getInfo();
   }, []);
+
   return (
     <>
       <section

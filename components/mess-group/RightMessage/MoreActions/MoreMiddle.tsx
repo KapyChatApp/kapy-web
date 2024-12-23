@@ -10,6 +10,7 @@ import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
 import { FileContent, UserInfoBox } from "@/lib/DTO/message";
+import { useUserContext } from "@/context/UserContext";
 
 const MoreMiddle = ({
   setActiveComponent,
@@ -24,6 +25,7 @@ const MoreMiddle = ({
   const [videos, setVideos] = useState<FileContent[]>([]);
   const [others, setOthers] = useState<FileContent[]>([]);
   const [members, setMembers] = useState<UserInfoBox[]>([]);
+  const { isOnlineChat } = useUserContext();
   //boxId
   useEffect(() => {
     // Lấy đường dẫn hiện tại từ URL
@@ -127,7 +129,7 @@ const MoreMiddle = ({
                           height={36}
                           className="rounded-full"
                         />
-                        {item.isOnline && (
+                        {isOnlineChat[item._id] && (
                           <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
                         )}
                       </div>
