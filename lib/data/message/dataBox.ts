@@ -73,11 +73,13 @@ export const fetchMessageBox = async (
           groupName: "",
           groupAva: "",
           pin: false,
+          readedId: item.readedId,
           readStatus: item.readStatus,
           stranger: item.stranger
         };
       })
       .filter((item): item is MessageBoxInfo => item !== null);
+
     return updatedDataChat;
   } catch (err: any) {
     setError(err.message);

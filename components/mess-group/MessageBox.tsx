@@ -2,6 +2,7 @@
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
@@ -55,7 +56,21 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { content, senderName, createAt } = contentWithSendername();
 
   const router = useRouter();
+  const handleReadMark = async () => {
+    try {
+      const success = await markMessageAsRead(box.id);
+      if (success) {
+        console.log("Message marked as read successfully.");
+      } else {
+        console.warn("Failed to mark message as read.");
+      }
+    } catch (error) {
+      console.error("Error in handleReadMark:", error);
+    }
+  };
+
   const handleClickLink = () => {
+    handleReadMark();
     isGroup ? router.push(`/group-chat/${id}`) : router.push(`/${id}`);
   };
 
@@ -126,7 +141,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 </p>
               </div>
               <div className="flex items-center justify-start w-full min-w-0">
-                {readStatusByBox[id] ? (
+                {readStatusByBox[box.id] ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
                     {senderName}
                   </p>
@@ -136,7 +151,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {readStatusByBox[id] ? (
+                  {readStatusByBox[box.id] ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
                     <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>

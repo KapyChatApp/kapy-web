@@ -23,35 +23,19 @@ export interface LeftMessageProps {
 const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
   const pathname = usePathname();
   const isGroup = pathname.startsWith("/group-chat");
-  const { dataChat, setDataChat, setMessagesByBox, messagesByBox } =
-    useChatContext();
-  const { adminInfo } = useUserContext();
+  const {
+    dataChat,
+    setDataChat,
+    setMessagesByBox,
+    setReadStatusByBox,
+    setReadedIdByBox
+  } = useChatContext();
   const [error, setError] = useState("");
   //OPEN MODAL CreateGroup
   const [isCreated, setCreated] = useState(false);
   const handleCreated = () => {
     setCreated(!isCreated);
   };
-
-  //CREATE BOX GROUP
-  // const [boxCreated, setBoxCreated] = useState(boxGroup);
-  // const handleAddGroup = () => {
-  //   const newGroup = {
-  //     id: (parseInt(boxCreated[dataChat.length - 1].id) + 1).toString(),
-  //     otherId: (boxCreated.length + 1).toString(),
-  //     otherName: `New Group ${boxCreated.length + 1}`,
-  //     ava: "/assets/images/icon.png",
-  //     sender: "",
-  //     content: "This is a new group message.",
-  //     pin: false,
-  //     time: "just now",
-  //     isOnline: false,
-  //     isSeen: false
-  //   };
-
-  //   setBoxCreated([...boxCreated, newGroup]);
-  //   console.log(boxCreated);
-  // };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -68,6 +52,17 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         for (const box of data) {
           const boxMessages = await fetchMessages(box.id);
           messagesMap[box.id] = boxMessages;
+        }
+
+        for (const box of data) {
+          setReadStatusByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readStatus
+          }));
+          setReadedIdByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readedId
+          }));
         }
 
         setDataChat(data);

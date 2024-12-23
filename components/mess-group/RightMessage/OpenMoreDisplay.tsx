@@ -54,8 +54,9 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
     groupName: "",
     groupAva: "",
     pin: false,
-    readStatus: true,
-    stranger: false
+    stranger: false,
+    readStatus: false,
+    readedId: []
   };
   if (detailByBox) {
     detail = detailByBox;

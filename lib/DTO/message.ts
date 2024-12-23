@@ -14,8 +14,9 @@ export interface MessageBoxInfo {
   groupName: string;
   groupAva: string;
   pin: boolean;
-  readStatus: boolean;
   stranger: boolean;
+  readStatus: boolean;
+  readedId: string[];
 }
 export interface RequestCreateGroup {
   membersIds: string[];
@@ -31,8 +32,9 @@ export interface MessageBoxDTO {
   groupAva: string;
   flag: boolean;
   pin: boolean;
-  readStatus: boolean;
   stranger: boolean;
+  readStatus: boolean;
+  readedId: string[];
 }
 
 export interface FileContent {
@@ -95,4 +97,10 @@ export interface ResponseReactMessageDTO {
   id: string;
   boxId: string;
   isReact: string[];
+}
+
+export interface ReadedStatusPusher {
+  success: boolean;
+  readedId: string[];
+  boxId: string;
 }

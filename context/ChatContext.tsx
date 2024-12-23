@@ -12,10 +12,12 @@ interface ChatContextType {
   setReadStatusByBox: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
   >;
+  readedIdByBox: Record<string, string[]>;
+  setReadedIdByBox: React.Dispatch<
+    React.SetStateAction<Record<string, string[]>>
+  >;
   dataChat: MessageBoxInfo[];
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>;
-  dataGroupChat: MessageBoxInfo[];
-  setDataGroupChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>;
   fileList: FileContent[];
   setFileList: React.Dispatch<React.SetStateAction<FileContent[]>>;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
@@ -40,7 +42,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
-  const [dataGroupChat, setDataGroupChat] = useState<MessageBoxInfo[]>([]);
   const [fileList, setFileList] = useState<FileContent[]>([]);
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
@@ -48,6 +49,9 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   const [readStatusByBox, setReadStatusByBox] = useState<
     Record<string, boolean>
   >({});
+  const [readedIdByBox, setReadedIdByBox] = useState<Record<string, string[]>>(
+    {}
+  );
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isReactedByMessage, setIsReactedByMessage] = useState<
     Record<string, boolean>
@@ -60,14 +64,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         dataChat,
         setDataChat,
-        dataGroupChat,
-        setDataGroupChat,
         fileList,
         setFileList,
         messagesByBox,
         setMessagesByBox,
         readStatusByBox,
         setReadStatusByBox,
+        readedIdByBox,
+        setReadedIdByBox,
         isTyping,
         setIsTyping,
         isReactedByMessage,

@@ -49,6 +49,7 @@ export const fetchMessageBoxGroup = async (
           groupName: item.groupName,
           groupAva: item.groupAva,
           pin: false,
+          readedId: item.readedId,
           readStatus: item.readStatus,
           stranger: false
         };

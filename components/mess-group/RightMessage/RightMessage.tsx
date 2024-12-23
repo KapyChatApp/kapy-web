@@ -10,6 +10,7 @@ import { useUserContext } from "@/context/UserContext";
 import {
   FileContent,
   MessageBoxInfo,
+  ReadedStatusPusher,
   ResponseMessageDTO
 } from "@/lib/DTO/message";
 import { fetchMessages } from "@/lib/data/message/dataMessages";
@@ -20,6 +21,7 @@ import { checkRelation } from "@/lib/services/user/checkRelation";
 import ReportCard from "@/components/shared/ReportCard";
 import { getFileList } from "@/lib/data/message/dataFileList";
 import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
+import { getPusherClient } from "@/lib/pusher";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -35,15 +37,11 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   const { id } = useParams();
   const [message, setMessage] = useState<ResponseMessageDTO[]>();
   const [relation, setRelation] = useState("");
-  const {
-    adminInfo,
-    isOnlineChat,
-    timeOfflineChat,
-    setTimeOfflineChat,
-    setIsOnlineChat
-  } = useUserContext();
+  const { adminInfo, isOnlineChat, setTimeOfflineChat, setIsOnlineChat } =
+    useUserContext();
   const { setListBlockedFriend } = useFriendContext();
-  const { setFileList, fileList } = useChatContext();
+  const { setFileList, fileList, setReadedIdByBox, dataChat } =
+    useChatContext();
   const adminId = adminInfo._id;
 
   const onclose = () => {
@@ -120,8 +118,23 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
     fetchRealTimeData();
   }, []);
 
-  console.log(timeOfflineChat);
-  console.log(isOnlineChat);
+  //Read status
+  useEffect(() => {
+    const pusherClient = getPusherClient();
+
+    const handleReadedId = (data: ReadedStatusPusher) => {
+      console.log("Successfully received readed-status:", data);
+      setReadedIdByBox((prevState) => ({
+        ...prevState,
+        [data.boxId]: data.readedId
+      }));
+    };
+
+    dataChat.forEach((box) => {
+      pusherClient.subscribe(`private-${box.id}`);
+      pusherClient.bind("readed-status", handleReadedId);
+    });
+  });
 
   //Right Top
   let top: any;

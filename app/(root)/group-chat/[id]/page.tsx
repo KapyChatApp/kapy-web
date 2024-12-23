@@ -13,6 +13,7 @@ const GroupMessContent = () => {
   const [error, setError] = useState("");
 
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
+  const { setReadStatusByBox, setReadedIdByBox } = useChatContext();
   const { id } = useParams();
   const router = useRouter();
 
@@ -25,7 +26,16 @@ const GroupMessContent = () => {
         const data: MessageBoxInfo[] = await fetchMessageBoxGroup(setError);
         console.log("API data:", data);
         setDataChat(data);
-
+        for (const box of data) {
+          setReadStatusByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readStatus
+          }));
+          setReadedIdByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readedId
+          }));
+        }
         // Sử dụng trực tiếp `data` thay vì `dataChat`
         if (!id && data.length > 0) {
           router.push(`/group-chat/${data[0].id}`); // Điều hướng sang chat đầu tiên

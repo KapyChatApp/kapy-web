@@ -10,6 +10,7 @@ import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
 import { getPusherClient } from "@/lib/pusher";
 import { OnlineEvent } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
+import { useChatContext } from "@/context/ChatContext";
 
 const MessageContent = () => {
   const [error, setError] = useState("");
@@ -18,6 +19,7 @@ const MessageContent = () => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
   const { id } = useParams();
   const router = useRouter();
+  const { setReadStatusByBox, setReadedIdByBox } = useChatContext();
 
   //Fetch and router to Id
   useEffect(() => {
@@ -29,6 +31,16 @@ const MessageContent = () => {
         console.log("API data:", data);
         setDataChat(data);
 
+        for (const box of data) {
+          setReadStatusByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readStatus
+          }));
+          setReadedIdByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readedId
+          }));
+        }
         if (!id && data.length > 0) {
           router.push(`/${data[0].id}`);
         } else if (data.length === 0) {

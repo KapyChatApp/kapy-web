@@ -39,7 +39,8 @@ const RightMiddle = ({
   const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
-  const { isTyping } = useChatContext();
+  const { readedIdByBox, dataChat } = useChatContext();
+  const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
     ...filteredSegmentAdmin,
     ...filteredSegmentOther
@@ -119,12 +120,18 @@ const RightMiddle = ({
   });
 
   useEffect(() => {
-    // Cuộn đến đáy khi component được render
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTop =
-        messageContainerRef.current.scrollHeight;
+    if (boxId && readedIdByBox?.[boxId]) {
+      const detailByBox = dataChat.find((box) => box.id === boxId);
+      if (detailByBox) {
+        const avatars = detailByBox.memberInfo
+          // .filter((item) => item._id !== adminId)
+          .filter((user) => readedIdByBox[boxId].includes(user._id))
+          .map((user) => user.avatar);
+
+        setAvaArray(avatars);
+      }
     }
-  }, [messagesToDisplay]);
+  }, []);
 
   return (
     <div
@@ -333,6 +340,21 @@ const RightMiddle = ({
                   </div>
                 </div>
               </div>
+            </div>
+          )}
+
+          {avaArray.length > 0 && (
+            <div className="flex flex-row gap-1 w-full h-fit justify-end items-center">
+              {avaArray.slice(0, 5).map((item, index) => (
+                <Image
+                  key={index}
+                  src={item ? item : "/assets/ava/default.png"}
+                  alt="Avatar"
+                  width={12}
+                  height={12}
+                  className="w-7 h-7 rounded-full object-cover"
+                />
+              ))}
             </div>
           )}
         </div>

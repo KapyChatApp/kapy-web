@@ -20,8 +20,9 @@ function transformToMessageBoxInfo(dto: MessageBoxDTO): MessageBoxInfo {
     groupName: dto.groupName,
     groupAva: dto.groupAva,
     pin: dto.pin,
-    readStatus: dto.readStatus,
-    stranger: dto.stranger
+    stranger: dto.stranger,
+    readStatus: false,
+    readedId: []
   };
 }
 
