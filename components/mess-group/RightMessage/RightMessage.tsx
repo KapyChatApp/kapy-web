@@ -7,19 +7,12 @@ import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import {
-  FileContent,
-  MessageBoxInfo,
-  ReadedStatusPusher,
-  ResponseMessageDTO
-} from "@/lib/DTO/message";
-import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { MessageBoxInfo, ReadedStatusPusher } from "@/lib/DTO/message";
 import { FriendRequestDTO } from "@/lib/DTO/friend";
 import { unBlockFr } from "@/lib/services/friend/unblock";
 import { useFriendContext } from "@/context/FriendContext";
 import { checkRelation } from "@/lib/services/user/checkRelation";
 import ReportCard from "@/components/shared/ReportCard";
-import { getFileList } from "@/lib/data/message/dataFileList";
 import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 import { getPusherClient } from "@/lib/pusher";
 
@@ -35,51 +28,69 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
 
   //FetchMessage Backend
   const { id } = useParams();
-  const [message, setMessage] = useState<ResponseMessageDTO[]>();
   const [relation, setRelation] = useState("");
   const { adminInfo, isOnlineChat, setTimeOfflineChat, setIsOnlineChat } =
     useUserContext();
   const { setListBlockedFriend } = useFriendContext();
-  const { setFileList, fileList, setReadedIdByBox, dataChat } =
-    useChatContext();
+  const { setReadedIdByBox, dataChat, messagesByBox } = useChatContext();
   const adminId = adminInfo._id;
 
   const onclose = () => {
     setReport(false);
   };
 
+  //boxId
+  const [boxId, setBoxId] = useState<string>("");
   useEffect(() => {
-    const getMessage = async () => {
-      try {
-        if (id) {
-          // Kiểm tra nếu boxId tồn tại
-          const boxMessages = await fetchMessages(id.toString());
-          setMessage(boxMessages);
-        } else {
-          console.warn("boxId is undefined");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    const fetchImageList = async () => {
-      try {
-        if (id) {
-          // Kiểm tra nếu boxId tồn tại
-          const list: FileContent[] = await getFileList(id.toString());
-          setFileList(list);
-        } else {
-          console.warn("boxId is undefined");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getMessage();
-    fetchImageList();
-  }, []);
+    // Lấy đường dẫn hiện tại từ URL
+    const path = window.location.pathname;
+    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
+    const parts = path.split("/");
+    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
+
+    if (id) {
+      setBoxId(id); // Set boxId là chuỗi
+    }
+  }, [boxId]);
+
+  // useEffect(() => {
+  //   const getMessage = async () => {
+  //     try {
+  //       if (id) {
+  //         // Kiểm tra nếu boxId tồn tại
+  //         const messagesMap: Record<string, ResponseMessageDTO[]> = {};
+
+  //         for (const box of dataChat) {
+  //           const boxMessages = await fetchMessages(box.id);
+  //           messagesMap[box.id] = boxMessages;
+  //         }
+  //         setMessagesByBox(messagesMap);
+  //       } else {
+  //         console.warn("boxId is undefined");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   const fetchImageList = async () => {
+  //     try {
+  //       if (id) {
+  //         // Kiểm tra nếu boxId tồn tại
+  //         const list: FileContent[] = await getFileList(id.toString());
+  //         setFileList(list);
+  //       } else {
+  //         console.warn("boxId is undefined");
+  //       }
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+  //   getMessage();
+  //   fetchImageList();
+  // }, []);
 
   //Online Status
+
   useEffect(() => {
     if (!chatItem) {
       return;
@@ -156,7 +167,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           ).length,
           openMore: openMore,
           setOpenMore: setOpenMore,
-          fileList: fileList,
           isOnline: isOnlineGroup
         }
       : {
@@ -179,7 +189,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           onlineGroup: 0,
           openMore: openMore,
           setOpenMore: setOpenMore,
-          fileList: fileList,
           isOnline: isOnline
         };
   } else {
@@ -204,11 +213,11 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
         };
   }
   //filterSegment
-  const filteredSegmentAdmin = message
-    ? message.filter((item) => item.createBy === adminId)
+  const filteredSegmentAdmin = messagesByBox[boxId]
+    ? messagesByBox[boxId].filter((item) => item.createBy === adminId)
     : [];
-  const filteredSegmentOther = message
-    ? message.filter((item) => item.createBy !== adminId)
+  const filteredSegmentOther = messagesByBox[boxId]
+    ? messagesByBox[boxId].filter((item) => item.createBy !== adminId)
     : [];
 
   //OpenMoreDisplay
@@ -217,8 +226,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
     openMore,
     setOpenMore,
     relation,
-    setRelation,
-    fileList
+    setRelation
   };
   const handleUnBlockChat = async () => {
     try {
@@ -330,8 +338,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
                     filteredSegmentOther={filteredSegmentOther}
                     receiverInfo={chatItem ? chatItem.memberInfo : []}
                     relation={relation}
-                    setMessage={setMessage}
-                    message={message}
                   />
                   <div className="flex flex-col items-center justify-center w-full h-20 border-t border-border-color text-dark100_light900">
                     <p className="text-sm">Your are blocked.</p>
@@ -345,8 +351,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
                     filteredSegmentOther={filteredSegmentOther}
                     receiverInfo={chatItem ? chatItem.memberInfo : []}
                     relation={relation}
-                    setMessage={setMessage}
-                    message={message}
                   />
                   <div className="flex flex-col items-center justify-center w-full border-t border-border-color text-dark100_light900">
                     <p className="text-sm p-4">You blocked this person.</p>
@@ -372,8 +376,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
                     filteredSegmentAdmin={filteredSegmentAdmin}
                     filteredSegmentOther={filteredSegmentOther}
                     receiverInfo={chatItem ? chatItem.memberInfo : []}
-                    setMessage={setMessage}
-                    message={message}
                   />
 
                   <RightBottom
@@ -381,8 +383,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
                       (item: any) => item.id
                     )}
                     relation={relation}
-                    setMessage={setMessage}
-                    message={message}
                   />
                 </>
               )
@@ -394,15 +394,11 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
                   filteredSegmentAdmin={filteredSegmentAdmin}
                   filteredSegmentOther={filteredSegmentOther}
                   receiverInfo={chatItem ? chatItem.memberInfo : []}
-                  setMessage={setMessage}
-                  message={message}
                 />
 
                 <RightBottom
                   recipientIds={chatItem.memberInfo.map((item: any) => item.id)}
                   relation={relation}
-                  setMessage={setMessage}
-                  message={message}
                 />
               </>
             )}

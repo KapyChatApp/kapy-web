@@ -12,11 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { getPusherClient } from "@/lib/pusher";
 import { useChatContext } from "@/context/ChatContext";
 import ConfirmRemove from "./ConfirmRemove";
-import {
-  PusherDelete,
-  PusherRevoke,
-  ResponseMessageDTO
-} from "@/lib/DTO/message";
+import { PusherDelete, PusherRevoke } from "@/lib/DTO/message";
 import { RevokeMessage } from "@/lib/services/message/revoke";
 import { DeleteMessage } from "@/lib/services/message/delete";
 import { useUserContext } from "@/context/UserContext";
@@ -26,20 +22,9 @@ interface MenuProps {
   admin?: string;
   messageId: string;
   boxId: string;
-  setMessage: React.Dispatch<
-    React.SetStateAction<ResponseMessageDTO[] | undefined>
-  >;
-  message: ResponseMessageDTO[] | undefined;
 }
 
-const MenubarSegment = ({
-  createAt,
-  admin,
-  messageId,
-  boxId,
-  setMessage,
-  message
-}: MenuProps) => {
+const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
   const [isClickMore, setClickMore] = useState(false);
   const [isConfirm, setConfirm] = useState(false);
   const [action, setAction] = useState("");
@@ -131,21 +116,13 @@ const MenubarSegment = ({
         if (fileDelete && fileDelete.contentId) {
           console.log("Updated fileList: ", fileDelete);
           setFileList((prev) => {
-            // Nếu `prev` là undefined, khởi tạo mảng rỗng
-            const currentFiles = (prev || []).filter(
-              (file) => file.url === fileDelete.contentId.url
-            );
-
-            const updatedFiles = currentFiles.filter(
-              (file) => file.url !== fileDelete.contentId.url
-            );
-
-            return [
-              ...(prev || []).filter(
-                (file) => file.url !== fileDelete.contentId.url
-              ),
-              ...updatedFiles
-            ];
+            const fileContent = prev[data.boxId] || [];
+            return {
+              ...prev,
+              [data.boxId]: fileContent.filter(
+                (msg) => msg.url !== fileDelete.contentId.url
+              )
+            };
           });
         }
         setMessagesByBox((prev) => {
@@ -163,25 +140,6 @@ const MenubarSegment = ({
           // Nếu không có tin nhắn nào cần xóa, trả về trạng thái cũ
           return prev;
         });
-        setMessage((prev) => {
-          // Nếu `prev` là undefined, khởi tạo mảng rỗng
-          const currentMessages = (prev || []).filter(
-            (msg) => msg.boxId === data.boxId
-          );
-
-          // Kiểm tra và xóa tin nhắn nếu đã tồn tại
-          const updatedMessages = currentMessages.some(
-            (msg) => msg.id === data.id
-          )
-            ? currentMessages.filter((msg) => msg.id !== data.id) // Xóa tin nhắn
-            : currentMessages;
-
-          // Trả về danh sách tin nhắn đã cập nhật
-          return [
-            ...(prev || []).filter((msg) => msg.boxId !== data.boxId), // Giữ các boxId khác
-            ...updatedMessages // Cập nhật boxId hiện tại
-          ];
-        });
       }
     };
     const handleRevokeMessage = (data: PusherRevoke) => {
@@ -190,21 +148,13 @@ const MenubarSegment = ({
       );
       if (fileRevoke && fileRevoke.contentId) {
         setFileList((prev) => {
-          // Nếu `prev` là undefined, khởi tạo mảng rỗng
-          const currentFiles = (prev || []).filter(
-            (file) => file.url === fileRevoke.contentId.url
-          );
-
-          const updatedFiles = currentFiles.filter(
-            (file) => file.url !== fileRevoke.contentId.url
-          );
-
-          return [
-            ...(prev || []).filter(
-              (file) => file.url !== fileRevoke.contentId.url
-            ),
-            ...updatedFiles
-          ];
+          const fileContent = prev[data.boxId] || [];
+          return {
+            ...prev,
+            [data.boxId]: fileContent.filter(
+              (msg) => msg.url !== fileRevoke.contentId.url
+            )
+          };
         });
       }
       setMessagesByBox((prev) => {
@@ -226,29 +176,6 @@ const MenubarSegment = ({
           ...prev,
           [data.boxId]: updatedMessages // Cập nhật lại danh sách tin nhắn
         };
-      });
-      setMessage((prev) => {
-        // Nếu `prev` là undefined, khởi tạo mảng rỗng
-        const currentMessages = (prev || []).filter(
-          (msg) => msg.boxId === data.boxId
-        );
-
-        // Cập nhật tin nhắn nếu trùng ID
-        const updatedMessages = currentMessages.map((msg) =>
-          msg.id === data.id
-            ? {
-                ...msg,
-                text: data.text,
-                flag: data.flag
-              }
-            : msg
-        );
-
-        // Trả về danh sách tin nhắn đã cập nhật
-        return [
-          ...(prev || []).filter((msg) => msg.boxId !== data.boxId), // Giữ các boxId khác
-          ...updatedMessages // Cập nhật boxId hiện tại
-        ];
       });
     };
     const pusherClient = getPusherClient();

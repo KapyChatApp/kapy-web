@@ -20,19 +20,13 @@ interface RightMiddleProps {
   filteredSegmentOther: ResponseMessageDTO[];
   receiverInfo: UserInfoBox[];
   relation?: string;
-  setMessage: React.Dispatch<
-    React.SetStateAction<ResponseMessageDTO[] | undefined>
-  >;
-  message: ResponseMessageDTO[] | undefined;
 }
 
 const RightMiddle = ({
   filteredSegmentAdmin,
   filteredSegmentOther,
   receiverInfo,
-  relation,
-  message,
-  setMessage
+  relation
 }: RightMiddleProps) => {
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
@@ -231,8 +225,6 @@ const RightMiddle = ({
                                   admin={adminId}
                                   messageId={item.id}
                                   boxId={item.boxId}
-                                  setMessage={setMessage}
-                                  message={message}
                                 />
                               )}
                             <SegmentMess
@@ -253,8 +245,6 @@ const RightMiddle = ({
                                   })}
                                   messageId={item.id}
                                   boxId={item.boxId}
-                                  setMessage={setMessage}
-                                  message={message}
                                 />
                               )}
                           </div>

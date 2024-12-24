@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import GlobalSearch from "../../shared/search/globalSearch";
 import MessageBox from "../MessageBox";
 import useSearchMessageBox from "@/hooks/use-search-message-box";
@@ -12,8 +12,9 @@ import { useUserContext } from "@/context/UserContext";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
 import LeftMessageRaw from "../UI-Raw/LeftMessageRaw";
-import { ResponseMessageDTO } from "@/lib/DTO/message";
+import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { getFileList } from "@/lib/data/message/dataFileList";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,7 +29,8 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     setDataChat,
     setMessagesByBox,
     setReadStatusByBox,
-    setReadedIdByBox
+    setReadedIdByBox,
+    setFileList
   } = useChatContext();
   const [error, setError] = useState("");
   //OPEN MODAL CreateGroup
@@ -54,6 +56,13 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           messagesMap[box.id] = boxMessages;
         }
 
+        const filesMap: Record<string, FileContent[]> = {};
+
+        for (const box of data) {
+          const boxFiles = await getFileList(box.id);
+          filesMap[box.id] = boxFiles;
+        }
+
         for (const box of data) {
           setReadStatusByBox((prevState) => ({
             ...prevState,
@@ -67,6 +76,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
 
         setDataChat(data);
         setMessagesByBox(messagesMap);
+        setFileList(filesMap);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);

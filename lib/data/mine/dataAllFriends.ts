@@ -33,7 +33,7 @@ export const getMyListFriend = async (
         firstName: item.firstName,
         lastName: item.lastName,
         nickName: item.nickName,
-        mutualFriends: item.mutualFriends
+        mutualFriends: item.mutualFriends ? item.mutualFriends : []
       };
     });
     setListFriend(data);

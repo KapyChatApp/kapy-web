@@ -16,21 +16,13 @@ interface OpenMoreDisplayProps {
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
   setRelation: React.Dispatch<React.SetStateAction<string>>;
   relation: string;
-  fileList: FileContent[] | undefined;
 }
 interface MoreDisplay {
   display: OpenMoreDisplayProps;
 }
 
 const OpenMoreDisplay = ({ display }: MoreDisplay) => {
-  const {
-    openMore,
-    setOpenMore,
-    detailByBox,
-    setRelation,
-    relation,
-    fileList
-  } = display;
+  const { openMore, setOpenMore, detailByBox, setRelation, relation } = display;
   let detail: MessageBoxInfo = {
     id: "",
     receiverInfo: {

@@ -34,7 +34,7 @@ export const getMyListBestFriend = async (
         firstName: item.firstName,
         lastName: item.lastName,
         nickName: item.nickName,
-        mutualFriends: item.mutualFriends
+        mutualFriends: item.mutualFriends ? item.mutualFriends : []
       };
     });
     console.log(data);

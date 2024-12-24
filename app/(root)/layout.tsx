@@ -12,8 +12,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
-  const [isTabVisible, setIsTabVisible] = useState(true);
-
   const checkOnlineStatus = async (token: string) => {
     try {
       const result = await isOnline(token);

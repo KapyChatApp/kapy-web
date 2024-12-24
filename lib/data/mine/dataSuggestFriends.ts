@@ -36,7 +36,7 @@ export const getMyListSuggestedFriend = async (
         firstName: item.firstName,
         lastName: item.lastName,
         nickName: item.nickName,
-        mutualFriends: item.mutualFriends
+        mutualFriends: item.mutualFriends ? item.mutualFriends : []
       };
     });
     setListSuggestedFriend(data);

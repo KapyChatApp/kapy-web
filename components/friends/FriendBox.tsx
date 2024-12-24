@@ -68,9 +68,9 @@ const FriendBox: React.FC<FriendBoxProps> = ({ friend, setIndex }) => {
             <p className="text-dark100_light900 base-medium">
               {info.firstName + " " + info.lastName}
             </p>
-            {info.mutualFriends > 0 && (
+            {info.mutualFriends.length > 0 && (
               <p className="text-dark100_light900 body-regular">
-                Mutual friends: {info.mutualFriends}
+                Mutual friends: {info.mutualFriends.length}
               </p>
             )}
           </div>
