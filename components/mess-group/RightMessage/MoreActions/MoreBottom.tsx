@@ -33,12 +33,26 @@ const MoreBottom: React.FC<{
       const isDeleted = await deleteMessageBox(boxId);
 
       if (isDeleted) {
-        console.log("Message box deleted successfully");
+        toast({
+          title: `Delete box chat successfully`,
+          className:
+            "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+        });
       } else {
         console.warn("Failed to delete message box");
+        toast({
+          title: `Failed to delete message box`,
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
       }
     } catch (error) {
-      console.warn("An error occurred while deleting the message box:", error);
+      toast({
+        title: `An error occurred while deleting the message box`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
     }
   };
 
@@ -67,6 +81,7 @@ const MoreBottom: React.FC<{
   };
 
   const handleLeaveGroup = async () => {};
+
   const handleFirstButton = () => {
     setFirst(!stButton);
     setConfirm({

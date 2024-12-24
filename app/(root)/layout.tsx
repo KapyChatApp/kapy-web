@@ -5,7 +5,6 @@ import { useUserContext } from "@/context/UserContext";
 import { OnlineEvent } from "@/lib/DTO/user";
 import { getPusherClient } from "@/lib/pusher";
 import { checkTokenFrontend } from "@/lib/services/auth/check-token";
-import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
 import { useRouter } from "next/navigation";

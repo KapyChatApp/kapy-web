@@ -43,23 +43,35 @@ const MoreActions = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-fit items-center justify-center p-1">
-      <MoreTop
-        top={isGroup ? topGroup : top}
-        setActiveComponent={setActiveComponent}
-      />
+    <div
+      className={` flex flex-col w-full ${
+        isGroup
+          ? "h-fit items-center justify-center"
+          : "h-full items-center justify-around"
+      } p-1 `}
+    >
+      <div className="flex w-full h-fit">
+        <MoreTop
+          top={isGroup ? topGroup : top}
+          setActiveComponent={setActiveComponent}
+        />
+      </div>
 
-      <MoreMiddle
-        detailByBox={detailByBox}
-        setActiveComponent={setActiveComponent}
-        setItemSent={setItemSent}
-        itemSent={itemSent}
-      />
-      <MoreBottom
-        setActiveComponent={setActiveComponent}
-        receiver={detailByBox.receiverInfo}
-        boxId={detailByBox.id}
-      />
+      <div className="flex w-full h-fit">
+        <MoreMiddle
+          detailByBox={detailByBox}
+          setActiveComponent={setActiveComponent}
+          setItemSent={setItemSent}
+          itemSent={itemSent}
+        />
+      </div>
+      <div className="flex w-full h-fit">
+        <MoreBottom
+          setActiveComponent={setActiveComponent}
+          receiver={detailByBox.receiverInfo}
+          boxId={detailByBox.id}
+        />
+      </div>
     </div>
   );
 };

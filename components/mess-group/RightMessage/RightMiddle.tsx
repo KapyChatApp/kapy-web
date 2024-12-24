@@ -362,9 +362,9 @@ const RightMiddle = ({
                   key={index}
                   src={item ? item : "/assets/ava/default.png"}
                   alt="Avatar"
-                  width={12}
-                  height={12}
-                  className="w-7 h-7 rounded-full object-cover"
+                  width={10}
+                  height={10}
+                  className="w-5 h-5 rounded-full object-cover"
                 />
               ))}
             </div>

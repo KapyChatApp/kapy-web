@@ -94,52 +94,59 @@ const MoreMiddle = ({
 
   return (
     <>
-      <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[18px] mt-[24px] mb-[24px] responsive-moreAction">
+      <div
+        className={`flex flex-col flex-1 items-center justify-center w-full h-fit gap-[18px] ${
+          isGroup ? "mt-[24px]" : ""
+        } mb-[24px] responsive-moreAction `}
+      >
         {/* Members */}
-        {isGroup && (
-          <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
-            <div className="flex flex-row items-center justify-start w-full">
-              <div className="flex flex-row w-fit items-end">
-                <p className="text-dark100_light900 paragraph-bold">Members</p>
-                <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                  {detailByBox.memberInfo.length}
-                </p>
-              </div>
-              <div className="flex flex-grow items-center justify-end">
-                <Button
-                  className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
-                  onClick={handleSeeAllMember}
-                >
-                  See all
-                </Button>
-              </div>
+        <div
+          className={`${
+            isGroup ? "flex" : "hidden"
+          } flex-col items-center justify-start w-full h-fit gap-[14px]`}
+        >
+          <div className="flex flex-row items-center justify-start w-full">
+            <div className="flex flex-row w-fit items-end">
+              <p className="text-dark100_light900 paragraph-bold">Members</p>
+              <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
+                {detailByBox.memberInfo.length}
+              </p>
             </div>
-            <div className="flex flex-col items-center w-full gap-[8px]">
-              {detailByBox.memberInfo.length > 0
-                ? // Sắp xếp members để leader đứng đầu
-                  detailByBox.memberInfo.slice(0, 3).map((item) => (
-                    <div
-                      className="flex flex-row items-center justify-start w-full gap-[12px]"
-                      key={item._id}
-                    >
-                      <div className="relative flex-shrink-0 w-fit">
-                        <Image
-                          src={item.avatar}
-                          alt="ava"
-                          width={36}
-                          height={36}
-                          className="rounded-full"
-                        />
-                        {isOnlineChat[item._id] && (
-                          <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-                        )}
-                      </div>
+            <div className="flex flex-grow items-center justify-end">
+              <Button
+                className="flex items-center justify-end text-dark100_light900 text-opacity-50 dark:text-opacity-80 small-custom underline bg-transparent shadow-none border-none p-0 w-fit"
+                onClick={handleSeeAllMember}
+              >
+                See all
+              </Button>
+            </div>
+          </div>
+          <div className="flex flex-col items-center w-full gap-[8px]">
+            {detailByBox.memberInfo.length > 0
+              ? // Sắp xếp members để leader đứng đầu
+                detailByBox.memberInfo.slice(0, 3).map((item) => (
+                  <div
+                    className="flex flex-row items-center justify-start w-full gap-[12px]"
+                    key={item._id}
+                  >
+                    <div className="relative flex-shrink-0 w-fit">
+                      <Image
+                        src={item.avatar}
+                        alt="ava"
+                        width={36}
+                        height={36}
+                        className="rounded-full"
+                      />
+                      {isOnlineChat[item._id] && (
+                        <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
+                      )}
+                    </div>
 
-                      <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
-                        <p className="paragraph-15-regular h-fit text-dark100_light900">
-                          {item.firstName + " " + item.lastName}
-                        </p>
-                        {/* <div className="flex items-center justify-start w-full min-w-0">
+                    <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
+                      <p className="paragraph-15-regular h-fit text-dark100_light900">
+                        {item.firstName + " " + item.lastName}
+                      </p>
+                      {/* <div className="flex items-center justify-start w-full min-w-0">
                             {item.addedBy === "" ? (
                               <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
                                 Leader
@@ -155,13 +162,12 @@ const MoreMiddle = ({
                               </div>
                             )}
                           </div> */}
-                      </div>
                     </div>
-                  ))
-                : null}
-            </div>
+                  </div>
+                ))
+              : null}
           </div>
-        )}
+        </div>
 
         {/* Photo */}
         <div className="flex flex-col items-center justify-start w-full h-fit gap-[14px]">
