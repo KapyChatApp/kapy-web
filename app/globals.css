@@ -97,9 +97,9 @@ body {
   border-radius: 2px;
 }
 
-.custom-scrollbar::-webkit-scrollbar-track {
+/* .custom-scrollbar::-webkit-scrollbar-track {
   background: #ffffff;
-}
+} */
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
   background: #bdbaba;

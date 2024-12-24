@@ -90,22 +90,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   // }, []);
 
   //Read status
-  useEffect(() => {
-    const pusherClient = getPusherClient();
-
-    const handleReadedId = (data: ReadedStatusPusher) => {
-      console.log("Successfully received readed-status:", data);
-      setReadedIdByBox((prevState) => ({
-        ...prevState,
-        [data.boxId]: data.readedId
-      }));
-    };
-
-    dataChat.forEach((box) => {
-      pusherClient.subscribe(`private-${box.id}`);
-      pusherClient.bind("readed-status", handleReadedId);
-    });
-  });
 
   //Right Top
   let top: any;
@@ -268,7 +252,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
 
   if (!chatItem) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-white">
+      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
         <div className="loader"></div>
       </div>
     );

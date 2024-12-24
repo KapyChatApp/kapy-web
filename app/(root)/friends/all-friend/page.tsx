@@ -66,7 +66,7 @@ const page = () => {
 
   if (!listBestFriend || !listFriend || !listRequestedFriend) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-white">
+      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
         <div className="loader"></div>
       </div>
     );

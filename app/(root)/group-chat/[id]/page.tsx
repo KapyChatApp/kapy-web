@@ -24,7 +24,6 @@ const GroupMessContent = () => {
       if (!adminId) return;
       try {
         const data: MessageBoxInfo[] = await fetchMessageBoxGroup(setError);
-        console.log("API data:", data);
         setDataChat(data);
         for (const box of data) {
           setReadStatusByBox((prevState) => ({
@@ -53,7 +52,7 @@ const GroupMessContent = () => {
 
   if (!dataChat) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-white">
+      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
         <div className="loader"></div>
       </div>
     );
