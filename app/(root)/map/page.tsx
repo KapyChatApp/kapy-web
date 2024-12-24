@@ -1,7 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
+import dynamic from "next/dynamic";
 
-const page = () => {
-  return <div>map</div>;
+// Chỉ import mã của Leaflet khi đang chạy trên client
+const MapComponent = dynamic(
+  () => import("../../../components/map/LeafLetMap"),
+  { ssr: false }
+);
+
+const Page = () => {
+  return (
+    <div>
+      <h1>My Leaflet Map</h1>
+      <MapComponent />
+    </div>
+  );
 };
 
-export default page;
+export default Page;
