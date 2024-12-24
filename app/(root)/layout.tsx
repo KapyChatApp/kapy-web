@@ -12,6 +12,9 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
+  const { dataChat } = useChatContext();
+
+  //Set realTime
   const checkOnlineStatus = async (token: string) => {
     try {
       const result = await isOnline(token);
@@ -47,9 +50,9 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
     };
   }, []);
 
+  //Online Pusher
   const { setIsOnlineChat, setTimeOfflineChat, isOnlineChat } =
     useUserContext();
-  const { dataChat } = useChatContext();
 
   useEffect(() => {
     const adminId = localStorage.getItem("adminId");

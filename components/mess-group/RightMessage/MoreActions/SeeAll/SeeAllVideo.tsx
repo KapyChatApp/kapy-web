@@ -31,7 +31,7 @@ const SeeAllVideo: React.FC<SeeAllProps> = ({
     return () => {
       Fancybox.destroy(); // Hủy Fancybox khi component unmount
     };
-  }, []);
+  });
   return (
     <div className="flex flex-col items-center justify-start w-full h-fit gap-6">
       <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-[12px] justify-center items-center h-[80px]">

@@ -89,46 +89,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //   fetchImageList();
   // }, []);
 
-  //Online Status
-
-  useEffect(() => {
-    if (!chatItem) {
-      return;
-    }
-
-    const fetchRealTimeData = async () => {
-      for (const user of chatItem.memberInfo) {
-        try {
-          const data = await getRealTimeOfUser(user._id);
-          if (data) {
-            if (!data.isOnline) {
-              setTimeOfflineChat((prev) => ({
-                ...prev,
-                [user._id]: data.updateTime // Lưu thời gian cập nhật
-              }));
-            }
-            setIsOnlineChat((prevState) => ({
-              ...prevState,
-              [user._id]: data.isOnline
-            }));
-          } else {
-            setIsOnlineChat((prevState) => ({
-              ...prevState,
-              [user._id]: false
-            }));
-          }
-        } catch (error) {
-          console.error(
-            `Failed to fetch real-time data for user ${user._id}:`,
-            error
-          );
-        }
-      }
-    };
-
-    fetchRealTimeData();
-  }, []);
-
   //Read status
   useEffect(() => {
     const pusherClient = getPusherClient();

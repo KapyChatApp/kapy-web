@@ -2,8 +2,8 @@
 import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import Image from "next/image";
 import React, { useEffect } from "react";
-import { Fancybox } from "@fancyapps/ui";
 import { useUserContext } from "@/context/UserContext";
+import { Fancybox } from "@fancyapps/ui";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 interface SegmentMessage {
@@ -30,14 +30,13 @@ const ImageSegment: React.FC<SegmentMessage> = ({
       Thumbs: true
     });
     return () => {
-      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+      Fancybox.destroy();
     };
   }, []);
 
   //Render Content
   const lastContent = contentId;
   const imageContent = lastContent as FileContent;
-
   //Rounded content
   const getContainerClasses = () => {
     if (length > 1) {

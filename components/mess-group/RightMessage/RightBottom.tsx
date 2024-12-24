@@ -24,7 +24,7 @@ interface BottomProps {
 }
 
 const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { dataChat, isTyping, setIsTyping, setMessagesByBox } =
+  const { dataChat, isTyping, setIsTyping, setMessagesByBox, setFileList } =
     useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
@@ -181,6 +181,21 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
+      if (data.contentId) {
+        setFileList((prev) => {
+          const fileContent = prev[data.boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
+            const updated = {
+              ...prev,
+              [data.boxId]: [...fileContent, data.contentId]
+            };
+            console.log("Updated fileList: ", updated);
+            return updated;
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
+      }
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
