@@ -8,7 +8,7 @@ export const defaultFriendResponseDTO: FriendResponseDTO = {
   lastName: "",
   nickName: "",
   avatar: "",
-  mutualFriends: 0
+  mutualFriends: []
 };
 
 export const defaultFriendRequestedDTO: RequestedResponseDTO = {
@@ -19,7 +19,7 @@ export const defaultFriendRequestedDTO: RequestedResponseDTO = {
   relation: "",
   status: false,
   createAt: "",
-  mutualFriends: 0
+  mutualFriends: []
 };
 
 // Tạo kiểu cho context

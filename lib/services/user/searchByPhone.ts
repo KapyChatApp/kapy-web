@@ -9,7 +9,7 @@ export const defaultFindUser: FindUserDTO = {
   avatar: "",
   relation: "",
   status: false,
-  mutualFriends: 0
+  mutualFriends: []
 };
 
 export const findUserByPhone = async (phoneNumber: string) => {
@@ -36,6 +36,8 @@ export const findUserByPhone = async (phoneNumber: string) => {
     }
 
     const data = await response.json();
+
+    console.log(data);
     return data;
   } catch (error) {
     console.error("Failed to fetch user by phone number:", error);

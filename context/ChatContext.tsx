@@ -18,8 +18,10 @@ interface ChatContextType {
   >;
   dataChat: MessageBoxInfo[];
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>;
-  fileList: FileContent[];
-  setFileList: React.Dispatch<React.SetStateAction<FileContent[]>>;
+  fileList: Record<string, FileContent[]>;
+  setFileList: React.Dispatch<
+    React.SetStateAction<Record<string, FileContent[]>>
+  >;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
@@ -42,7 +44,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
-  const [fileList, setFileList] = useState<FileContent[]>([]);
+  const [fileList, setFileList] = useState<Record<string, FileContent[]>>({});
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
   >({});

@@ -20,6 +20,7 @@ const MoreBottom: React.FC<{
   const [stButton, setFirst] = useState(false);
   const [ndButton, setSecond] = useState(false);
   const { setListFriend } = useFriendContext();
+  const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
     handleAction: () => {},
@@ -80,13 +81,13 @@ const MoreBottom: React.FC<{
     setSecond(!ndButton);
     isGroup
       ? setConfirm({
-          setConfirm: setFirst,
+          setConfirm: setSecond,
           handleAction: handleLeaveGroup,
           name: "group",
           action: "leave"
         })
       : setConfirm({
-          setConfirm: setFirst,
+          setConfirm: setSecond,
           handleAction: handleUnfriend,
           name: receiver.firstName + " " + receiver.lastName,
           action: "unfriend"

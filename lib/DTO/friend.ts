@@ -1,10 +1,18 @@
+export interface ShortUserResponseDTO {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  nickName: string;
+  avatar: string;
+}
+
 export interface FriendResponseDTO {
   _id: string;
   avatar: string;
   firstName: string;
   lastName: string;
   nickName: string;
-  mutualFriends: number;
+  mutualFriends: ShortUserResponseDTO[];
 }
 
 export interface FriendProfileResponseDTO {
@@ -26,7 +34,7 @@ export interface FriendProfileResponseDTO {
   birthDay: Date;
   attendDate: Date;
   relation: string;
-  mutualFriends: number;
+  mutualFriends: ShortUserResponseDTO[];
 }
 
 export interface RequestedResponseDTO {
@@ -35,9 +43,8 @@ export interface RequestedResponseDTO {
   lastName: string;
   avatar: string;
   relation: string;
-  status: boolean;
   createAt: string;
-  mutualFriends: number;
+  mutualFriends: ShortUserResponseDTO[];
 }
 
 export interface FindUserDTO {
@@ -48,7 +55,7 @@ export interface FindUserDTO {
   avatar: string;
   relation: string;
   status: boolean;
-  mutualFriends: number;
+  mutualFriends: ShortUserResponseDTO[];
 }
 
 export interface FriendRequestDTO {

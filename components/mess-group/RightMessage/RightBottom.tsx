@@ -13,8 +13,7 @@ import MessageRecorder from "../MessageRecorder";
 import { useUserContext } from "@/context/UserContext";
 import { isTexting } from "@/lib/services/message/isTexting";
 import { disableTexting } from "@/lib/services/message/disableTexting";
-import { ResponseUserInfo } from "@/lib/DTO/user";
-import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
+import { ResponseMessageDTO } from "@/lib/DTO/message";
 import { handleSendRecorder } from "@/lib/services/message/send/sendRecord";
 import { handleSendTextMessage } from "@/lib/services/message/send/sendText";
 import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipleFiles";
@@ -22,19 +21,10 @@ import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipl
 interface BottomProps {
   recipientIds: string[] | undefined;
   relation: string;
-  setMessage: React.Dispatch<
-    React.SetStateAction<ResponseMessageDTO[] | undefined>
-  >;
-  message: ResponseMessageDTO[] | undefined;
 }
 
-const RightBottom = ({
-  recipientIds,
-  relation,
-  setMessage,
-  message
-}: BottomProps) => {
-  const { dataChat, isTyping, setIsTyping, setFileList, setMessagesByBox } =
+const RightBottom = ({ recipientIds }: BottomProps) => {
+  const { dataChat, isTyping, setIsTyping, setMessagesByBox } =
     useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
@@ -178,19 +168,8 @@ const RightBottom = ({
   }, [isTyping]);
 
   //Send Message
-  const router = useRouter();
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
-      setMessage((prev) => {
-        const currentMessages = prev || [];
-        // Chỉ cập nhật nếu tin nhắn thực sự mới
-        if (!currentMessages.some((msg) => msg.id === data.id)) {
-          const updated = [...currentMessages, data]; // Thêm tin nhắn mới
-          console.log("Updated messages: ", updated);
-          return updated;
-        }
-        return prev; // Không thay đổi nếu tin nhắn đã tồn tại
-      });
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];
         // Chỉ cập nhật nếu tin nhắn thực sự mới
@@ -202,18 +181,6 @@ const RightBottom = ({
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
-      if (data.contentId) {
-        setFileList((prev) => {
-          const fileContent = prev || [];
-          // Chỉ cập nhật nếu tin nhắn thực sự mới
-          if (!fileContent.some((file) => file.url === data.contentId.url)) {
-            const updated = [...fileContent, data.contentId]; // Thêm phần tử mới
-            console.log("Updated fileList: ", updated);
-            return updated;
-          }
-          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
-        });
-      }
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);
@@ -232,7 +199,7 @@ const RightBottom = ({
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
 
-    setMessage((prev: any) =>
+    setMessagesByBox((prev: any) =>
       prev.map((msg: any) => {
         const mapEntry = temporaryToCloudinaryMap.find(
           (entry) => msg.contentId[0].url === entry.tempUrl

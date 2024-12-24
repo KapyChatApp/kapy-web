@@ -38,7 +38,14 @@ interface FirstItemProps {
   user: FriendProfileResponseDTO;
 }
 
-// relation: friend / bff / sent_friend/ received_friend/  sent_bff / received_bff
+// stranger
+//block
+// friend
+// bff
+// sent_bff
+// received_bff
+// sent_friend
+// received_friend
 
 const FirstItem = ({ user }: FirstItemProps) => {
   const defaultConfirm: ConfirmModalProps = {
@@ -316,9 +323,9 @@ const FirstItem = ({ user }: FirstItemProps) => {
                 <p className="text-dark100_light900 paragraph-regular">
                   {user.firstName + " " + user.lastName}
                 </p>
-                {user.mutualFriends > 0 && (
+                {user.mutualFriends.length > 0 && (
                   <p className="text-dark100_light900 subtle-light">
-                    {user.mutualFriends} mutual friends
+                    {user.mutualFriends.length} mutual friends
                   </p>
                 )}
               </div>

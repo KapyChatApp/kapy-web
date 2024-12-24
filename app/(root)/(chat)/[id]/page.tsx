@@ -5,11 +5,7 @@ import { useParams, usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { fetchMessageBox } from "@/lib/data/message/dataBox";
 import { MessageBoxInfo } from "@/lib/DTO/message";
-import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
 import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
-import { getPusherClient } from "@/lib/pusher";
-import { OnlineEvent } from "@/lib/DTO/user";
-import { useUserContext } from "@/context/UserContext";
 import { useChatContext } from "@/context/ChatContext";
 
 const MessageContent = () => {

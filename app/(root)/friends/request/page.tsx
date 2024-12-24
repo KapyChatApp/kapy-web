@@ -24,7 +24,7 @@ const page = () => {
     };
 
     fetchData();
-  }, []);
+  }, [setListRequestedFriend]);
 
   if (loading) {
     return <div>Loading...</div>;

@@ -27,23 +27,23 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
 }) => {
   const { adminInfo } = useUserContext();
   const { setListFriend } = useFriendContext();
-  const list = request;
+  const list = request as RequestedResponseDTO;
   const friendRequest: FriendRequestDTO = {
     sender: adminInfo._id,
     receiver: list._id
   };
 
-  const [status, setStatus] = useState("");
-  const label = status === "" ? "Add friend" : "Cancel Request";
+  const [status, setStatus] = useState(list.relation);
+  const label = status === "sent_friend" ? "Cancel Request" : "Add friend";
   const handleButton = () => {
     switch (label) {
       case "Add friend":
         handleAddfr(friendRequest);
-        setStatus("cancel");
+        setStatus("sent_friend");
         break;
       case "Cancel Request":
         handleUnfr(friendRequest, setListFriend);
-        setStatus("");
+        setStatus("stranger");
         break;
     }
   };
@@ -76,9 +76,9 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
           <p className="text-dark100_light900 base-medium">
             {list.firstName + " " + list.lastName}
           </p>
-          {list.mutualFriends > 0 && (
+          {list.mutualFriends.length > 0 && (
             <p className="text-dark100_light900 body-regular">
-              Mutual friends: {list.mutualFriends}
+              Mutual friends: {list.mutualFriends.length}
             </p>
           )}
         </div>
@@ -92,7 +92,11 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
             }}
           >
             <Icon
-              icon={status === "" ? "mingcute:add-fill" : "iconoir:cancel"}
+              icon={
+                status === "sent_friend"
+                  ? "iconoir:cancel"
+                  : "mingcute:add-fill"
+              }
               width={14}
               height={14}
               className="text-light-900"

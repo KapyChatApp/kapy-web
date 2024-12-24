@@ -28,7 +28,19 @@ export const getMyListRequestedFriend = async (
 
     const result = await response.json();
 
-    const data: RequestedResponseDTO[] = result;
+    const data: RequestedResponseDTO[] = result.map(
+      (item: RequestedResponseDTO) => {
+        return {
+          _id: item._id,
+          avatar: item.avatar,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          relation: item.relation,
+          createAt: item.createAt,
+          mutualFriends: item.mutualFriends ? item.mutualFriends : []
+        };
+      }
+    );
     setListRequestedFriend(data);
     return data;
   } catch (err: any) {

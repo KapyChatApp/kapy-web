@@ -19,7 +19,7 @@ export const defaultFriendProfileResponseDTO: FriendProfileResponseDTO = {
   birthDay: new Date(0), // Default to epoch or earliest possible date
   attendDate: new Date(0),
   relation: "",
-  mutualFriends: 0
+  mutualFriends: []
 };
 
 export const fetchFriendProfile = async (
