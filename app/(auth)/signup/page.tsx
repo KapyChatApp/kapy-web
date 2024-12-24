@@ -14,7 +14,7 @@ import { loginUser } from "@/lib/services/auth/login";
 
 const Signup = () => {
   const { adminInfo, setAdminInfo } = useUserContext();
-
+  const [isOtp, setIsOtp] = useState(false);
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -42,7 +42,6 @@ const Signup = () => {
       setValue: setConfirmedPassword
     }
   ];
-
   const handleSignUp = async () => {
     try {
       const result = SignInSchema.safeParse({

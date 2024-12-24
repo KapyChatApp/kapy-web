@@ -55,7 +55,11 @@ const MoreActions = ({
         setItemSent={setItemSent}
         itemSent={itemSent}
       />
-      <MoreBottom setActiveComponent={setActiveComponent} />
+      <MoreBottom
+        setActiveComponent={setActiveComponent}
+        receiver={detailByBox.receiverInfo}
+        boxId={detailByBox.id}
+      />
     </div>
   );
 };
