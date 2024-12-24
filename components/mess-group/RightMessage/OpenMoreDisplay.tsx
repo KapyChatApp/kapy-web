@@ -14,8 +14,9 @@ interface OpenMoreDisplayProps {
   detailByBox: MessageBoxInfo | undefined;
   openMore: boolean;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
-  isClickOtherRight?: boolean;
-  setClickOtherRight?: React.Dispatch<React.SetStateAction<boolean>>;
+  setRelation: React.Dispatch<React.SetStateAction<string>>;
+  relation: string;
+  fileList: FileContent[] | undefined;
 }
 interface MoreDisplay {
   display: OpenMoreDisplayProps;
@@ -25,9 +26,10 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
   const {
     openMore,
     setOpenMore,
-    isClickOtherRight,
-    setClickOtherRight,
-    detailByBox
+    detailByBox,
+    setRelation,
+    relation,
+    fileList
   } = display;
   let detail: MessageBoxInfo = {
     id: "",
@@ -52,8 +54,9 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
     groupName: "",
     groupAva: "",
     pin: false,
-    readStatus: true,
-    stranger: false
+    stranger: false,
+    readStatus: false,
+    readedId: []
   };
   if (detailByBox) {
     detail = detailByBox;
@@ -79,7 +82,12 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
         return (
           <>
             <AddComponent setActiveComponent={setActiveComponent} />
-            <MoreActions propsAll={propsAll} setOpenMore={setOpenMore} />
+            <MoreActions
+              propsAll={propsAll}
+              setOpenMore={setOpenMore}
+              relation={relation}
+              setRelation={setRelation}
+            />
           </>
         );
       case "member":
@@ -119,42 +127,35 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
           />
         );
       default:
-        return <MoreActions propsAll={propsAll} setOpenMore={setOpenMore} />;
-    }
-  };
-  return isClickOtherRight ? (
-    openMore ? (
-      activeComponent ? (
-        <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-full h-full">
-          {renderComponent()}
-        </div>
-      ) : (
-        <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-full">
+        return (
           <MoreActions
             propsAll={propsAll}
             setOpenMore={setOpenMore}
-            setClickOtherRight={setClickOtherRight}
+            relation={relation}
+            setRelation={setRelation}
           />
-        </div>
-      )
-    ) : null
-  ) : openMore ? (
-    activeComponent ? (
+        );
+    }
+  };
+  return (
+    openMore &&
+    (activeComponent ? (
       <div
-        className={`md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[25%] md:w-[50%] w-[40%] h-full`}
+        className={`md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[20%] h-full`}
       >
         {renderComponent()}
       </div>
     ) : (
-      <div className="md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 lg:w-[25%] md:w-[50%] w-[40%] h-full">
+      <div className="md:flex hidden background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[20%] h-full">
         <MoreActions
           propsAll={propsAll}
-          openMore={openMore}
           setOpenMore={setOpenMore}
+          relation={relation}
+          setRelation={setRelation}
         />
       </div>
-    )
-  ) : null;
+    ))
+  );
 };
 
 export default OpenMoreDisplay;

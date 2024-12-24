@@ -1,97 +1,186 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import RightTop from "./RightTop";
 import RightBottom from "./RightBottom";
 import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import {
+  FileContent,
+  MessageBoxInfo,
+  ReadedStatusPusher,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { unBlockFr } from "@/lib/services/friend/unblock";
+import { useFriendContext } from "@/context/FriendContext";
+import { checkRelation } from "@/lib/services/user/checkRelation";
+import ReportCard from "@/components/shared/ReportCard";
+import { getFileList } from "@/lib/data/message/dataFileList";
+import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
+import { getPusherClient } from "@/lib/pusher";
 
 interface RightMessageProps {
-  setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
-  setClickOtherRight: React.Dispatch<React.SetStateAction<boolean>>;
-  isClickOtherRight?: boolean;
-  openMore: boolean;
-  setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
+  chatItem: MessageBoxInfo | undefined;
 }
 
-const RightMessage = ({
-  setClickBox,
-  setClickOtherRight,
-  isClickOtherRight,
-  openMore,
-  setOpenMore
-}: RightMessageProps) => {
-  const { messagesByBox } = useChatContext();
+const RightMessage = ({ chatItem }: RightMessageProps) => {
   const pathname = usePathname();
-  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const [openMore, setOpenMore] = useState(false);
+  const [isReport, setReport] = useState(false);
+  const isGroup = pathname.startsWith("/group-chat");
 
   //FetchMessage Backend
-  const [recipientId, setRecipientId] = useState<string[]>();
-  const [boxId, setBoxId] = useState<string>("");
-  const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
-  const { dataChat } = useChatContext();
-  const { adminInfo } = useUserContext();
+  const { id } = useParams();
+  const [message, setMessage] = useState<ResponseMessageDTO[]>();
+  const [relation, setRelation] = useState("");
+  const { adminInfo, isOnlineChat, setTimeOfflineChat, setIsOnlineChat } =
+    useUserContext();
+  const { setListBlockedFriend } = useFriendContext();
+  const { setFileList, fileList, setReadedIdByBox, dataChat } =
+    useChatContext();
   const adminId = adminInfo._id;
 
-  //boxId
-  useEffect(() => {
-    // Lấy đường dẫn hiện tại từ URL
-    const path = window.location.pathname;
-    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
-    const parts = path.split("/");
-    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
-
-    if (id) {
-      setBoxId(id); // Set boxId là chuỗi
-    }
-  }, [boxId]);
+  const onclose = () => {
+    setReport(false);
+  };
 
   useEffect(() => {
-    if (boxId !== "") {
-      const detail = dataChat.find((box) => box.id === boxId);
-      if (detail) {
-        setDetailByBox(detail);
-        setRecipientId(detail.memberInfo.map((item: any) => item.id));
+    const getMessage = async () => {
+      try {
+        if (id) {
+          // Kiểm tra nếu boxId tồn tại
+          const boxMessages = await fetchMessages(id.toString());
+          setMessage(boxMessages);
+        } else {
+          console.warn("boxId is undefined");
+        }
+      } catch (error) {
+        console.log(error);
       }
-    }
-  }, [boxId, dataChat, setDetailByBox]);
+    };
+    const fetchImageList = async () => {
+      try {
+        if (id) {
+          // Kiểm tra nếu boxId tồn tại
+          const list: FileContent[] = await getFileList(id.toString());
+          setFileList(list);
+        } else {
+          console.warn("boxId is undefined");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    getMessage();
+    fetchImageList();
+  }, []);
 
-  //RightTop
+  //Online Status
+  useEffect(() => {
+    if (!chatItem) {
+      return;
+    }
+
+    const fetchRealTimeData = async () => {
+      for (const user of chatItem.memberInfo) {
+        try {
+          const data = await getRealTimeOfUser(user._id);
+          if (data) {
+            if (!data.isOnline) {
+              setTimeOfflineChat((prev) => ({
+                ...prev,
+                [user._id]: data.updateTime // Lưu thời gian cập nhật
+              }));
+            }
+            setIsOnlineChat((prevState) => ({
+              ...prevState,
+              [user._id]: data.isOnline
+            }));
+          } else {
+            setIsOnlineChat((prevState) => ({
+              ...prevState,
+              [user._id]: false
+            }));
+          }
+        } catch (error) {
+          console.error(
+            `Failed to fetch real-time data for user ${user._id}:`,
+            error
+          );
+        }
+      }
+    };
+
+    fetchRealTimeData();
+  }, []);
+
+  //Read status
+  useEffect(() => {
+    const pusherClient = getPusherClient();
+
+    const handleReadedId = (data: ReadedStatusPusher) => {
+      console.log("Successfully received readed-status:", data);
+      setReadedIdByBox((prevState) => ({
+        ...prevState,
+        [data.boxId]: data.readedId
+      }));
+    };
+
+    dataChat.forEach((box) => {
+      pusherClient.subscribe(`private-${box.id}`);
+      pusherClient.bind("readed-status", handleReadedId);
+    });
+  });
+
+  //Right Top
   let top: any;
-  if (boxId && detailByBox) {
+  if (id && chatItem) {
+    const isOnlineGroup = chatItem.memberInfo.some(
+      (member) => isOnlineChat[member._id]
+    );
+    const isOnline = isOnlineChat[chatItem.receiverInfo._id];
     top = isGroup
       ? {
-          ava: detailByBox.groupAva
-            ? detailByBox.groupAva
+          _id: chatItem.id,
+          ava: chatItem.groupAva
+            ? chatItem.groupAva
             : "/assets/images/icon.png",
-          name: detailByBox.groupName ? detailByBox.groupName : "Group Chat",
-          membersGroup: detailByBox.memberInfo.length,
-          onlineGroup: 0,
+          name: chatItem.groupName ? chatItem.groupName : "Group Chat",
+          membersGroup: chatItem.memberInfo.length,
+          onlineGroup: chatItem.memberInfo.filter(
+            (member) => isOnlineChat[member._id]
+          ).length,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          fileList: fileList,
+          isOnline: isOnlineGroup
         }
       : {
+          _id: chatItem.receiverInfo._id,
           ava:
-            detailByBox.receiverInfo && detailByBox.receiverInfo.avatar
-              ? detailByBox.receiverInfo.avatar
+            chatItem.receiverInfo && chatItem.receiverInfo.avatar
+              ? chatItem.receiverInfo.avatar
               : "/assets/ava/default.png",
 
           name:
-            detailByBox.receiverInfo &&
-            detailByBox.receiverInfo.firstName !== "" &&
-            detailByBox.receiverInfo.lastName !== ""
-              ? detailByBox.receiverInfo.firstName +
+            chatItem.receiverInfo &&
+            chatItem.receiverInfo.firstName !== "" &&
+            chatItem.receiverInfo.lastName !== ""
+              ? chatItem.receiverInfo.firstName +
                 " " +
-                detailByBox.receiverInfo.lastName
+                chatItem.receiverInfo.lastName
               : "Unknown name",
 
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          fileList: fileList,
+          isOnline: isOnline
         };
   } else {
     top = isGroup
@@ -101,7 +190,8 @@ const RightMessage = ({
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          isOnline: false
         }
       : {
           ava: "/assets/ava/default.png",
@@ -109,87 +199,222 @@ const RightMessage = ({
           membersGroup: 0,
           onlineGroup: 0,
           openMore: openMore,
-          setOpenMore: setOpenMore
+          setOpenMore: setOpenMore,
+          isOnline: false
         };
   }
   //filterSegment
-  let message: ResponseMessageDTO[] = [];
-  if (boxId && messagesByBox && messagesByBox[boxId]) {
-    message = messagesByBox[boxId];
-  }
-  const filteredSegmentAdmin = message.filter(
-    (item) => item.createBy === adminId
-  );
-  const filteredSegmentOther = message.filter(
-    (item) => item.createBy !== adminId
-  );
+  const filteredSegmentAdmin = message
+    ? message.filter((item) => item.createBy === adminId)
+    : [];
+  const filteredSegmentOther = message
+    ? message.filter((item) => item.createBy !== adminId)
+    : [];
 
   //OpenMoreDisplay
   const display = {
-    detailByBox,
+    detailByBox: chatItem,
     openMore,
     setOpenMore,
-    isClickOtherRight,
-    setClickOtherRight
+    relation,
+    setRelation,
+    fileList
+  };
+  const handleUnBlockChat = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("adminId");
+
+      // Kiểm tra xem receiverId và senderId có tồn tại hay không
+      if (!chatItem?.receiverInfo._id || !userId) {
+        alert("Lỗi: Không có ID người nhận hoặc người gửi.");
+        return;
+      }
+
+      // Tạo đối tượng params theo kiểu FriendRequestDTO
+      const params: FriendRequestDTO = {
+        sender: userId ? userId : "",
+        receiver: chatItem?.receiverInfo._id || ""
+      };
+
+      await unBlockFr(params, setListBlockedFriend);
+      setRelation("stranger"); // Hoặc bạn có thể thay thế với giá trị mới mà bạn muốn
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  //Open More Responsive
-  const [isMdScreen, setIsMdScreen] = useState(false);
   useEffect(() => {
-    const handleResize = () => {
-      // Kiểm tra kích thước cửa sổ
-      const otherRight = sessionStorage.getItem("otherRight");
-      if (window.innerWidth >= 768 && window.innerWidth < 878) {
-        setIsMdScreen(true);
-      } else {
-        setIsMdScreen(false);
+    if (!chatItem) {
+      return; // Nếu chưa có chatItem, không thực hiện gì
+    }
+    let isMounted = true;
+    const userId = localStorage.getItem("adminId");
+
+    const check = async () => {
+      try {
+        if (userId) {
+          const res: any = await checkRelation(
+            userId,
+            chatItem?.receiverInfo._id
+          );
+          if (isMounted) {
+            if (!res) {
+              setRelation("stranger");
+            } else {
+              const { relation, status, sender, receiver } = res;
+
+              if (relation === "bff") {
+                if (status) {
+                  setRelation("bff"); //
+                } else if (userId === sender) {
+                  setRelation("sent_bff"); //
+                } else if (userId === receiver) {
+                  setRelation("received_bff"); //
+                }
+              } else if (relation === "friend") {
+                setRelation("friend");
+              } else if (relation === "block") {
+                if (userId === sender) {
+                  setRelation("blocked"); //
+                } else if (userId === receiver) {
+                  setRelation("blockedBy");
+                }
+              } else {
+                setRelation("stranger"); //
+              }
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching relation:", error);
       }
     };
-    // Kiểm tra kích thước ngay khi component render lần đầu
-    handleResize();
-    // Lắng nghe sự kiện thay đổi kích thước cửa sổ
-    window.addEventListener("resize", handleResize);
-    // Hủy lắng nghe sự kiện khi component unmount
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+    if (!isGroup) {
+      check();
+    }
+    return () => {
+      isMounted = false;
+    };
+  }, [chatItem]);
 
-  return (
-    <div className="flex flex-row w-full h-full">
-      <div
-        className={`${
-          isMdScreen && openMore
-            ? "w-0"
-            : openMore
-            ? "xl:w-[66%] lg:w-[60%] md:w-[66%] w-full"
-            : "w-full"
-        } ${
-          isClickOtherRight ? "hidden" : "flex"
-        }  background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
-      >
-        <div
-          className={` ${
-            isMdScreen && openMore
-              ? "hidden"
-              : "flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pl-0 pr-[12px] justify-between"
-          }`}
-        >
-          <RightTop
-            top={top}
-            setClickBox={setClickBox}
-            setClickOtherRight={setClickOtherRight}
-          />
-
-          <RightMiddle
-            filteredSegmentAdmin={filteredSegmentAdmin}
-            filteredSegmentOther={filteredSegmentOther}
-            receiverInfo={detailByBox ? detailByBox.memberInfo : []}
-          />
-
-          <RightBottom recipientIds={recipientId} />
-        </div>
+  if (!chatItem) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="loader"></div>
       </div>
-      <OpenMoreDisplay display={display} />
-    </div>
+    );
+  }
+  return (
+    <>
+      <div className="flex flex-row w-full h-full">
+        <div
+          className={`${
+            openMore ? "w-[65%]" : "w-full"
+          } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
+        >
+          <div
+            className={`flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pr-[12px] justify-between h-full`}
+          >
+            {!isGroup ? (
+              relation === "" ? (
+                <div className="flex flex-col items-center justify-center w-full h-full">
+                  <div className="loader"></div>
+                  <p className="text-sm text-gray-500">Loading...</p>
+                </div>
+              ) : relation === "blockedBy" ? (
+                <>
+                  <RightTop top={top} />
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                  <div className="flex flex-col items-center justify-center w-full h-20 border-t border-border-color text-dark100_light900">
+                    <p className="text-sm">Your are blocked.</p>
+                  </div>
+                </>
+              ) : relation === "blocked" ? (
+                <>
+                  <RightTop top={top} />
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                  <div className="flex flex-col items-center justify-center w-full border-t border-border-color text-dark100_light900">
+                    <p className="text-sm p-4">You blocked this person.</p>
+                    <button
+                      className="text-sm cursor-pointer text-blue-500 hover:bg-opacity-30 hover:bg-border-color rounded-md shadow-none w-full p-2"
+                      onClick={handleUnBlockChat}
+                    >
+                      Unblock
+                    </button>
+                    <button
+                      className="text-sm cursor-pointer text-red-500 hover:bg-opacity-30 hover:bg-border-color rounded-md shadow-none w-full p-2"
+                      onClick={() => setReport(true)}
+                    >
+                      Report
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <RightTop top={top} />
+
+                  <RightMiddle
+                    filteredSegmentAdmin={filteredSegmentAdmin}
+                    filteredSegmentOther={filteredSegmentOther}
+                    receiverInfo={chatItem ? chatItem.memberInfo : []}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+
+                  <RightBottom
+                    recipientIds={chatItem.memberInfo.map(
+                      (item: any) => item.id
+                    )}
+                    relation={relation}
+                    setMessage={setMessage}
+                    message={message}
+                  />
+                </>
+              )
+            ) : (
+              <>
+                <RightTop top={top} />
+
+                <RightMiddle
+                  filteredSegmentAdmin={filteredSegmentAdmin}
+                  filteredSegmentOther={filteredSegmentOther}
+                  receiverInfo={chatItem ? chatItem.memberInfo : []}
+                  setMessage={setMessage}
+                  message={message}
+                />
+
+                <RightBottom
+                  recipientIds={chatItem.memberInfo.map((item: any) => item.id)}
+                  relation={relation}
+                  setMessage={setMessage}
+                  message={message}
+                />
+              </>
+            )}
+          </div>
+        </div>
+        <OpenMoreDisplay display={display} />
+      </div>
+
+      {isReport && (
+        <ReportCard onClose={onclose} type="Message" reportedId={chatItem.id} />
+      )}
+    </>
   );
 };
 

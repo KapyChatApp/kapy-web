@@ -1,129 +1,70 @@
 "use client";
-
 import RightMessage from "@/components/mess-group/RightMessage/RightMessage";
-import LeftMessage from "@/components/mess-group/LeftMessage/LeftMessage";
 import { useEffect, useState } from "react";
 import { useChatContext } from "@/context/ChatContext";
-import { isCurrentPageBoxId } from "@/lib/utils";
-import { markMessageAsRead } from "@/lib/services/message/read-mark";
-import { getPusherClient } from "@/lib/pusher";
-import { ResponseMessageDTO } from "@/lib/DTO/message";
-import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { fetchMessageBox } from "@/lib/data/message/dataBox";
+import { MessageBoxInfo } from "@/lib/DTO/message";
+import { fetchMessageBoxGroup } from "@/lib/data/message/dataBoxGroup";
+import RightMessageRaw from "@/components/mess-group/UI-Raw/RightMessageRaw";
 
-const page = () => {
-  const [isClickBox, setClickBox] = useState(true);
-  const [isClickOtherRight, setClickOtherRight] = useState(false);
-  const divClassName = "flex h-full lg:hidden md:hidden w-full ";
-  //Click open more responsive
-  const [isMdScreen, setIsMdScreen] = useState(false);
-  const [openMore, setOpenMore] = useState(false);
+const GroupMessContent = () => {
+  const [error, setError] = useState("");
+
+  const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
+  const { setReadStatusByBox, setReadedIdByBox } = useChatContext();
+  const { id } = useParams();
+  const router = useRouter();
+
+  //Fetch and router to Id
   useEffect(() => {
-    const handleResize = () => {
-      // Kiểm tra kích thước cửa sổ
-      if (window.innerWidth >= 768 && window.innerWidth < 878) {
-        setIsMdScreen(true);
-      } else {
-        setIsMdScreen(false);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  //Fetch Box Chat from Backend
-  const { dataChat, setMessagesByBox, setReadStatusByBox } = useChatContext();
-
-  // Fetch messages
-  useEffect(() => {
-    const fetchMessagesForBoxes = async () => {
-      const messagesMap: Record<string, ResponseMessageDTO[]> = {};
-
-      for (const box of dataChat) {
-        const boxMessages = await fetchMessages(box.id);
-        messagesMap[box.id] = boxMessages;
-      }
-
-      setMessagesByBox(messagesMap);
-    };
-
-    fetchMessagesForBoxes();
-  }, [dataChat]);
-
-  //Subcribe channel in pusher
-  useEffect(() => {
-    for (const box of dataChat) {
-      const pusherClient = getPusherClient();
-      pusherClient.subscribe(`private-${box.id}`);
-    }
-  }, [dataChat]);
-
-  //Fetch Detail Box Chat from Backend
-  const readStatusMap: Record<string, boolean> = {};
-  useEffect(() => {
-    const fetchDataForBoxes = async () => {
-      if (dataChat.length === 0) {
-        console.log("dataChat is empty");
-        return;
-      }
-
-      for (const box of dataChat) {
-        if (box) {
-          if (isCurrentPageBoxId(box.id)) {
-            const readMess = await markMessageAsRead(box.id);
-            readStatusMap[box.id] = readMess;
-          } else {
-            readStatusMap[box.id] = box.readStatus;
-          }
-        } else {
-          console.log(`No detail for box: ${box}`);
+    const fetchChats = async () => {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) return;
+      try {
+        const data: MessageBoxInfo[] = await fetchMessageBoxGroup(setError);
+        console.log("API data:", data);
+        setDataChat(data);
+        for (const box of data) {
+          setReadStatusByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readStatus
+          }));
+          setReadedIdByBox((prevState) => ({
+            ...prevState,
+            [box.id]: box.readedId
+          }));
         }
+        // Sử dụng trực tiếp `data` thay vì `dataChat`
+        if (!id && data.length > 0) {
+          router.push(`/group-chat/${data[0].id}`); // Điều hướng sang chat đầu tiên
+        } else if (data.length === 0) {
+          // Nếu không có chat nào, điều hướng về trang chính
+          router.push("/group-chat");
+        }
+      } catch (error) {
+        console.error("Error loading chats:", error);
       }
-      setReadStatusByBox(readStatusMap);
     };
 
-    fetchDataForBoxes();
-  }, [dataChat]);
+    fetchChats();
+  }, [id, router, setDataChat]);
 
-  return (
-    <section className="py-[16px] pr-[16px] w-full flex h-full">
-      <div className={`flex flex-row w-full`}>
-        {divClassName.includes("w-full") &&
-          (isClickBox ? (
-            <div className="flex md:hidden h-full w-full bg-transparent ">
-              <RightMessage
-                setClickBox={setClickBox}
-                setClickOtherRight={setClickOtherRight}
-                isClickOtherRight={isClickOtherRight}
-                setOpenMore={setOpenMore}
-                openMore={openMore}
-              />
-            </div>
-          ) : (
-            <div className={divClassName}>
-              <LeftMessage
-                setClickBox={setClickBox}
-                setClickOtherRight={setClickOtherRight}
-              />
-            </div>
-          ))}
-        <div
-          className={`md:flex hidden h-full  ${
-            isMdScreen && openMore ? "w-[70%]" : "lg:w-[25.6608%]  w-[30%]"
-          }`}
-        >
-          <LeftMessage />
-        </div>
-        <div className="md:flex hidden h-full w-full bg-transparent ">
-          <RightMessage
-            setOpenMore={setOpenMore}
-            openMore={openMore}
-            setClickOtherRight={setClickOtherRight}
-          />
-        </div>
+  if (!dataChat) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="loader"></div>
       </div>
-    </section>
-  );
+    );
+  }
+
+  if (!dataChat.length) {
+    return <RightMessageRaw />;
+  }
+  const chatItem = dataChat.find((chat) => chat.id === id);
+
+  return <RightMessage chatItem={chatItem} />;
 };
 
-export default page;
+export default GroupMessContent;

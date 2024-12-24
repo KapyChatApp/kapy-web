@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { usePathname } from "next/navigation";
@@ -13,10 +13,8 @@ import {
   RequestedResponseDTO
 } from "@/lib/DTO/friend";
 import { useUserContext } from "@/context/UserContext";
-import { addFriendRequest } from "@/lib/services/friend/addFriend";
-import { toast } from "@/hooks/use-toast";
 import { useFriendContext } from "@/context/FriendContext";
-import { unFriend } from "@/lib/services/friend/unfriend";
+import { handleAddfr, handleUnfr } from "@/lib/utils";
 
 interface VerticalBoxProps {
   request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
@@ -29,44 +27,24 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
 }) => {
   const { adminInfo } = useUserContext();
   const { setListFriend } = useFriendContext();
-  const label = "Add friend";
   const list = request;
+  const friendRequest: FriendRequestDTO = {
+    sender: adminInfo._id,
+    receiver: list._id
+  };
 
   const [status, setStatus] = useState("");
-  const handleButton = async () => {
-    try {
-      const friendRequest: FriendRequestDTO = {
-        sender: adminInfo._id,
-        receiver: list._id
-      };
-      const result = await addFriendRequest(friendRequest);
-      setStatus("cancel");
-    } catch (error) {
-      console.error("Failed to send friend request", error);
-      toast({
-        title: `Error in add friend`,
-        description: error instanceof Error ? error.message : "Unknown error",
-        className:
-          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
-      });
-    }
-  };
-  const handleCancel = async () => {
-    try {
-      const friendRequest: FriendRequestDTO = {
-        sender: adminInfo._id,
-        receiver: list._id
-      };
-      const result = await unFriend(friendRequest, setListFriend);
-      setStatus("");
-    } catch (error) {
-      console.error("Failed to unfriend request", error);
-      toast({
-        title: `Error in unfriend`,
-        description: error instanceof Error ? error.message : "Unknown error",
-        className:
-          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
-      });
+  const label = status === "" ? "Add friend" : "Cancel Request";
+  const handleButton = () => {
+    switch (label) {
+      case "Add friend":
+        handleAddfr(friendRequest);
+        setStatus("cancel");
+        break;
+      case "Cancel Request":
+        handleUnfr(friendRequest, setListFriend);
+        setStatus("");
+        break;
     }
   };
 
@@ -87,7 +65,7 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
         onClick={handleClick}
       >
         <Image
-          src={list.avatar}
+          src={list.avatar ? list.avatar : "/assets/ava/default.png"}
           alt="ava"
           width={172}
           height={166}
@@ -106,39 +84,21 @@ const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
         </div>
 
         <div className="flex flex-col gap-2 w-fit h-fit justify-center items-center mt-4">
-          {status === "" ? (
-            <Button
-              className={`px-7 flex flex-row gap-[6px] py-1 bg-primary-500 hover:bg-primary-500 border-none shadow-none w-full rounded-lg`}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleButton();
-              }}
-            >
-              <Icon
-                icon="mingcute:add-fill"
-                width={14}
-                height={14}
-                className="text-light-900"
-              />
-              <p className="text-light-900 body-regular">{label}</p>
-            </Button>
-          ) : (
-            <Button
-              className={`px-7 flex flex-row gap-[6px] py-1 bg-primary-500 hover:bg-primary-500 border-none shadow-none w-full rounded-lg`}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleCancel();
-              }}
-            >
-              <Icon
-                icon="iconoir:cancel"
-                width={14}
-                height={14}
-                className="text-light-900"
-              />
-              <p className="text-light-900 body-regular">Cancel request</p>
-            </Button>
-          )}
+          <Button
+            className={`px-7 flex flex-row gap-[6px] py-1 bg-primary-500 hover:bg-primary-500 border-none shadow-none w-full rounded-lg`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleButton();
+            }}
+          >
+            <Icon
+              icon={status === "" ? "mingcute:add-fill" : "iconoir:cancel"}
+              width={14}
+              height={14}
+              className="text-light-900"
+            />
+            <p className="text-light-900 body-regular">{label}</p>
+          </Button>
 
           {/* <Button
             className="flex flex-row px-7 bg-light-700 hover:bg-light-700 bg-opacity-80 hover:bg-opacity-80 dark:bg-dark-200 dark:hover:bg-dark-200 dark:bg-opacity-50 dark:hover:bg-opacity-50 border-none shadow-none w-full rounded-lg"

@@ -14,7 +14,7 @@ import { loginUser } from "@/lib/services/auth/login";
 
 const Signup = () => {
   const { adminInfo, setAdminInfo } = useUserContext();
-
+  const [isOtp, setIsOtp] = useState(false);
   const [error, setError] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -42,8 +42,7 @@ const Signup = () => {
       setValue: setConfirmedPassword
     }
   ];
-
-  const handleSignIn = async () => {
+  const handleSignUp = async () => {
     try {
       const result = SignInSchema.safeParse({
         firstName,
@@ -103,7 +102,8 @@ const Signup = () => {
         birthDay: birth
       };
 
-      // Gửi yêu cầu đăng ký
+      console.log(params);
+      //Gửi yêu cầu đăng ký
       const response = await registerUser(params);
       if (response) {
         toast({
@@ -131,9 +131,9 @@ const Signup = () => {
         const token = result.token;
         localStorage.setItem("token", token);
 
-        await getMyProfile(setAdminInfo, setError);
+        await getMyProfile(setAdminInfo);
 
-        window.location.href = "/chat";
+        window.location.href = "/";
       }
     } catch (error: any) {
       const errorMessage =
@@ -196,7 +196,7 @@ const Signup = () => {
       <div className="flex flex-col gap-6 items-start justify-center w-full h-fit">
         <Button
           className="border-none bg-primary-500 hover:bg-primary-500  shadow-none w-full h-full py-4 rounded-[20px]"
-          onClick={handleSignIn}
+          onClick={handleSignUp}
         >
           <div className="w-full h-[30px] items-center justify-center flex">
             <p className="text-[20px] font-bold text-light-900 ">

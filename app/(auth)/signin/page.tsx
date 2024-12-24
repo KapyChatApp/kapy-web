@@ -43,9 +43,9 @@ const Signin = () => {
       const token = result.token;
       localStorage.setItem("token", token);
 
-      await getMyProfile(setAdminInfo, setError);
+      await getMyProfile(setAdminInfo);
 
-      window.location.href = "/chat";
+      window.location.href = "/";
     } catch (error) {
       setError("An error occurred during login");
       console.error("Login error:", error);

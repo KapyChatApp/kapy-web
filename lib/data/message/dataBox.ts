@@ -1,15 +1,15 @@
+import MessageBox from "@/components/mess-group/MessageBox";
 import { MessageBoxDTO, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 import axios from "axios";
 
 export const fetchMessageBox = async (
   adminId: string,
-  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
-) => {
+): Promise<MessageBoxInfo[]> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) {
     setError("No token found");
-    return;
+    return [];
   }
 
   try {
@@ -24,7 +24,9 @@ export const fetchMessageBox = async (
     );
 
     const apiDataChat = responseChat.data;
-
+    if (!apiDataChat.success) {
+      return [];
+    }
     const sortedApiDataChat: MessageBoxDTO[] = apiDataChat.box.sort(
       (a: any, b: any) => {
         if (a.lastMessage && b.lastMessage) {
@@ -71,14 +73,17 @@ export const fetchMessageBox = async (
           groupName: "",
           groupAva: "",
           pin: false,
+          readedId: item.readedId,
           readStatus: item.readStatus,
           stranger: item.stranger
         };
       })
       .filter((item): item is MessageBoxInfo => item !== null);
-    setDataChat(updatedDataChat);
+
+    return updatedDataChat;
   } catch (err: any) {
     setError(err.message);
     console.error("Error fetching messages:", err);
+    return [];
   }
 };

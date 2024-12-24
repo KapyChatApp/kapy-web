@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import MessageInput from "../MessageInput";
 import { Button } from "../../ui/button";
 import axios from "axios";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
 import { getFileFormat } from "@/lib/utils";
@@ -21,23 +21,27 @@ import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipl
 
 interface BottomProps {
   recipientIds: string[] | undefined;
+  relation: string;
+  setMessage: React.Dispatch<
+    React.SetStateAction<ResponseMessageDTO[] | undefined>
+  >;
+  message: ResponseMessageDTO[] | undefined;
 }
-const tempSenderInfo = {
-  id: "",
-  firstName: "Default",
-  lastName: " User",
-  nickName: "defaultNick",
-  avatar: "defaultAvatarUrl"
-} as ResponseUserInfo;
-const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { setMessagesByBox, setFileList, dataChat, isTyping, setIsTyping } =
+
+const RightBottom = ({
+  recipientIds,
+  relation,
+  setMessage,
+  message
+}: BottomProps) => {
+  const { dataChat, isTyping, setIsTyping, setFileList, setMessagesByBox } =
     useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const { adminId } = useUserContext();
+  const { adminInfo } = useUserContext();
   const [temporaryToCloudinaryMap, setTemporaryToCloudinaryMap] = useState<
     { tempUrl: string; cloudinaryUrl: string }[]
   >([]);
@@ -135,32 +139,34 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
   useEffect(() => {
     const createTextingEvent = async () => {
       if (!boxId) return;
-      const storedToken = localStorage.getItem("token");
-      if (!storedToken) return;
       const box = dataChat.filter((item) => item.id === boxId);
       if (isTyping) {
-        if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item._id === adminId);
+        if (dataChat && adminInfo._id && box.length > 0) {
+          const user = box[0].memberInfo.filter(
+            (item) => item._id === adminInfo._id
+          );
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
         }
         try {
           // Gọi API để thông báo người dùng đang nhập
-          const result = await isTexting(storedToken, boxId, avatar);
+          const result = await isTexting(boxId, avatar);
           console.log(result);
         } catch (error) {
           console.error("Error texting event:", error);
         }
       } else {
-        if (dataChat && adminId && box.length > 0) {
-          const user = box[0].memberInfo.filter((item) => item._id === adminId);
+        if (dataChat && adminInfo._id && box.length > 0) {
+          const user = box[0].memberInfo.filter(
+            (item) => item._id === adminInfo._id
+          );
           if (user && user.length > 0) {
             avatar = user[0].avatar;
           }
         }
         try {
-          const result = await disableTexting(storedToken, boxId, avatar);
+          const result = await disableTexting(boxId, avatar);
           console.log(result);
         } catch (error) {
           console.error("Error texting event:", error);
@@ -169,12 +175,22 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     };
 
     createTextingEvent();
-  }, [isTyping, avatar]);
+  }, [isTyping]);
 
   //Send Message
+  const router = useRouter();
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {
-      console.log("Successfully received message: ", data);
+      setMessage((prev) => {
+        const currentMessages = prev || [];
+        // Chỉ cập nhật nếu tin nhắn thực sự mới
+        if (!currentMessages.some((msg) => msg.id === data.id)) {
+          const updated = [...currentMessages, data]; // Thêm tin nhắn mới
+          console.log("Updated messages: ", updated);
+          return updated;
+        }
+        return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+      });
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];
         // Chỉ cập nhật nếu tin nhắn thực sự mới
@@ -188,13 +204,10 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
       });
       if (data.contentId) {
         setFileList((prev) => {
-          const fileContent = prev[data.boxId] || [];
+          const fileContent = prev || [];
           // Chỉ cập nhật nếu tin nhắn thực sự mới
-          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
-            const updated = {
-              ...prev,
-              [data.boxId]: [...fileContent, data.contentId]
-            };
+          if (!fileContent.some((file) => file.url === data.contentId.url)) {
+            const updated = [...fileContent, data.contentId]; // Thêm phần tử mới
             console.log("Updated fileList: ", updated);
             return updated;
           }
@@ -211,6 +224,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     //Cleanup khi component bị unmount hoặc boxId thay đổi
     return () => {
       pusherClient.unsubscribe(`private-${boxId}`);
+
       pusherClient.unbind("new-message", handleNewMessage);
     };
   }, [isTyping]);
@@ -218,7 +232,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
   useEffect(() => {
     if (temporaryToCloudinaryMap.length === 0) return;
 
-    setMessagesByBox((prev: any) =>
+    setMessage((prev: any) =>
       prev.map((msg: any) => {
         const mapEntry = temporaryToCloudinaryMap.find(
           (entry) => msg.contentId[0].url === entry.tempUrl

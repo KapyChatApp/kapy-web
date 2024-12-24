@@ -10,6 +10,7 @@ import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
 import { FileContent, UserInfoBox } from "@/lib/DTO/message";
+import { useUserContext } from "@/context/UserContext";
 
 const MoreMiddle = ({
   setActiveComponent,
@@ -24,6 +25,7 @@ const MoreMiddle = ({
   const [videos, setVideos] = useState<FileContent[]>([]);
   const [others, setOthers] = useState<FileContent[]>([]);
   const [members, setMembers] = useState<UserInfoBox[]>([]);
+  const { isOnlineChat } = useUserContext();
   //boxId
   useEffect(() => {
     // Lấy đường dẫn hiện tại từ URL
@@ -38,15 +40,15 @@ const MoreMiddle = ({
   }, [boxId]);
 
   useEffect(() => {
-    if (boxId !== "" && fileList[boxId]) {
-      const imageList = fileList[boxId].filter((item) => item.type === "Image");
-      const videoList = fileList[boxId].filter((item) => item.type === "Video");
-      const otherList = fileList[boxId].filter((item) => item.type === "Other");
+    if (boxId !== "" && fileList) {
+      const imageList = fileList.filter((item) => item.type === "Image");
+      const videoList = fileList.filter((item) => item.type === "Video");
+      const otherList = fileList.filter((item) => item.type === "Other");
       if (imageList) setImages(imageList);
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  }, [boxId, fileList[boxId]]);
+  }, [boxId, fileList]);
 
   //Show image in more
   useEffect(() => {
@@ -127,7 +129,7 @@ const MoreMiddle = ({
                           height={36}
                           className="rounded-full"
                         />
-                        {item.isOnline && (
+                        {isOnlineChat[item._id] && (
                           <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
                         )}
                       </div>

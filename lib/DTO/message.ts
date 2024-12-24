@@ -14,14 +14,15 @@ export interface MessageBoxInfo {
   groupName: string;
   groupAva: string;
   pin: boolean;
-  readStatus: boolean;
   stranger: boolean;
+  readStatus: boolean;
+  readedId: string[];
 }
-
 export interface RequestCreateGroup {
   membersIds: string[];
   groupName: string;
 }
+
 // Interface Response
 export interface MessageBoxDTO {
   _id: string;
@@ -31,8 +32,9 @@ export interface MessageBoxDTO {
   groupAva: string;
   flag: boolean;
   pin: boolean;
-  readStatus: boolean;
   stranger: boolean;
+  readStatus: boolean;
+  readedId: string[];
 }
 
 export interface FileContent {
@@ -60,6 +62,7 @@ export interface ResponseMessageDTO {
   boxId: string;
   createAt: string;
   createBy: string;
+  isReact: string[];
 }
 
 export interface PusherRevoke {
@@ -88,4 +91,16 @@ export interface TextingEvent {
   userId: string;
   avatar: string;
   texting: boolean;
+}
+
+export interface ResponseReactMessageDTO {
+  id: string;
+  boxId: string;
+  isReact: string[];
+}
+
+export interface ReadedStatusPusher {
+  success: boolean;
+  readedId: string[];
+  boxId: string;
 }

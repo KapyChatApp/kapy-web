@@ -3,8 +3,8 @@ import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import ReactPlayer from "react-player";
 import React, { useEffect } from "react";
 import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { useUserContext } from "@/context/UserContext";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;

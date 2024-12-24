@@ -1,7 +1,8 @@
 import { Button } from "@/components/ui/button";
+import { useUserContext } from "@/context/UserContext";
 import { UserInfoBox } from "@/lib/DTO/message";
+import { isOnline } from "@/lib/services/user/isOnline";
 import { ActiveComponentProps, SeeAllProps } from "@/types/mess-group";
-import { MememberGroup } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React from "react";
@@ -13,6 +14,7 @@ const SeeAllMember: React.FC<SeeAllProps> = ({
   itemSent
 }) => {
   const memberList = itemSent as UserInfoBox[];
+  const { isOnlineChat } = useUserContext();
   const handleBack = () => {
     setActiveComponent("");
   };
@@ -48,13 +50,13 @@ const SeeAllMember: React.FC<SeeAllProps> = ({
               >
                 <div className="relative flex-shrink-0 w-fit">
                   <Image
-                    src={item.avatar}
+                    src={item.avatar ? item.avatar : "/assets/ava/default.png"}
                     alt="ava"
                     width={42}
                     height={42}
                     className="rounded-full"
                   />
-                  {item.isOnline && (
+                  {isOnlineChat[item._id] && (
                     <div className="bg-green-600 rounded-full w-[10px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
                   )}
                 </div>

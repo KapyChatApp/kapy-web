@@ -1,7 +1,6 @@
 "use client";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
-import { Button } from "../ui/button";
 import Link from "next/link";
 
 interface ButtonLeftProps {

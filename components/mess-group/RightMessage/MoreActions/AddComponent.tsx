@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ActiveComponentProps } from "@/types/mess-group";
-import React from "react";
+import React, { useState } from "react";
 import LocalSearch from "@/components/shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import UserCheckbox from "./UserCheckbox";
@@ -13,6 +13,7 @@ import useSearchFriendByPhone from "@/hooks/use-search-friend-by-phone";
 const AddComponent: React.FC<ActiveComponentProps> = ({
   setActiveComponent
 }) => {
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { listFriend } = useFriendContext();
   const { toast } = useToast();
   const handleBack = () => {
@@ -29,6 +30,12 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
 
   const { searchTerm, setSearchTerm, filteredFriends } =
     useSearchFriendByPhone(listFriend);
+
+  const handleCheckboxChange = (id: string, isChecked: boolean) => {
+    setSelectedIds((prev) =>
+      isChecked ? [...prev, id] : prev.filter((itemId) => itemId !== id)
+    );
+  };
 
   return (
     <div className="modal-overlay">
@@ -63,7 +70,8 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
               const user = {
                 id: item._id,
                 ava: item.avatar,
-                name: item.firstName + " " + item.lastName
+                name: item.firstName + " " + item.lastName,
+                onChange: handleCheckboxChange
               };
               return <UserCheckbox user={user} />;
             })}

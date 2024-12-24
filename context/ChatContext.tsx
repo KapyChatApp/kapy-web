@@ -12,18 +12,26 @@ interface ChatContextType {
   setReadStatusByBox: React.Dispatch<
     React.SetStateAction<Record<string, boolean>>
   >;
+  readedIdByBox: Record<string, string[]>;
+  setReadedIdByBox: React.Dispatch<
+    React.SetStateAction<Record<string, string[]>>
+  >;
   dataChat: MessageBoxInfo[];
   setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>;
-  fileList: Record<string, FileContent[]>;
-  setFileList: React.Dispatch<
-    React.SetStateAction<Record<string, FileContent[]>>
-  >;
+  fileList: FileContent[];
+  setFileList: React.Dispatch<React.SetStateAction<FileContent[]>>;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
   >;
   isTyping: boolean;
   setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
+  isReactedByMessage: Record<string, boolean>;
+  setIsReactedByMessage: React.Dispatch<Record<string, boolean>>;
+  isDeleted: boolean;
+  setIsDeleted: React.Dispatch<React.SetStateAction<boolean>>;
+  isRevoked: boolean;
+  setIsRevoked: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Tạo context
@@ -34,15 +42,23 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
-  const [fileList, setFileList] = useState<Record<string, FileContent[]>>({});
+  const [fileList, setFileList] = useState<FileContent[]>([]);
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
   >({});
   const [readStatusByBox, setReadStatusByBox] = useState<
     Record<string, boolean>
   >({});
+  const [readedIdByBox, setReadedIdByBox] = useState<Record<string, string[]>>(
+    {}
+  );
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const [isReactedByMessage, setIsReactedByMessage] = useState<
+    Record<string, boolean>
+  >({});
 
+  const [isDeleted, setIsDeleted] = useState<boolean>(false);
+  const [isRevoked, setIsRevoked] = useState<boolean>(false);
   return (
     <ChatContext.Provider
       value={{
@@ -54,8 +70,16 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         setMessagesByBox,
         readStatusByBox,
         setReadStatusByBox,
+        readedIdByBox,
+        setReadedIdByBox,
         isTyping,
-        setIsTyping
+        setIsTyping,
+        isReactedByMessage,
+        setIsReactedByMessage,
+        isDeleted,
+        setIsDeleted,
+        isRevoked,
+        setIsRevoked
       }}
     >
       {children}

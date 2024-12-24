@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { acceptFriend } from "@/lib/services/friend/acceptFriend";
 import { useFriendContext } from "@/context/FriendContext";
 import { acceptBestFriend } from "@/lib/services/friend/accepBff";
+import { handleAcceptBff, handleAcceptFr } from "@/lib/utils";
 
 interface VerticalBoxProps {
   request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
@@ -31,17 +32,14 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
   const object = request as RequestedResponseDTO;
   const label = object.relation === "friend" ? "Accept" : "Accept Bff";
 
-  const handleButton = async () => {
+  const handleButton = () => {
     if (object.relation === "friend") {
       try {
         const friendRequest: FriendRequestDTO = {
           sender: object._id,
           receiver: adminInfo._id
         };
-        const result = await acceptFriend(
-          friendRequest,
-          setListRequestedFriend
-        );
+        handleAcceptFr(friendRequest, setListRequestedFriend);
         setIndex(object._id);
       } catch (error) {
         console.error("Failed to accept friend request", error);
@@ -58,10 +56,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
           sender: object._id,
           receiver: adminInfo._id
         };
-        const result = await acceptBestFriend(
-          friendRequest,
-          setListRequestedFriend
-        );
+        handleAcceptBff(friendRequest, setListRequestedFriend);
         setIndex(object._id);
       } catch (error) {
         console.error("Failed to accept best friend request", error);
@@ -92,7 +87,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
         onClick={handleClick}
       >
         <Image
-          src={object.avatar}
+          src={object.avatar ? object.avatar : "/assets/ava/default.png"}
           alt="ava"
           width={172}
           height={166}

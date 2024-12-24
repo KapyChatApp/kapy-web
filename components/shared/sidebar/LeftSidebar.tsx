@@ -25,6 +25,10 @@ import {
 import { PersonalAccount } from "@/components/settings/Profile/PersonalAccount";
 import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
 import { useUserContext } from "@/context/UserContext";
+import { getMyProfile } from "@/lib/data/mine/dataAdmin";
+import { getPusherClient } from "@/lib/pusher";
+import { OnlineEvent } from "@/lib/DTO/user";
+import { useChatContext } from "@/context/ChatContext";
 
 const Leftsidebar = () => {
   const [isParagraphVisible, setIsParagraphVisible] = useState(true);
@@ -53,7 +57,7 @@ const Leftsidebar = () => {
   const [isAccount, setAccount] = useState(false);
   const [isSetting, setSetting] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
-  const { adminInfo, newAva } = useUserContext();
+  const { adminInfo, newAva, setAdminInfo } = useUserContext();
 
   const handleAccount = () => {
     setAccount(!isAccount);
@@ -74,6 +78,7 @@ const Leftsidebar = () => {
 
       if (response.ok) {
         localStorage.removeItem("token");
+        localStorage.removeItem("adminId");
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
@@ -98,6 +103,14 @@ const Leftsidebar = () => {
       window.removeEventListener("resize", handleResize);
     };
   }, []);
+
+  useEffect(() => {
+    const getInfo = async () => {
+      await getMyProfile(setAdminInfo);
+    };
+    getInfo();
+  }, []);
+
   return (
     <>
       <section
@@ -135,14 +148,14 @@ const Leftsidebar = () => {
             }`}
           >
             {sidebarLinks.map((item) => {
-              const isDynamicPath = pathname.startsWith("/chat/");
+              const isDynamicPath = /^\/[a-zA-Z0-9_-]+$/.test(pathname);
               const isGroupDynamicPath = pathname.startsWith("/group-chat/");
               const isFriendDynamicPath = pathname.startsWith("/friends/");
               const isActive =
                 pathname === item.route ||
-                (isDynamicPath && item.route === "/chat") ||
                 (isGroupDynamicPath && item.route === "/group-chat") ||
-                (isFriendDynamicPath && item.route === "/friends");
+                (isFriendDynamicPath && item.route === "/friends") ||
+                (/^\/[a-zA-Z0-9]{24}$/.test(pathname) && item.route === "/");
               return (
                 <Link
                   key={item.route}

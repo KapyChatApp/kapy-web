@@ -20,33 +20,32 @@ const page = () => {
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [setListFriend]);
 
   useEffect(() => {
     // Gọi API lấy danh sách bạn thân khi component mount
     const fetchData = async () => {
       try {
         await getMyListBestFriend(setListBestFriend, setError);
-        console.log(listBestFriend);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
-  }, []);
+  }, [setListBestFriend]);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!listBestFriend || !listFriend) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center bg-white">
+        <div className="loader"></div>
+      </div>
+    );
   }
   return <RightComponent />;
 };

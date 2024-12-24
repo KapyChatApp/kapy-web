@@ -1,7 +1,6 @@
 "use client";
 import LeftComponent from "@/components/friends/LeftComponent";
 import RightComponent from "@/components/friends/RightComponent";
-import { strangeFriend } from "@/constants/friends";
 import { useFriendContext } from "@/context/FriendContext";
 import { getMyListSuggestedFriend } from "@/lib/data/mine/dataSuggestFriends";
 import React, { useEffect, useState } from "react";
@@ -16,7 +15,6 @@ const page = () => {
     const fetchData = async () => {
       try {
         await getMyListSuggestedFriend(setListSuggestedFriend, setError);
-        console.log(listSuggestedFriend);
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);

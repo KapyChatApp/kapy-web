@@ -50,7 +50,7 @@ const useSearchFriendByPhone = (
       setFilteredFriends(friendList); // Reset khi không có từ khóa
     }
     console.log(filteredFriends);
-  }, [searchTerm, friendList]);
+  }, [searchTerm]);
 
   return { searchTerm, setSearchTerm, filteredFriends, isSearching };
 };

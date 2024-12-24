@@ -1,7 +1,5 @@
 "use client";
 import { FriendProfileResponseDTO } from "@/lib/DTO/friend";
-import { HistoryFindFriend } from "@/types/friends";
-import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";

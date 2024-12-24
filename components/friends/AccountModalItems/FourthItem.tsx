@@ -1,8 +1,6 @@
 import { Switch } from "@/components/ui/switch";
 import { useChatContext } from "@/context/ChatContext";
 import { FriendProfileResponseDTO } from "@/lib/DTO/friend";
-import { HistoryFindFriend } from "@/types/friends";
-import { User } from "@/types/object";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 

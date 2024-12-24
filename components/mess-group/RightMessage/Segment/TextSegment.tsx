@@ -54,21 +54,15 @@ const TextSegment: React.FC<SegmentMessage> = ({ segments, index, length }) => {
 
   return (
     <div
-      className={`flex flex-row items-center justify-start w-fit gap-2 h-full  relative`}
+      className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
     >
-      <div
-        className={`${getContainerClasses()} flex flex-wrap w-fit h-full items-center justify-center`}
+      <p
+        className={`${isActive ? "text-dark100_light900" : "text-light-900"} ${
+          segments.flag === false ? "text-opacity-70" : ""
+        } flex-wrap md:text-[14px] text-[13px] font-[320px]`}
       >
-        <p
-          className={`${
-            isActive ? "text-dark100_light900" : "text-light-900"
-          } ${
-            segments.flag === false ? "text-opacity-70" : ""
-          } flex-wrap md:text-[14px] text-[13px] font-[320px]`}
-        >
-          {textContent}
-        </p>
-      </div>
+        {textContent}
+      </p>
     </div>
   );
 };

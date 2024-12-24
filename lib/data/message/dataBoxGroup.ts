@@ -2,13 +2,12 @@ import { MessageBoxDTO, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 import axios from "axios";
 
 export const fetchMessageBoxGroup = async (
-  setDataChat: React.Dispatch<React.SetStateAction<MessageBoxInfo[]>>,
   setError: React.Dispatch<React.SetStateAction<string>>
-) => {
+): Promise<MessageBoxInfo[]> => {
   const storedToken = localStorage.getItem("token");
   if (!storedToken) {
     setError("No token found");
-    return;
+    return [];
   }
 
   try {
@@ -50,15 +49,16 @@ export const fetchMessageBoxGroup = async (
           groupName: item.groupName,
           groupAva: item.groupAva,
           pin: false,
+          readedId: item.readedId,
           readStatus: item.readStatus,
           stranger: false
         };
       })
       .filter((item: any): item is MessageBoxInfo => item !== null); // Loại bỏ các giá trị null
-
-    setDataChat(updatedDataChat);
+    return updatedDataChat;
   } catch (err: any) {
     setError(err.message);
     console.error("Error fetching messages:", err);
+    return [];
   }
 };

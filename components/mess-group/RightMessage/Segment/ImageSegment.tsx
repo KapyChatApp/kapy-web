@@ -3,8 +3,8 @@ import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import Image from "next/image";
 import React, { useEffect } from "react";
 import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import { useUserContext } from "@/context/UserContext";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -73,7 +73,7 @@ const ImageSegment: React.FC<SegmentMessage> = ({
       <a
         href={imageContent.url} // Thêm liên kết tới ảnh lớn
         data-fancybox="gallery" // Kích hoạt Fancybox cho nhóm hình ảnh
-        className={` max-w-full h-auto cursor-pointer`}
+        className={`max-w-full h-auto cursor-pointer`}
       >
         <Image
           src={imageContent.url}

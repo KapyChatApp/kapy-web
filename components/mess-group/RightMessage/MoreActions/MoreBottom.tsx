@@ -2,19 +2,95 @@
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
 import React, { useState } from "react";
-import ModalConfirm from "./ModalConfirm";
-import { ActiveComponentProps } from "@/types/mess-group";
+import { deleteMessageBox } from "@/lib/services/message/deleteBox";
+import ConfirmModal, {
+  ConfirmModalProps
+} from "@/components/friends/ConfirmModal";
+import { toast } from "@/hooks/use-toast";
+import { unFriend } from "@/lib/services/friend/unfriend";
+import { FriendRequestDTO } from "@/lib/DTO/friend";
+import { useFriendContext } from "@/context/FriendContext";
+import { UserInfoBox } from "@/lib/DTO/message";
 
-const MoreBottom: React.FC<ActiveComponentProps> = ({ setActiveComponent }) => {
+const MoreBottom: React.FC<{
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+  receiver: UserInfoBox;
+  boxId: string;
+}> = ({ receiver, setActiveComponent, boxId }) => {
   const [stButton, setFirst] = useState(false);
   const [ndButton, setSecond] = useState(false);
+  const { setListFriend } = useFriendContext();
+  const [confirm, setConfirm] = useState<ConfirmModalProps>({
+    setConfirm: () => {},
+    handleAction: () => {},
+    name: "",
+    action: ""
+  });
 
+  const handleDeleteChat = async (boxId: string) => {
+    try {
+      const isDeleted = await deleteMessageBox(boxId);
+
+      if (isDeleted) {
+        console.log("Message box deleted successfully");
+      } else {
+        console.warn("Failed to delete message box");
+      }
+    } catch (error) {
+      console.warn("An error occurred while deleting the message box:", error);
+    }
+  };
+
+  const handleUnfriend = async () => {
+    try {
+      const adminId = localStorage.getItem("adminId");
+      const friendRequest: FriendRequestDTO = {
+        sender: receiver._id,
+        receiver: adminId || ""
+      };
+      const result = await unFriend(friendRequest, setListFriend);
+      toast({
+        title: `Unfriend successfully`,
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
+    } catch (error) {
+      console.error("Failed to unfriend", error);
+      toast({
+        title: `Error in unfriend`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
+    }
+  };
+
+  const handleLeaveGroup = async () => {};
   const handleFirstButton = () => {
     setFirst(!stButton);
+    setConfirm({
+      setConfirm: setFirst,
+      handleAction: () => handleDeleteChat(boxId),
+      name: receiver.firstName + " " + receiver.lastName,
+      action: "remove"
+    });
   };
 
   const handleSecondButton = () => {
     setSecond(!ndButton);
+    isGroup
+      ? setConfirm({
+          setConfirm: setFirst,
+          handleAction: handleLeaveGroup,
+          name: "group",
+          action: "leave"
+        })
+      : setConfirm({
+          setConfirm: setFirst,
+          handleAction: handleUnfriend,
+          name: receiver.firstName + " " + receiver.lastName,
+          action: "unfriend"
+        });
   };
 
   const pathname = usePathname();
@@ -43,25 +119,9 @@ const MoreBottom: React.FC<ActiveComponentProps> = ({ setActiveComponent }) => {
         </div>
       </div>
 
-      {stButton && (
-        <ModalConfirm
-          setConfirm={setFirst}
-          setActiveComponent={setActiveComponent}
-          label="Are you sure to remove this chat?"
-        />
-      )}
+      {stButton && <ConfirmModal confirm={confirm} />}
 
-      {ndButton && (
-        <ModalConfirm
-          setConfirm={setSecond}
-          setActiveComponent={setActiveComponent}
-          label={
-            isGroup
-              ? "Are you sure to leave this group chat?"
-              : "Are you sure to unfriend?"
-          }
-        />
-      )}
+      {ndButton && <ConfirmModal confirm={confirm} />}
     </>
   );
 };

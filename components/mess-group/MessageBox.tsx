@@ -2,11 +2,12 @@
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface Box {
@@ -18,10 +19,10 @@ interface Box {
 const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const { id, receiverInfo, pin, groupName, groupAva, memberInfo } = box;
   const pathname = usePathname();
-  const isActive = pathname.includes(id) || pathname === `/chat/${id}`;
-  const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
+  const isActive = pathname.includes(id) || pathname === `/${id}`;
+  const isGroup = /^\/group-chat/.test(pathname);
   const { messagesByBox, readStatusByBox, dataChat } = useChatContext();
-  const { adminInfo, isOnlineChat } = useUserContext();
+  const { adminInfo, isOnlineChat, timeOfflineChat } = useUserContext();
   const adminId = adminInfo._id;
   const isOnlineGroup = memberInfo.some((member) => isOnlineChat[member._id]);
   const [formattedCreateAt, setFormattedCreateAt] = useState("");
@@ -37,6 +38,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     }
     if (message.length > 0 && message[message.length - 1] && dataChat) {
       const detailByBox = dataChat.find((box) => box.id === id);
+
       const detail =
         isGroup && detailByBox && detailByBox.receiverInfo
           ? contentBox(
@@ -52,16 +54,30 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
-  const handleClickLink = () => {
-    if (setClickBox) {
-      setClickBox(true); //Click box for responsive
+
+  const router = useRouter();
+  const handleReadMark = async () => {
+    try {
+      const success = await markMessageAsRead(box.id);
+      if (success) {
+        console.log("Message marked as read successfully.");
+      } else {
+        console.warn("Failed to mark message as read.");
+      }
+    } catch (error) {
+      console.error("Error in handleReadMark:", error);
     }
+  };
+
+  const handleClickLink = () => {
+    handleReadMark();
+    isGroup ? router.push(`/group-chat/${id}`) : router.push(`/${id}`);
   };
 
   // Cập nhật createAt mỗi phút
   useEffect(() => {
     // Cập nhật ngay khi render lần đầu
-    if (createAt !== "") {
+    if (createAt) {
       const updateCreateAt = () => {
         const now = new Date();
         const sendDate = new Date(createAt);
@@ -79,9 +95,8 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   }, [createAt]);
 
   return (
-    <Link
-      key=""
-      href={isGroup ? `/group-chat/${id}` : `/chat/${id}`}
+    <div
+      key={id}
       className={`${
         isActive
           ? "text-dark100_light900 bg-light-800 dark:bg-dark-200 dark:bg-opacity-40"
@@ -126,7 +141,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 </p>
               </div>
               <div className="flex items-center justify-start w-full min-w-0">
-                {readStatusByBox[id] ? (
+                {readStatusByBox[box.id] ? (
                   <p className="small-regular justify-start text-dark100_light900 text-ellipsis whitespace-nowrap">
                     {senderName}
                   </p>
@@ -136,7 +151,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                   </p>
                 )}
                 <div className="flex min-w-0 ">
-                  {readStatusByBox[id] ? (
+                  {readStatusByBox[box.id] ? (
                     <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
                   ) : (
                     <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
@@ -170,7 +185,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 };
 

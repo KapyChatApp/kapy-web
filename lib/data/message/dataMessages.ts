@@ -18,7 +18,6 @@ export const fetchMessages = async (
         }
       }
     );
-
     const apiMessages: ResponseMessageDTO[] = response.data.messages;
     if (apiMessages && Array.isArray(apiMessages)) {
       messageData = await Promise.all(
@@ -31,7 +30,8 @@ export const fetchMessages = async (
             text: msg.text,
             boxId: msg.boxId,
             createAt: msg.createAt || "",
-            createBy: msg.createBy
+            createBy: msg.createBy,
+            isReact: msg.isReact
           };
         })
       );
