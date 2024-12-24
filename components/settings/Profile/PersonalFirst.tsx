@@ -39,7 +39,7 @@ const PersonalFirst = ({ personal, setEdit }: PersonalItemProps) => {
     return () => {
       Fancybox.destroy(); // Hủy Fancybox khi component unmount
     };
-  }, []);
+  });
   //Show background
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
@@ -50,7 +50,7 @@ const PersonalFirst = ({ personal, setEdit }: PersonalItemProps) => {
     return () => {
       Fancybox.destroy(); // Hủy Fancybox khi component unmount
     };
-  }, []);
+  });
   return (
     <>
       <div className="w-full h-[184px] relative px-4">

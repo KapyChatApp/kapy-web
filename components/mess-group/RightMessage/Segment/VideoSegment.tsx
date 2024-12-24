@@ -30,7 +30,7 @@ const VideoSegment: React.FC<SegmentMessage> = ({
       Thumbs: true
     });
     return () => {
-      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+      Fancybox.destroy();
     };
   }, []);
 

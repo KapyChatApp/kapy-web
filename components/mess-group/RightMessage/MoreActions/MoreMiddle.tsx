@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { SeeAllProps } from "@/types/mess-group";
 import { useChatContext } from "@/context/ChatContext";
 import { Fancybox } from "@fancyapps/ui";
-import "@fancyapps/ui/dist/fancybox/fancybox.css";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
 import { FileContent, UserInfoBox } from "@/lib/DTO/message";
 import { useUserContext } from "@/context/UserContext";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
 const MoreMiddle = ({
   setActiveComponent,
@@ -40,16 +40,17 @@ const MoreMiddle = ({
   }, [boxId]);
 
   useEffect(() => {
-    if (boxId !== "" && fileList) {
-      const imageList = fileList.filter((item) => item.type === "Image");
-      const videoList = fileList.filter((item) => item.type === "Video");
-      const otherList = fileList.filter((item) => item.type === "Other");
+    if (boxId !== "" && fileList && fileList[boxId]) {
+      const imageList = fileList[boxId].filter((item) => item.type === "Image");
+      const videoList = fileList[boxId].filter((item) => item.type === "Video");
+      const otherList = fileList[boxId].filter((item) => item.type === "Other");
       if (imageList) setImages(imageList);
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  }, [boxId, fileList]);
+  });
 
+  console.log(fileList);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
@@ -58,7 +59,7 @@ const MoreMiddle = ({
       Thumbs: true
     });
     return () => {
-      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+      Fancybox.destroy();
     };
   }, []);
 
@@ -70,7 +71,7 @@ const MoreMiddle = ({
       Thumbs: true
     });
     return () => {
-      Fancybox.destroy(); // Hủy Fancybox khi component unmount
+      Fancybox.destroy();
     };
   }, []);
 
@@ -187,7 +188,7 @@ const MoreMiddle = ({
                     <a
                       href={item.url} // Thêm liên kết tới ảnh lớn
                       data-fancybox="more-image" // Kích hoạt Fancybox cho nhóm hình ảnh
-                      className={` max-w-full h-auto cursor-pointer`}
+                      className={`max-w-full h-auto cursor-pointer`}
                     >
                       <Image
                         src={item.url}

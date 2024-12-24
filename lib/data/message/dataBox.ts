@@ -79,7 +79,6 @@ export const fetchMessageBox = async (
         };
       })
       .filter((item): item is MessageBoxInfo => item !== null);
-
     return updatedDataChat;
   } catch (err: any) {
     setError(err.message);

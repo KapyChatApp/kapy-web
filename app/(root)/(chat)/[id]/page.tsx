@@ -24,7 +24,6 @@ const MessageContent = () => {
       if (!adminId) return;
       try {
         const data: MessageBoxInfo[] = await fetchMessageBox(adminId, setError);
-        console.log("API data:", data);
         setDataChat(data);
 
         for (const box of data) {
@@ -51,7 +50,7 @@ const MessageContent = () => {
 
   if (!dataChat) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-white">
+      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
         <div className="loader"></div>
       </div>
     );

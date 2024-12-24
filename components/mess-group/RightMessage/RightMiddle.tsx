@@ -10,6 +10,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
 import { usePathname } from "next/navigation";
 import {
+  ReadedStatusPusher,
   ResponseMessageDTO,
   TextingEvent,
   UserInfoBox
@@ -33,7 +34,7 @@ const RightMiddle = ({
   const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
-  const { readedIdByBox, dataChat } = useChatContext();
+  const { readedIdByBox, dataChat, setReadedIdByBox } = useChatContext();
   const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
     ...filteredSegmentAdmin,
@@ -87,6 +88,7 @@ const RightMiddle = ({
     }
   }, [messagesToDisplay]);
 
+  //Texting Event
   useEffect(() => {
     const handleTexting = (data: TextingEvent) => {
       console.log("Successfully received texting-status:", data);
@@ -113,20 +115,40 @@ const RightMiddle = ({
     }
   });
 
+  //Readed status
+  useEffect(() => {
+    const pusherClient = getPusherClient();
+
+    const handleReadedId = (data: ReadedStatusPusher) => {
+      console.log("Successfully received readed-status:", data);
+      setReadedIdByBox((prevState) => ({
+        ...prevState,
+        [data.boxId]: data.readedId
+      }));
+    };
+
+    dataChat.forEach((box) => {
+      pusherClient.subscribe(`private-${box.id}`);
+      pusherClient.bind("readed-status", handleReadedId);
+    });
+  });
+
   useEffect(() => {
     if (boxId && readedIdByBox?.[boxId]) {
       const detailByBox = dataChat.find((box) => box.id === boxId);
       if (detailByBox) {
         const avatars = detailByBox.memberInfo
-          // .filter((item) => item._id !== adminId)
+          .filter((item) => item._id !== adminId)
           .filter((user) => readedIdByBox[boxId].includes(user._id))
           .map((user) => user.avatar);
 
         setAvaArray(avatars);
       }
     }
-  }, []);
+  }, [readedIdByBox, boxId]);
 
+  console.log(avaArray, "avatar");
+  console.log(boxId ? readedIdByBox[boxId] : "", "readed");
   return (
     <div
       className="flex w-full h-fit overflow-scroll custom-scrollbar "

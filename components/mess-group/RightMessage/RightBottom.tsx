@@ -7,7 +7,7 @@ import axios from "axios";
 import { usePathname, useRouter } from "next/navigation";
 import { useChatContext } from "@/context/ChatContext";
 import { getPusherClient } from "@/lib/pusher";
-import { getFileFormat } from "@/lib/utils";
+import { getFileFormat, isCurrentPageBoxId } from "@/lib/utils";
 import MicRecorder from "mic-recorder-to-mp3";
 import MessageRecorder from "../MessageRecorder";
 import { useUserContext } from "@/context/UserContext";
@@ -17,6 +17,7 @@ import { ResponseMessageDTO } from "@/lib/DTO/message";
 import { handleSendRecorder } from "@/lib/services/message/send/sendRecord";
 import { handleSendTextMessage } from "@/lib/services/message/send/sendText";
 import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipleFiles";
+import { markMessageAsRead } from "@/lib/services/message/read-mark";
 
 interface BottomProps {
   recipientIds: string[] | undefined;
@@ -24,8 +25,14 @@ interface BottomProps {
 }
 
 const RightBottom = ({ recipientIds }: BottomProps) => {
-  const { dataChat, isTyping, setIsTyping, setMessagesByBox } =
-    useChatContext();
+  const {
+    dataChat,
+    isTyping,
+    setIsTyping,
+    setMessagesByBox,
+    setFileList,
+    setReadStatusByBox
+  } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -124,6 +131,18 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
     }
   };
 
+  const handleReadMark = async (boxId: string) => {
+    try {
+      const success = await markMessageAsRead(boxId);
+      if (success) {
+        console.log("Message marked as read successfully.");
+      } else {
+        console.warn("Failed to mark message as read.");
+      }
+    } catch (error) {
+      console.error("Error in handleReadMark:", error);
+    }
+  };
   //Create Texting/DisableTexting Event
   let avatar: string = "";
   useEffect(() => {
@@ -181,6 +200,29 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
+      if (isCurrentPageBoxId(data.boxId)) {
+        handleReadMark(data.boxId);
+      } else {
+        setReadStatusByBox((prevState) => ({
+          ...prevState,
+          [data.boxId]: false
+        }));
+      }
+      if (data.contentId) {
+        setFileList((prev) => {
+          const fileContent = prev[data.boxId] || [];
+          // Chỉ cập nhật nếu tin nhắn thực sự mới
+          if (!fileContent.some((msg) => msg.url === data.contentId.url)) {
+            const updated = {
+              ...prev,
+              [data.boxId]: [...fileContent, data.contentId]
+            };
+            console.log("Updated fileList: ", updated);
+            return updated;
+          }
+          return prev; // Không thay đổi nếu tin nhắn đã tồn tại
+        });
+      }
     };
     const pusherClient = getPusherClient();
     pusherClient.subscribe(`private-${boxId}`);

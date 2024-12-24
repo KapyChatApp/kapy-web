@@ -89,63 +89,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //   fetchImageList();
   // }, []);
 
-  //Online Status
-
-  useEffect(() => {
-    if (!chatItem) {
-      return;
-    }
-
-    const fetchRealTimeData = async () => {
-      for (const user of chatItem.memberInfo) {
-        try {
-          const data = await getRealTimeOfUser(user._id);
-          if (data) {
-            if (!data.isOnline) {
-              setTimeOfflineChat((prev) => ({
-                ...prev,
-                [user._id]: data.updateTime // Lưu thời gian cập nhật
-              }));
-            }
-            setIsOnlineChat((prevState) => ({
-              ...prevState,
-              [user._id]: data.isOnline
-            }));
-          } else {
-            setIsOnlineChat((prevState) => ({
-              ...prevState,
-              [user._id]: false
-            }));
-          }
-        } catch (error) {
-          console.error(
-            `Failed to fetch real-time data for user ${user._id}:`,
-            error
-          );
-        }
-      }
-    };
-
-    fetchRealTimeData();
-  }, []);
-
   //Read status
-  useEffect(() => {
-    const pusherClient = getPusherClient();
-
-    const handleReadedId = (data: ReadedStatusPusher) => {
-      console.log("Successfully received readed-status:", data);
-      setReadedIdByBox((prevState) => ({
-        ...prevState,
-        [data.boxId]: data.readedId
-      }));
-    };
-
-    dataChat.forEach((box) => {
-      pusherClient.subscribe(`private-${box.id}`);
-      pusherClient.bind("readed-status", handleReadedId);
-    });
-  });
 
   //Right Top
   let top: any;
@@ -308,7 +252,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
 
   if (!chatItem) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center bg-white">
+      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
         <div className="loader"></div>
       </div>
     );
