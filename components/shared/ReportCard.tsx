@@ -4,52 +4,53 @@ import { createReport } from "@/lib/services/report";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { toast } from "@/hooks/use-toast";
 const categorizedReportOptions = [
   {
-    category: "HÀNH VI PHẠM TỘI VÀ BẠO LỰC",
+    category: "CRIMINAL BEHAVIOR AND VIOLENCE",
     options: [
-      "Hành vi phạm tội và bạo lực",
-      "Cấu kết gây hại và cổ xúy tội ác",
-      "Cá nhân và tổ chức nguy hiểm"
+      "Criminal behavior and violence",
+      "Collusion to cause harm and incite crimes",
+      "Dangerous individuals and organizations"
     ]
   },
   {
-    category: "SỰ AN TOÀN",
+    category: "SAFETY",
     options: [
-      "Hành vi gian lận, lừa đảo và lừa gạt",
-      "Hàng hóa và dịch vụ bị hạn chế",
-      "Bạo lực và khích nộ"
+      "Fraud, deception, and scams",
+      "Restricted goods and services",
+      "Violence and incitement"
     ]
   },
   {
-    category: "NỘI DUNG PHẢN CẢM",
+    category: "OBJECTIONABLE CONTENT",
     options: [
-      "Nội dung phản cảm",
-      "Hoạt động tình dục và ảnh khỏa thân người lớn",
-      "Hành vi gạ gẫm tình dục người lớn và ngôn ngữ khiêu dâm"
+      "Objectionable content",
+      "Sexual activities and adult nudity",
+      "Sexual solicitation and explicit language"
     ]
   },
   {
-    category: "TÍNH TOÀN VẸN VÀ TÍNH XÁC THỰC",
+    category: "INTEGRITY AND AUTHENTICITY",
     options: [
-      "Tính toàn vẹn của tài khoản",
-      "Cam đoan về danh tính thực",
-      "An ninh mạng"
+      "Account integrity",
+      "Commitment to real identity",
+      "Cybersecurity"
     ]
   },
   {
-    category: "TÔN TRỌNG QUYỀN SỞ HỮU TRÍ TUỆ",
+    category: "RESPECT FOR INTELLECTUAL PROPERTY RIGHTS",
     options: [
-      "Vi phạm quyền sở hữu trí tuệ của bên thứ ba",
-      "Sử dụng giấy phép và quyền sở hữu trí tuệ của Meta"
+      "Violation of third-party intellectual property rights",
+      "Use of Meta's intellectual property and licenses"
     ]
   },
   {
-    category: "YÊU CẦU VÀ QUYẾT ĐỊNH LIÊN QUAN ĐẾN NỘI DUNG",
-    options: ["Yêu cầu của người dùng", "Thông tin sai lệch", "Spam"]
+    category: "CONTENT-RELATED REQUESTS AND DECISIONS",
+    options: ["User requests", "Misinformation", "Spam"]
   }
 ];
-
+//Post Message Comment User
 const ReportCard = ({
   onClose,
   type,
@@ -60,12 +61,10 @@ const ReportCard = ({
   reportedId: string;
 }) => {
   const [selectedOption, setSelectedOption] = useState<string>("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
     const token = localStorage.getItem("token");
@@ -73,42 +72,47 @@ const ReportCard = ({
     const userId = localStorage.getItem("userId");
     if (!token) {
       setError("Authentication is required");
-      setLoading(false);
       return;
     }
 
     try {
       const reportPayload: CreateReportDTO = {
-        title: "Báo cáo vi phạm",
+        title: "Report Details",
         content: selectedOption,
         targetId: reportedId || "",
         targetType: type
       };
       const res = await createReport(reportPayload);
-      console.log(res, "res rp");
-
-      alert("Repost created successfully!");
+      toast({
+        title: `Send Report Successfully`,
+        className:
+          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+      });
       onClose();
     } catch (err: any) {
       console.error(err);
       setError(err.message || "Error creating repost");
-    } finally {
-      setLoading(false);
+      toast({
+        title: `Error in sending report`,
+        description: err instanceof Error ? err.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-black opacity-50"
+        className="absolute inset-0 background-light900_dark100 opacity-20"
         onClick={onClose}
       ></div>
 
-      <div className="no-scrollbar background-light700_dark300 text-dark100_light500 relative z-10 h-[70vh] w-[50vw] overflow-y-auto rounded-md shadow-lg md:w-[30vw]">
+      <div className="no-scrollbar background-light900_dark200 text-dark100_light900 relative z-10 h-[80vh] w-[50vw] overflow-y-auto shadow-lg md:w-[30vw] rounded-lg ">
         <div className="flex size-full flex-col">
           <div className="flex items-center justify-between px-4 py-2 pl-0">
             <span className="rounded-lg rounded-l-none p-2 px-4 text-center text-sm md:text-base">
-              Nội dung
+              Details
             </span>
             <Icon
               icon="iconoir:cancel"
@@ -124,7 +128,7 @@ const ReportCard = ({
             {categorizedReportOptions.map((category, catIndex) => (
               <div key={catIndex} className="mb-4">
                 {/* Tiêu đề mục lớn */}
-                <h3 className="text-sm font-bold text-primary-100 md:text-base">
+                <h3 className="text-sm font-bold text-primary-500 md:text-base">
                   {category.category}
                 </h3>
 
@@ -153,16 +157,16 @@ const ReportCard = ({
           <div className="text-dark100_light500 flex items-center justify-between gap-4 px-8 py-4">
             <Button
               onClick={onClose}
-              className="h-[35px] w-32 bg-white text-xs shadow-md dark:border dark:bg-transparent md:text-sm"
+              className="h-[35px] w-32 background-light700_dark400 text-xs shadow-md md:text-sm hover:background-light700_dark400 rounded-lg"
             >
-              Hủy
+              Cancel
             </Button>
             <Button
               onClick={handleSubmit} // Truyền giá trị đã chọn
               disabled={!selectedOption} // Vô hiệu hóa nếu chưa chọn mục
-              className="h-[35px] w-32 bg-primary-100 text-xs text-white shadow-md md:text-sm"
+              className="h-[35px] w-32 bg-primary-500 text-xs text-light-900 shadow-md md:text-sm hover:bg-primary-500 rounded-lg"
             >
-              Xác nhận
+              Confirm
             </Button>
           </div>
         </div>
