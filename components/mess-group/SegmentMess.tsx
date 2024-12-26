@@ -34,7 +34,6 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   const { adminInfo } = useUserContext();
   const { setIsReactedByMessage, isReactedByMessage } = useChatContext();
   const adminId = adminInfo._id;
-  const isActive = createBy !== adminId;
 
   // Render Content
   const textSegment = text;
@@ -45,38 +44,35 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   const otherSegment = contentSegment && contentId.type === "Other";
 
   const [isHovered, setIsHovered] = useState(false);
-  const [isReacted, setIsReacted] = useState(false);
   const [showQuantity, setShowQuantity] = useState(false);
   const [isCount, setIsCount] = useState(segments.isReact.length);
   const [listReact, setListReact] = useState<string[]>(segments.isReact);
-
-  useEffect(() => {}, [isCount, listReact]);
-
   const handleReact = async () => {
-    const reactMap: Record<string, boolean> = { ...isReactedByMessage };
     try {
       const resp = await reactMessage(id);
       if (resp.isReact.length > 0) {
-        setIsReacted(true);
         setIsCount(resp.isReact.length);
-        reactMap[id] = true;
-        setIsReactedByMessage(reactMap);
+        setIsReactedByMessage((prevState) => ({
+          ...prevState,
+          [id]: true
+        }));
       } else {
-        setIsReacted(false);
         setIsCount(resp.isReact.length);
-        reactMap[id] = false;
-        setIsReactedByMessage(reactMap);
+        setIsReactedByMessage((prevState) => ({
+          ...prevState,
+          [id]: false
+        }));
       }
     } catch (error) {
       console.error("Error reacting to message:", error);
     }
   };
-
   const handleShowQuantity = () => {
     setShowQuantity(!showQuantity);
   };
 
-  const showHeart = segments.flag && (isHovered || isReacted);
+  const showHeart =
+    segments.flag && (isHovered || isReactedByMessage[segments.id]);
   const params = {
     setShowQuantity,
     recieverInfo,
@@ -88,12 +84,18 @@ const SegmentMess: React.FC<SegmentMessage> = ({
       console.log("Successfully received message: ", data);
       const quantity = data.isReact.length;
       if (quantity > 0 && data.id === segments.id) {
-        setIsReacted(true);
         setIsCount(quantity);
         setListReact(data.isReact);
+        setIsReactedByMessage((prevState) => ({
+          ...prevState,
+          [id]: true
+        }));
       } else if (data.id === segments.id) {
-        setIsReacted(false);
         setIsCount(0);
+        setIsReactedByMessage((prevState) => ({
+          ...prevState,
+          [id]: false
+        }));
       }
     };
     const pusherClient = getPusherClient();
@@ -113,16 +115,14 @@ const SegmentMess: React.FC<SegmentMessage> = ({
 
   useEffect(() => {
     if (segments.isReact.length > 0) {
-      setIsReacted(true);
       setIsCount(segments.isReact.length);
     }
   });
-
   return (
     <>
       <div
         className={`relative flex flex-row items-center justify-start w-fit gap-2 h-full ${
-          segments.flag && isReacted ? "pb-5" : ""
+          segments.flag && isReactedByMessage[segments.id] ? "pb-5" : ""
         }`}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
@@ -144,7 +144,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({
         )}
 
         {/* Div hiển thị khi đã react */}
-        {segments.flag && isReacted && (
+        {segments.flag && isReactedByMessage[segments.id] && (
           <div className="absolute bottom-0 right-[40px] ">
             <div
               className="flex flex-row gap-2 background-light700_dark200 rounded-3xl shadow-sm items-center justify-center p-1 h-fit cursor-pointer"
@@ -168,7 +168,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({
           className={`absolute cursor-pointer transition-transform p-1 rounded-full shadow-sm background-light700_dark200 z-10 ${
             showHeart ? "visible" : "invisible"
           } ${isHovered ? "hover:scale-110" : ""} ${
-            segments.flag && isReacted
+            segments.flag && isReactedByMessage[segments.id]
               ? "bottom-[-2px] right-[6px]"
               : "bottom-[-18px] right-[6px]"
           }`}
@@ -176,12 +176,14 @@ const SegmentMess: React.FC<SegmentMessage> = ({
         >
           <Icon
             icon={
-              segments.flag && isReacted ? "mynaui:heart-solid" : "mynaui:heart"
+              segments.flag && isReactedByMessage[segments.id]
+                ? "mynaui:heart-solid"
+                : "mynaui:heart"
             }
             width={18}
             height={18}
             className={
-              segments.flag && isReacted
+              segments.flag && isReactedByMessage[segments.id]
                 ? "text-accent-red"
                 : "text-dark100_light900"
             }

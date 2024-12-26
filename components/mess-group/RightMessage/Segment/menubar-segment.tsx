@@ -201,7 +201,7 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
     <>
       <div
         className={`flex flex-row gap-2 items-center justify-start w-fit h-full group ${
-          isReactedByMessage[messageId] ? "mb-5" : ""
+          isReactedByMessage[messageId] ? "pb-5" : ""
         }`}
       >
         {admin && (
