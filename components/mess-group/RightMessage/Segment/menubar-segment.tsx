@@ -146,19 +146,21 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       }
     };
     const handleRevokeMessage = (data: PusherRevoke) => {
-      const fileRevoke = messagesByBox[data.boxId].find(
-        (item) => item.id === data.id
-      );
-      if (fileRevoke && fileRevoke.contentId) {
-        setFileList((prev) => {
-          const fileContent = prev[data.boxId] || [];
-          return {
-            ...prev,
-            [data.boxId]: fileContent.filter(
-              (msg) => msg.url !== fileRevoke.contentId.url
-            )
-          };
-        });
+      if (messagesByBox && messagesByBox[data.boxId]) {
+        const fileRevoke = messagesByBox[data.boxId].find(
+          (item) => item.id === data.id
+        );
+        if (fileRevoke && fileRevoke.contentId) {
+          setFileList((prev) => {
+            const fileContent = prev[data.boxId] || [];
+            return {
+              ...prev,
+              [data.boxId]: fileContent.filter(
+                (msg) => msg.url !== fileRevoke.contentId.url
+              )
+            };
+          });
+        }
       }
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];

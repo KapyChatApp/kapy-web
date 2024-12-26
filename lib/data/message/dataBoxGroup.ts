@@ -51,7 +51,8 @@ export const fetchMessageBoxGroup = async (
           pin: false,
           readedId: item.readedId,
           readStatus: item.readStatus,
-          stranger: false
+          stranger: false,
+          createBy: item.createBy
         };
       })
       .filter((item: any): item is MessageBoxInfo => item !== null); // Loại bỏ các giá trị null

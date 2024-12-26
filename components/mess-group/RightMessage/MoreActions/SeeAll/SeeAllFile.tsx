@@ -7,7 +7,6 @@ import React, { useEffect, useState } from "react";
 
 const SeeAllFile: React.FC<SeeAllProps> = ({
   setActiveComponent,
-  setItemSent,
   itemSent
 }) => {
   const [fileList, setFileList] = useState<FileContent[]>([]);

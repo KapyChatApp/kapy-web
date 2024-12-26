@@ -65,7 +65,6 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
       membersIds: selectedIds,
       groupName: groupName
     };
-    console.log(param);
     const result = await createGroup(param, groupAva, setDataChat, setError);
     const { success, newBox } = result;
     console.log(success);
@@ -195,6 +194,7 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
               <Button
                 className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
                 onClick={handleAdd}
+                disabled={selectedIds.length < 2}
               >
                 Create
               </Button>

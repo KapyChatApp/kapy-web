@@ -17,6 +17,7 @@ export interface MessageBoxInfo {
   stranger: boolean;
   readStatus: boolean;
   readedId: string[];
+  createBy: string;
 }
 export interface RequestCreateGroup {
   membersIds: string[];
@@ -35,6 +36,7 @@ export interface MessageBoxDTO {
   stranger: boolean;
   readStatus: boolean;
   readedId: string[];
+  createBy: string;
 }
 
 export interface FileContent {
