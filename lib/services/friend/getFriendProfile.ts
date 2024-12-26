@@ -51,6 +51,7 @@ export const fetchFriendProfile = async (
     }
 
     const data: FriendProfileResponseDTO = await response.json();
+    console.log(data);
     return data;
   } catch (error: any) {
     console.error("Error fetching friend profile:", error);

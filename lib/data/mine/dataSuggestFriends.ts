@@ -39,6 +39,7 @@ export const getMyListSuggestedFriend = async (
         mutualFriends: item.mutualFriends ? item.mutualFriends : []
       };
     });
+    console.log(result);
     setListSuggestedFriend(data);
     return data;
   } catch (err: any) {

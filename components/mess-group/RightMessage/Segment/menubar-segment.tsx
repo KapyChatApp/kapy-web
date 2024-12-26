@@ -16,6 +16,7 @@ import { PusherDelete, PusherRevoke } from "@/lib/DTO/message";
 import { RevokeMessage } from "@/lib/services/message/revoke";
 import { DeleteMessage } from "@/lib/services/message/delete";
 import { useUserContext } from "@/context/UserContext";
+import ReportCard from "@/components/shared/ReportCard";
 
 interface MenuProps {
   createAt: string;
@@ -38,7 +39,9 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
   } = useChatContext();
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
-
+  const onclose = () => {
+    setConfirm(false);
+  };
   const handleItemClick = () => {
     setClickMore(false);
     setConfirm(true);
@@ -226,7 +229,7 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
             <MenubarContent
               side="top"
               align="center"
-              className="hover:boder-none ml-[13px] md:min-w-[100px] rounded-lg shadow-lg p-1 dark:bg-dark-200 bg-light-900 gap-2 justify-start items-center group-hover:opacity-100"
+              className="hover:boder-none ml-[13px] md:min-w-[130px] w-[130px] rounded-lg shadow-lg p-1 dark:bg-dark-200 bg-light-900 gap-2 justify-start items-center group-hover:opacity-100"
             >
               <MenubarItem
                 onClick={() => {
@@ -245,6 +248,15 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
                 className="hover:background-light700_dark400 hover:rounded-lg hover:border-none group-hover:opacity-100"
               >
                 Revoke
+              </MenubarItem>
+              <MenubarItem
+                onClick={() => {
+                  handleItemClick();
+                  setAction("report");
+                }}
+                className="hover:background-light700_dark400 hover:rounded-lg hover:border-none group-hover:opacity-100"
+              >
+                Report
               </MenubarItem>
             </MenubarContent>
           </MenubarMenu>
@@ -269,6 +281,9 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           label={action}
           onEvent={handleRevoke}
         />
+      )}
+      {isConfirm && action === "report" && (
+        <ReportCard onClose={onclose} type="Message" reportedId={messageId} />
       )}
     </>
   );

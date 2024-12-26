@@ -8,6 +8,7 @@ import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useUserContext } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { formatTimeMessageBox } from "@/lib/utils";
+import { useLayoutContext } from "@/context/LayoutContext";
 
 interface RightTopProps {
   _id: string;
@@ -25,20 +26,12 @@ interface rightTop {
 }
 
 const RightTop: React.FC<rightTop> = ({ top }) => {
-  const {
-    _id,
-    ava,
-    name,
-    membersGroup,
-    onlineGroup,
-    openMore,
-    setOpenMore,
-    isOnline
-  } = top;
+  const { _id, ava, name, membersGroup, onlineGroup, isOnline } = top;
 
   const pathname = usePathname();
   const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { timeOfflineChat } = useUserContext();
+  const { openMore, setOpenMore } = useLayoutContext();
   const [timeOff, setTimeOff] = useState("");
   const handleOpenMore = () => {
     setOpenMore(!openMore);
@@ -110,17 +103,30 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
         const now = new Date();
         const sendDate = new Date(timeOfflineChat[_id]);
         const timeDifference = now.getTime() - sendDate.getTime();
-        const formattedTime =
-          timeDifference < 60000
-            ? "1min"
-            : formatTimeMessageBox(timeOfflineChat[_id]);
+
+        let formattedTime;
+        if (timeDifference < 60000) {
+          formattedTime = "1min";
+        } else {
+          formattedTime = formatTimeMessageBox(timeOfflineChat[_id]);
+        }
+        if (
+          !formattedTime.includes("s") &&
+          !formattedTime.includes("mins") &&
+          !formattedTime.includes("h")
+        ) {
+          formattedTime = `Online since ${formattedTime}`;
+        }
         setTimeOff(formattedTime);
       };
+
       updateCreateAt();
+
       const interval = setInterval(() => {
         updateCreateAt();
-      }, 180000); // Cập nhật mỗi 1 phút
-      return () => clearInterval(interval); // Cleanup interval khi component unmount
+      }, 180000);
+
+      return () => clearInterval(interval);
     }
   }, []);
 
@@ -152,7 +158,11 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
                 </p>
               ) : (
                 <p className="small-light text-dark100_light900">
-                  {timeOff && !isOnlineChat[_id] && `Online ${timeOff} ago`}
+                  {timeOff &&
+                    !isOnlineChat[_id] &&
+                    (timeOff.includes("Online since")
+                      ? timeOff
+                      : `Online ${timeOff} ago`)}
                 </p>
               )}
             </div>

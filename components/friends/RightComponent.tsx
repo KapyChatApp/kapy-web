@@ -80,7 +80,6 @@ const RightComponent = () => {
     setIsSearching(!!searchTerm.trim());
   }, [searchTerm]);
 
-  console.log(isSearching);
   const renderCoveredDiv = () => {
     let render = "";
     matchedPath === "all-friend" || matchedPath === "best-friend"
@@ -93,7 +92,7 @@ const RightComponent = () => {
           "flex flex-row xl:justify-start justify-between items-center flex-wrap gap-3 xl:gap-x-3 xl:gap-y-6 overflow-scroll scrollable h-fit");
     return render;
   };
-  console.log(filteredFriends);
+
   return (
     <div className="flex flex-col w-full h-full px-4 pt-4 pb-3 md:p-0 overflow-scroll scrollable">
       <div className="flex md:hidden w-full h-fit">

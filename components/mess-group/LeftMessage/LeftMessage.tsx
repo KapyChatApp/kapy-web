@@ -15,6 +15,8 @@ import LeftMessageRaw from "../UI-Raw/LeftMessageRaw";
 import { FileContent, ResponseMessageDTO } from "@/lib/DTO/message";
 import { fetchMessages } from "@/lib/data/message/dataMessages";
 import { getFileList } from "@/lib/data/message/dataFileList";
+import { getPusherClient } from "@/lib/pusher";
+import { AnimatePresence, motion } from "framer-motion";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -50,10 +52,14 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           : await fetchMessageBox(adminId, setError);
 
         const messagesMap: Record<string, ResponseMessageDTO[]> = {};
-
+        const boxLastMessageTimes: Record<string, string | null> = {};
         for (const box of data) {
           const boxMessages = await fetchMessages(box.id);
           messagesMap[box.id] = boxMessages;
+
+          // Lấy tin nhắn cuối cùng (nếu có)
+          const lastMessage = boxMessages[boxMessages.length - 1];
+          boxLastMessageTimes[box.id] = lastMessage?.createAt || null;
         }
 
         const filesMap: Record<string, FileContent[]> = {};
@@ -73,8 +79,14 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
             [box.id]: box.readedId
           }));
         }
-
-        setDataChat(data);
+        const sortedData = [...data].sort((a, b) => {
+          const timeA = boxLastMessageTimes[a.id];
+          const timeB = boxLastMessageTimes[b.id];
+          return (
+            new Date(timeB || 0).getTime() - new Date(timeA || 0).getTime()
+          );
+        });
+        setDataChat(sortedData);
         setMessagesByBox(messagesMap);
         setFileList(filesMap);
       } catch (err) {
@@ -86,6 +98,34 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     fetchData();
   }, [isGroup]);
 
+  useEffect(() => {
+    const handleNewMessage = (data: ResponseMessageDTO) => {
+      setDataChat((prevDataChat) => {
+        const boxIndex = prevDataChat.findIndex((box) => box.id === data.boxId);
+        if (boxIndex !== -1) {
+          const updatedChat = [...prevDataChat];
+          const [movedBox] = updatedChat.splice(boxIndex, 1);
+          return [movedBox, ...updatedChat];
+        }
+        return prevDataChat;
+      });
+    };
+    const pusherClient = getPusherClient();
+    for (const box of dataChat) {
+      pusherClient.subscribe(`private-${box.id}`);
+
+      // Bind sự kiện với handler
+      pusherClient.bind("new-message", handleNewMessage);
+
+      //Cleanup khi component bị unmount hoặc boxId thay đổi
+      return () => {
+        pusherClient.unsubscribe(`private-${box.id}`);
+
+        pusherClient.unbind("new-message", handleNewMessage);
+      };
+    }
+  });
+
   const { searchTerm, setSearchTerm, filteredBox } =
     useSearchMessageBox(dataChat);
 
@@ -95,7 +135,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
 
   return (
     <>
-      <div className="flex flex-col background-light900_dark400 h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[12px] rounded-br-[12px] lg:rounded-tr-[0px] lg:rounded-br-[0px] md:rounded-tr-[0px] md:rounded-br-[0px] w-full">
+      <div className="flex flex-col background-light900_dark400 h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[0px] rounded-br-[0px] w-full">
         <p className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900 px-2">
           {isGroup ? "Groups" : "Messages"}
         </p>
@@ -106,11 +146,19 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           {filteredBox.length > 0
             ? filteredBox.map((item) => {
                 return (
-                  <MessageBox
-                    box={item}
-                    setClickBox={setClickBox}
-                    setClickOtherRight={setClickOtherRight}
-                  />
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <MessageBox
+                      box={item}
+                      setClickBox={setClickBox}
+                      setClickOtherRight={setClickOtherRight}
+                    />
+                  </motion.div>
                 );
               })
             : null}

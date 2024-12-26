@@ -8,17 +8,11 @@ import { SeeAllProps } from "@/types/mess-group";
 
 interface MoreActionsProps {
   propsAll: SeeAllProps;
-  setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
   relation: string;
   setRelation: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const MoreActions = ({
-  propsAll,
-  setOpenMore,
-  relation,
-  setRelation
-}: MoreActionsProps) => {
+const MoreActions = ({ propsAll, relation, setRelation }: MoreActionsProps) => {
   const { detailByBox, setActiveComponent, setItemSent, itemSent } = propsAll;
   const pathname = usePathname();
 
@@ -43,23 +37,35 @@ const MoreActions = ({
   };
 
   return (
-    <div className="flex flex-col w-full h-fit items-center justify-center p-1">
-      <MoreTop
-        top={isGroup ? topGroup : top}
-        setActiveComponent={setActiveComponent}
-      />
+    <div
+      className={` flex flex-col w-full ${
+        isGroup
+          ? "h-fit items-center justify-center"
+          : "h-full items-center justify-start gap-7"
+      } p-1`}
+    >
+      <div className="flex w-full h-fit">
+        <MoreTop
+          top={isGroup ? topGroup : top}
+          setActiveComponent={setActiveComponent}
+        />
+      </div>
 
-      <MoreMiddle
-        detailByBox={detailByBox}
-        setActiveComponent={setActiveComponent}
-        setItemSent={setItemSent}
-        itemSent={itemSent}
-      />
-      <MoreBottom
-        setActiveComponent={setActiveComponent}
-        receiver={detailByBox.receiverInfo}
-        boxId={detailByBox.id}
-      />
+      <div className={`flex w-full ${isGroup ? "h-fit" : "h-full"}`}>
+        <MoreMiddle
+          detailByBox={detailByBox}
+          setActiveComponent={setActiveComponent}
+          setItemSent={setItemSent}
+          itemSent={itemSent}
+        />
+      </div>
+      <div className="flex w-full h-fit">
+        <MoreBottom
+          setActiveComponent={setActiveComponent}
+          receiver={detailByBox.receiverInfo}
+          boxId={detailByBox.id}
+        />
+      </div>
     </div>
   );
 };

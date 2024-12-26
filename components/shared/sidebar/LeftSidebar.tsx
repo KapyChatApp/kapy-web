@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger
@@ -26,12 +25,10 @@ import { PersonalAccount } from "@/components/settings/Profile/PersonalAccount";
 import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
 import { useUserContext } from "@/context/UserContext";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
-import { getPusherClient } from "@/lib/pusher";
-import { OnlineEvent } from "@/lib/DTO/user";
-import { useChatContext } from "@/context/ChatContext";
+import { useLayoutContext } from "@/context/LayoutContext";
 
 const Leftsidebar = () => {
-  const [isParagraphVisible, setIsParagraphVisible] = useState(true);
+  const { setIsParagraphVisible, isParagraphVisible } = useLayoutContext();
   const toggleParagraphVisibility = () => {
     setIsParagraphVisible(!isParagraphVisible);
   };
@@ -58,6 +55,13 @@ const Leftsidebar = () => {
   const [isSetting, setSetting] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { adminInfo, newAva, setAdminInfo } = useUserContext();
+  const { openMore, setOpenMore } = useLayoutContext();
+
+  const handleClick = () => {
+    if (openMore) {
+      setOpenMore(!openMore);
+    }
+  };
 
   const handleAccount = () => {
     setAccount(!isAccount);
@@ -119,7 +123,10 @@ const Leftsidebar = () => {
         }`}
       >
         <div className={`flex-1 w-full items-center justify-center`}>
-          <div className={`flex flex-col w-full items-center justify-center `}>
+          <div
+            className={`flex flex-col w-full items-center justify-center `}
+            onClick={handleClick}
+          >
             <Link
               key="logo"
               href="/"
@@ -166,7 +173,10 @@ const Leftsidebar = () => {
                       : "text-dark100_light900 bg-transparent hover:bg-light-500 hover:bg-opacity-30 hover:dark:bg-dark-400 hover:dark:bg-opacity-40"
                   } flex items-center justify-start hover:rounded-lg`}
                 >
-                  <div className="bg-transparent flex items-end justify-start p-[12px]">
+                  <div
+                    className="bg-transparent flex items-end justify-start p-[12px] h-full w-full"
+                    onClick={handleClick}
+                  >
                     <Icon
                       icon={item.icon}
                       width={20}
@@ -228,7 +238,7 @@ const Leftsidebar = () => {
                   )}
                 </div>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="mb-[8px] ml-[28px] min-w-[344px] rounded-lg shadow-lg p-1 dark:bg-dark-200 bg-light-900 gap-2">
+              <DropdownMenuContent className="mb-[8px] ml-[28px] min-w-[344px] rounded-lg shadow-lg p-1 dark:bg-dark-200 bg-light-900 gap-2 z-1000">
                 <DropdownMenuLabel className="hover:bg-light-700 hover:rounded-lg hover:dark:bg-dark-400 hover:dark:bg-opacity-80">
                   <Button
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent border-none shadow-none p-0 w-full"

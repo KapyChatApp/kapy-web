@@ -1,10 +1,4 @@
-export interface ShortUserResponseDTO {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  nickName: string;
-  avatar: string;
-}
+import { ShortUserResponseDTO } from "./user";
 
 export interface FriendResponseDTO {
   _id: string;

@@ -1,5 +1,6 @@
 "use client";
 import { useChatContext } from "@/context/ChatContext";
+import { useLayoutContext } from "@/context/LayoutContext";
 import { useUserContext } from "@/context/UserContext";
 import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
 import { markMessageAsRead } from "@/lib/services/message/read-mark";
@@ -54,6 +55,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
+  const { openMore, setOpenMore } = useLayoutContext();
 
   const router = useRouter();
   const handleReadMark = async () => {
@@ -71,6 +73,9 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
 
   const handleClickLink = () => {
     handleReadMark();
+    if (openMore) {
+      setOpenMore(!openMore);
+    }
     isGroup ? router.push(`/group-chat/${id}`) : router.push(`/${id}`);
   };
 

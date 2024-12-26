@@ -8,6 +8,7 @@ import { ChatProvider } from "@/context/ChatContext";
 import { UserProvider } from "@/context/UserContext";
 import { FriendProvider } from "@/context/FriendContext";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
+import { LayoutProvider } from "@/context/LayoutContext";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -37,13 +38,15 @@ export default function RootLayout({
         ></link>
       </head>
       <body className="font-helvetica custom-scrollbar">
-        <ThemeProvider>
-          <ChatProvider>
-            <FriendProvider>
-              <UserProvider>{children}</UserProvider>
-            </FriendProvider>
-          </ChatProvider>
-        </ThemeProvider>
+        <LayoutProvider>
+          <ThemeProvider>
+            <ChatProvider>
+              <FriendProvider>
+                <UserProvider>{children}</UserProvider>
+              </FriendProvider>
+            </ChatProvider>
+          </ThemeProvider>
+        </LayoutProvider>
         <Toaster />
       </body>
     </html>
