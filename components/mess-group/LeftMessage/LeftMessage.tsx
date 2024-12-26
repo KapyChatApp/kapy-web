@@ -63,12 +63,12 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
         }
 
         const filesMap: Record<string, FileContent[]> = {};
-
         for (const box of data) {
           const boxFiles = await getFileList(box.id);
           filesMap[box.id] = boxFiles;
         }
 
+        //Read Status
         for (const box of data) {
           setReadStatusByBox((prevState) => ({
             ...prevState,

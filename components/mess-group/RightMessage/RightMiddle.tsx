@@ -32,10 +32,17 @@ const RightMiddle = ({
   const { adminInfo } = useUserContext();
   const adminId = adminInfo._id;
   const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
+  const { isReactedByMessage } = useChatContext();
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
   const isGroup = /^\/group-chat/.test(pathname);
-  const { readedIdByBox, dataChat, setReadedIdByBox } = useChatContext();
+  const {
+    readedIdByBox,
+    dataChat,
+    setReadedIdByBox,
+    setIsReactedByMessage,
+    messagesByBox
+  } = useChatContext();
   const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
     ...filteredSegmentAdmin,
@@ -87,7 +94,7 @@ const RightMiddle = ({
         behavior: "smooth" // Thêm hiệu ứng mượt mà
       });
     }
-  }, [messagesToDisplay]);
+  }, []);
 
   //Texting Event
   useEffect(() => {
@@ -148,6 +155,16 @@ const RightMiddle = ({
     }
   }, [readedIdByBox, boxId]);
 
+  useEffect(() => {
+    if (!boxId || !messagesByBox[boxId]) return;
+    for (const msg of messagesByBox[boxId]) {
+      setIsReactedByMessage((prevState) => ({
+        ...prevState,
+        [msg.id]: msg.isReact.length > 0 ? true : false
+      }));
+    }
+  }, [messagesByBox, boxId]);
+
   return (
     <div
       className="flex w-full h-fit overflow-scroll custom-scrollbar "
@@ -205,7 +222,13 @@ const RightMiddle = ({
                       } gap-3`}
                     >
                       {group[0].createBy !== adminId && (
-                        <div className="flex items-end h-full w-7 flex-shrink-0 relative">
+                        <div
+                          className={`flex items-end h-full w-7 flex-shrink-0 relative ${
+                            isReactedByMessage[group[group.length - 1].id]
+                              ? "pb-5"
+                              : ""
+                          }`}
+                        >
                           <Image
                             src={
                               foundItem?.avatar

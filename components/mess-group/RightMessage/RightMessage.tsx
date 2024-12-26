@@ -31,7 +31,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   const [relation, setRelation] = useState("");
   const { adminInfo, isOnlineChat } = useUserContext();
   const { setListBlockedFriend } = useFriendContext();
-  const { messagesByBox } = useChatContext();
+  const { messagesByBox, setIsReactedByMessage, isReactedByMessage } =
+    useChatContext();
   const { openMore, isParagraphVisible } = useLayoutContext();
   const adminId = adminInfo._id;
 
@@ -199,7 +200,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
       isMounted = false;
     };
   }, [chatItem]);
-
   if (!chatItem) {
     return (
       <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">

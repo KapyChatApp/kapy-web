@@ -49,8 +49,6 @@ const MoreMiddle = ({
       if (otherList) setOthers(otherList);
     }
   });
-
-  console.log(fileList);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng

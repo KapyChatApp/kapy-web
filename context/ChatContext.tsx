@@ -29,7 +29,10 @@ interface ChatContextType {
   isTyping: boolean;
   setIsTyping: React.Dispatch<React.SetStateAction<boolean>>;
   isReactedByMessage: Record<string, boolean>;
-  setIsReactedByMessage: React.Dispatch<Record<string, boolean>>;
+  setIsReactedByMessage: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
+
   isDeleted: boolean;
   setIsDeleted: React.Dispatch<React.SetStateAction<boolean>>;
   isRevoked: boolean;
