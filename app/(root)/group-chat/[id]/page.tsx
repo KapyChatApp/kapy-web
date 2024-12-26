@@ -52,7 +52,7 @@ const GroupMessContent = () => {
 
   if (!dataChat) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
+      <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">
         <div className="loader"></div>
       </div>
     );

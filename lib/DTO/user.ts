@@ -90,3 +90,11 @@ export interface OnlineEvent {
   online: boolean;
   updateTime: Date;
 }
+
+export interface ShortUserResponseDTO {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  nickName: string;
+  avatar: string;
+}

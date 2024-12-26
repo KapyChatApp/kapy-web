@@ -95,9 +95,11 @@ const MoreMiddle = ({
   return (
     <>
       <div
-        className={`flex flex-col flex-1 items-center justify-center w-full h-fit gap-[18px] ${
-          isGroup ? "mt-[24px]" : ""
-        } mb-[24px] responsive-moreAction `}
+        className={`flex flex-col flex-1 items-center w-full ${
+          isGroup
+            ? "h-fit gap-[18px] justify-center mt-[24px] mb-[24px]"
+            : "h-full justify-between pt-[12px] pb-3"
+        }`}
       >
         {/* Members */}
         <div

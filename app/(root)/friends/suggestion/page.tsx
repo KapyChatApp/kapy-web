@@ -6,7 +6,6 @@ import { getMyListSuggestedFriend } from "@/lib/data/mine/dataSuggestFriends";
 import React, { useEffect, useState } from "react";
 
 const page = () => {
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const { listSuggestedFriend, setListSuggestedFriend } = useFriendContext();
 
@@ -18,16 +17,18 @@ const page = () => {
       } catch (err) {
         setError("Failed to fetch data.");
         console.error(err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  if (loading) {
-    return <div>Loading...</div>;
+  if (!listSuggestedFriend) {
+    return (
+      <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">
+        <div className="loader"></div>
+      </div>
+    );
   }
 
   return <RightComponent />;

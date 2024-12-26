@@ -9,11 +9,10 @@ import SeeAllFile from "./MoreActions/SeeAll/SeeAllFile";
 import SeeAllPhoto from "./MoreActions/SeeAll/SeeAllPhoto";
 import SeeAllVideo from "./MoreActions/SeeAll/SeeAllVideo";
 import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
+import { useLayoutContext } from "@/context/LayoutContext";
 
 interface OpenMoreDisplayProps {
   detailByBox: MessageBoxInfo | undefined;
-  openMore: boolean;
-  setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
   setRelation: React.Dispatch<React.SetStateAction<string>>;
   relation: string;
 }
@@ -22,7 +21,8 @@ interface MoreDisplay {
 }
 
 const OpenMoreDisplay = ({ display }: MoreDisplay) => {
-  const { openMore, setOpenMore, detailByBox, setRelation, relation } = display;
+  const { detailByBox, setRelation, relation } = display;
+  const { openMore } = useLayoutContext();
   let detail: MessageBoxInfo = {
     id: "",
     receiverInfo: {
@@ -76,7 +76,6 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
             <AddComponent setActiveComponent={setActiveComponent} />
             <MoreActions
               propsAll={propsAll}
-              setOpenMore={setOpenMore}
               relation={relation}
               setRelation={setRelation}
             />
@@ -122,7 +121,6 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
         return (
           <MoreActions
             propsAll={propsAll}
-            setOpenMore={setOpenMore}
             relation={relation}
             setRelation={setRelation}
           />
@@ -141,7 +139,6 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       <div className="flex background-light850_dark200 flex-grow scrollable overflow-scroll pl-4 w-[20%] h-full">
         <MoreActions
           propsAll={propsAll}
-          setOpenMore={setOpenMore}
           relation={relation}
           setRelation={setRelation}
         />

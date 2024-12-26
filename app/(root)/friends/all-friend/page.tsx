@@ -4,9 +4,12 @@ import { useFriendContext } from "@/context/FriendContext";
 import { getMyListFriend } from "@/lib/data/mine/dataAllFriends";
 import { getMyListBestFriend } from "@/lib/data/mine/dataBestFriend";
 import { getMyListRequestedFriend } from "@/lib/data/mine/dataRequestFriend";
+import { getMyListSuggestedFriend } from "@/lib/data/mine/dataSuggestFriends";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
-const page = () => {
+const MyFriendPage = () => {
+  const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const {
@@ -15,58 +18,38 @@ const page = () => {
     listBestFriend,
     setListBestFriend,
     listRequestedFriend,
-    setListRequestedFriend
+    setListRequestedFriend,
+    listSuggestedFriend,
+    setListSuggestedFriend
   } = useFriendContext();
 
-  useEffect(() => {
-    // Gọi API lấy danh sách bạn bè khi component mount
-    const fetchData = async () => {
-      try {
-        await getMyListFriend(setListFriend, setError);
-        console.log(listFriend);
-      } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
-      }
-    };
-
-    fetchData();
-  }, [setListFriend]);
-
-  useEffect(() => {
-    // Gọi API lấy danh sách bạn thân khi component mount
-    const fetchData = async () => {
-      try {
-        await getMyListBestFriend(setListBestFriend, setError);
-      } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
-      }
-    };
-
-    fetchData();
-  }, [setListBestFriend]);
+  const fetchData = async () => {
+    try {
+      await Promise.all([
+        getMyListBestFriend(setListBestFriend, setError),
+        getMyListFriend(setListFriend, setError),
+        getMyListRequestedFriend(setListRequestedFriend, setError),
+        getMyListSuggestedFriend(setListSuggestedFriend, setError)
+      ]);
+    } catch (err) {
+      setError("Failed to fetch data.");
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    // Gọi API lấy danh sách bạn thân khi component mount
-    const fetchData = async () => {
-      try {
-        await getMyListRequestedFriend(setListRequestedFriend, setError);
-        console.log(listRequestedFriend);
-      } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
-  }, [setListRequestedFriend]);
+    router.push(`/friends/all-friend`);
+  }, []);
 
-  if (!listBestFriend || !listFriend || !listRequestedFriend) {
+  if (
+    !listBestFriend ||
+    !listFriend ||
+    !listRequestedFriend ||
+    !listSuggestedFriend
+  ) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
+      <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">
         <div className="loader"></div>
       </div>
     );
@@ -74,4 +57,4 @@ const page = () => {
   return <RightComponent />;
 };
 
-export default page;
+export default MyFriendPage;

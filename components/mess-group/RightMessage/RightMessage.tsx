@@ -15,6 +15,7 @@ import { checkRelation } from "@/lib/services/user/checkRelation";
 import ReportCard from "@/components/shared/ReportCard";
 import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 import { getPusherClient } from "@/lib/pusher";
+import { useLayoutContext } from "@/context/LayoutContext";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -22,17 +23,16 @@ interface RightMessageProps {
 
 const RightMessage = ({ chatItem }: RightMessageProps) => {
   const pathname = usePathname();
-  const [openMore, setOpenMore] = useState(false);
   const [isReport, setReport] = useState(false);
   const isGroup = pathname.startsWith("/group-chat");
 
   //FetchMessage Backend
   const { id } = useParams();
   const [relation, setRelation] = useState("");
-  const { adminInfo, isOnlineChat, setTimeOfflineChat, setIsOnlineChat } =
-    useUserContext();
+  const { adminInfo, isOnlineChat } = useUserContext();
   const { setListBlockedFriend } = useFriendContext();
-  const { setReadedIdByBox, dataChat, messagesByBox } = useChatContext();
+  const { messagesByBox } = useChatContext();
+  const { openMore, isParagraphVisible } = useLayoutContext();
   const adminId = adminInfo._id;
 
   const onclose = () => {
@@ -42,54 +42,14 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //boxId
   const [boxId, setBoxId] = useState<string>("");
   useEffect(() => {
-    // Lấy đường dẫn hiện tại từ URL
     const path = window.location.pathname;
-    // Chia đường dẫn thành các phần và lấy phần cuối cùng (boxId)
     const parts = path.split("/");
-    const id = parts.pop(); // Lấy phần cuối cùng của đường dẫn
+    const id = parts.pop();
 
     if (id) {
-      setBoxId(id); // Set boxId là chuỗi
+      setBoxId(id);
     }
   }, [boxId]);
-
-  // useEffect(() => {
-  //   const getMessage = async () => {
-  //     try {
-  //       if (id) {
-  //         // Kiểm tra nếu boxId tồn tại
-  //         const messagesMap: Record<string, ResponseMessageDTO[]> = {};
-
-  //         for (const box of dataChat) {
-  //           const boxMessages = await fetchMessages(box.id);
-  //           messagesMap[box.id] = boxMessages;
-  //         }
-  //         setMessagesByBox(messagesMap);
-  //       } else {
-  //         console.warn("boxId is undefined");
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   const fetchImageList = async () => {
-  //     try {
-  //       if (id) {
-  //         // Kiểm tra nếu boxId tồn tại
-  //         const list: FileContent[] = await getFileList(id.toString());
-  //         setFileList(list);
-  //       } else {
-  //         console.warn("boxId is undefined");
-  //       }
-  //     } catch (error) {
-  //       console.log(error);
-  //     }
-  //   };
-  //   getMessage();
-  //   fetchImageList();
-  // }, []);
-
-  //Read status
 
   //Right Top
   let top: any;
@@ -109,8 +69,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           onlineGroup: chatItem.memberInfo.filter(
             (member) => isOnlineChat[member._id]
           ).length,
-          openMore: openMore,
-          setOpenMore: setOpenMore,
           isOnline: isOnlineGroup
         }
       : {
@@ -131,8 +89,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
 
           membersGroup: 0,
           onlineGroup: 0,
-          openMore: openMore,
-          setOpenMore: setOpenMore,
           isOnline: isOnline
         };
   } else {
@@ -142,8 +98,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           name: "Unknown name",
           membersGroup: 0,
           onlineGroup: 0,
-          openMore: openMore,
-          setOpenMore: setOpenMore,
           isOnline: false
         }
       : {
@@ -151,8 +105,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           name: "Unknown name",
           membersGroup: 0,
           onlineGroup: 0,
-          openMore: openMore,
-          setOpenMore: setOpenMore,
           isOnline: false
         };
   }
@@ -167,8 +119,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //OpenMoreDisplay
   const display = {
     detailByBox: chatItem,
-    openMore,
-    setOpenMore,
     relation,
     setRelation
   };
@@ -252,7 +202,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
 
   if (!chatItem) {
     return (
-      <div className="flex h-screen w-screen items-center justify-center background-light900-dark400">
+      <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">
         <div className="loader"></div>
       </div>
     );
@@ -262,8 +212,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
       <div className="flex flex-row w-full h-full">
         <div
           className={`${
-            openMore ? "w-[65%]" : "w-full"
-          } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[12px] rounded-bl-[12px] lg:rounded-tl-[0px] lg:rounded-bl-[0px] md:rounded-tl-[0px] md:rounded-bl-[0px]`}
+            openMore ? (isParagraphVisible ? "w-[65%]" : "w-[70%]") : "w-full"
+          } background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[0px] rounded-bl-[0px]`}
         >
           <div
             className={`flex flex-col flex-1 w-full py-[16px] lg:px-[12px] pr-[12px] justify-between h-full`}

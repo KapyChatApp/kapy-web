@@ -500,6 +500,32 @@
     opacity: 1;
   }
 
+  /* Message box */
+  .message-container {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+  }
+
+  .message-container-enter {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  .message-container-enter-active {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .message-container-exit {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .message-container-exit-active {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  /* Map layout */
   body {
     margin: 0;
     padding: 0;
@@ -511,5 +537,63 @@
     bottom: 0;
     width: 80%;
     height: 80%;
+    z-index: 10;
+  }
+  #map > * {
+    margin: 16px; /* Áp dụng khoảng cách cho tất cả các phần tử con */
+  }
+
+  .modal-overlay-map {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  /* Popup */
+  .custom-leaflet-popup .leaflet-popup-content-wrapper {
+    background-color: #f57206;
+    color: #ffffff;
+    border-radius: 0.5rem;
+    padding: 4px;
+    box-shadow: none;
+  }
+  .custom-leaflet-popup .leaflet-popup-tip {
+    background-color: #f57206; /* bg-primary-500 */
+  }
+  .custom-leaflet-popup .leaflet-popup-close-button span {
+    color: #ffffff;
+  }
+
+  .custom-leaflet-popup-bff .leaflet-popup-content-wrapper {
+    background-color: #fcede0;
+    color: #f57206;
+    border-radius: 0.5rem;
+    padding: 4px;
+    box-shadow: none;
+  }
+  .custom-leaflet-popup-bff .leaflet-popup-tip {
+    background-color: #fcede0; /* bg-primary-500 */
+  }
+  .custom-leaflet-popup-bff .leaflet-popup-close-button span {
+    color: #f57206;
+  }
+
+  /* Image */
+  .custom-marker-icon {
+    border-radius: 50%; /* Làm hình tròn */
+    overflow: hidden; /* Ẩn các phần ngoài vùng tròn */
+    width: 40px; /* Kích thước hình tròn */
+    height: 40px; /* Kích thước hình tròn */
+  }
+  .custom-marker-icon {
+    border-radius: 50%; /* Làm hình tròn */
+    overflow: hidden; /* Ẩn các phần ngoài vùng tròn */
+    width: 40px; /* Kích thước hình tròn */
+    height: 40px; /* Kích thước hình tròn */
   }
 }
