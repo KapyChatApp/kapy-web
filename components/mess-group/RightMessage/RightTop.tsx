@@ -113,6 +113,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
         if (
           !formattedTime.includes("s") &&
           !formattedTime.includes("mins") &&
+          !formattedTime.includes("min") &&
           !formattedTime.includes("h")
         ) {
           formattedTime = `Online since ${formattedTime}`;

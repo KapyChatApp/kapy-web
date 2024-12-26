@@ -7,6 +7,7 @@ import { defaultValue, getMyMap } from "@/lib/services/map/getMineMap";
 import { LocationDTO } from "@/lib/DTO/location";
 import { toast } from "@/hooks/use-toast";
 import { MapStatusResponseDTO } from "@/lib/DTO/map";
+import { deltaMapStatus } from "@/lib/utils";
 
 const LeafletMap = ({
   params: { mapBff }
@@ -32,7 +33,6 @@ const LeafletMap = ({
       mapInstanceRef.current?.remove();
     };
   }, []);
-  console.log(mapBff);
   const getAndInitiateMyMap = async (param: LocationDTO) => {
     const result: MapStatusResponseDTO = await getMyMap(param, setError);
     if (result) {
@@ -52,7 +52,11 @@ const LeafletMap = ({
       <div className="custom-popup p-1 rounded text-center gap-1 justify-center items-center">
         <p className="text-light-900 body-regular">You're here!</p>
         <p className="text-light-900 body-bold">${
-          status ? status : rawStatus
+          status
+            ? status
+            : rawStatus
+            ? rawStatus
+            : "Click the name to create status!"
         }</p>
       </div>
     `;
@@ -68,7 +72,7 @@ const LeafletMap = ({
   };
   const createCustomIcon = (avatar: string) => {
     return L.icon({
-      iconUrl: `${avatar}`,
+      iconUrl: `${avatar ? avatar : "/assets/ava/default.png"}`,
       iconSize: [40, 40],
       iconAnchor: [20, 20],
       popupAnchor: [0, -30],
@@ -130,7 +134,7 @@ const LeafletMap = ({
 
     mapInstanceRef.current = L.map(mapContainerRef.current!, {
       center: L.latLng(0, 0),
-      zoom: 18
+      zoom: 20
     });
 
     const key = "ftVwmQtJphE9VzstsQqs";
@@ -177,45 +181,73 @@ const LeafletMap = ({
         }
       );
       // Tạo marker và popup cho các bạn bè (bff)
-      mapBff.forEach((bff) => {
-        if (bff.createBy.avatar) {
-          const bffLatLng = L.latLng(
-            bff.location.latitude,
-            bff.location.longitude
-          );
-
-          const bffIcon = createCustomIcon(bff.createBy.avatar);
-
-          const bffMarker = L.marker(bffLatLng, { icon: bffIcon }).addTo(
-            mapInstanceRef.current!
-          );
-
-          const bffPopupContent = createPopupBffContent(bff.caption);
-          const bffPopup = L.popup({
-            className: "custom-leaflet-popup-bff",
-            autoClose: false,
-            closeOnClick: false
-          })
-            .setLatLng(bffLatLng)
-            .setContent(bffPopupContent);
-          bffMarker.bindPopup(bffPopup).openPopup();
-
-          // Tạo nameDiv cho bff
-          const bffNameDiv = createNameDiv(
-            bff.createBy.firstName + " " + bff.createBy.lastName
-          );
-          const bffNameMarker = L.marker(bffLatLng, { icon: bffNameDiv }).addTo(
-            mapInstanceRef.current!
-          );
-          bffNameMarker.addTo(mapInstanceRef.current!);
-        }
-      });
     } else {
       setStatus("Browser does not support geolocation.");
     }
   };
+
+  const renderMapBff = () => {
+    if (!mapInstanceRef.current) {
+      console.error("Map instance is not initialized yet.");
+      return;
+    }
+    mapBff.forEach((bff) => {
+      if (bff.createBy.avatar) {
+        const bffLatLng = L.latLng(
+          bff.location.latitude,
+          bff.location.longitude
+        );
+
+        const latitude = parseFloat(bff.location.latitude.toString());
+        const longitude = parseFloat(bff.location.longitude.toString());
+
+        if (isNaN(latitude) || isNaN(longitude)) {
+          console.error("Invalid latitude or longitude:", latitude, longitude);
+          return;
+        }
+
+        const { deltaLatitude, deltaLongitude } = deltaMapStatus(
+          bff.location.latitude
+        );
+
+        const newBffLatLng =
+          userLocation && bffLatLng.equals(userLocation)
+            ? L.latLng(latitude + deltaLatitude, longitude + deltaLongitude)
+            : L.latLng(latitude, longitude);
+
+        console.log("check:", newBffLatLng);
+        const bffIcon = createCustomIcon(bff.createBy.avatar);
+
+        const bffMarker = L.marker(newBffLatLng, { icon: bffIcon }).addTo(
+          mapInstanceRef.current!
+        );
+
+        const bffPopupContent = createPopupBffContent(bff.caption);
+        const bffPopup = L.popup({
+          className: "custom-leaflet-popup-bff",
+          autoClose: false,
+          closeOnClick: false
+        })
+          .setLatLng(newBffLatLng)
+          .setContent(bffPopupContent);
+        bffMarker.bindPopup(bffPopup).openPopup();
+
+        // Tạo nameDiv cho bff
+        const bffNameDiv = createNameDiv(
+          bff.createBy.firstName + " " + bff.createBy.lastName
+        );
+        const bffNameMarker = L.marker(newBffLatLng, {
+          icon: bffNameDiv
+        }).addTo(mapInstanceRef.current!);
+        bffNameMarker.addTo(mapInstanceRef.current!);
+      }
+    });
+  };
   useEffect(() => {
     renderMap();
+    if (userLocation) {
+      renderMapBff();
+    }
   });
 
   useEffect(() => {

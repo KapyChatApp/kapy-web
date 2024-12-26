@@ -544,3 +544,16 @@ export const handleBlockFr = async (
     });
   }
 };
+
+export const deltaMapStatus = (latitude: number) => {
+  const parseLatitude = parseFloat(latitude.toString());
+  const EARTH_RADIUS = 6371000; // Bán kính Trái Đất tính bằng mét
+  const OFFSET_METERS = 10; // Bán kính dịch chuyển tính bằng mét
+  const deltaLatitude = (OFFSET_METERS / EARTH_RADIUS) * (180 / Math.PI);
+  const deltaLongitude =
+    (OFFSET_METERS /
+      (EARTH_RADIUS * Math.cos((parseLatitude * Math.PI) / 180))) *
+    (180 / Math.PI);
+
+  return { deltaLatitude, deltaLongitude };
+};
