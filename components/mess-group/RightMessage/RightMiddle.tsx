@@ -34,6 +34,7 @@ const RightMiddle = ({
   const [isTexting, setIsTexting] = useState<Record<string, TextingEvent>>({});
   const pathname = usePathname();
   const boxId = pathname.split("/").pop();
+  const isGroup = /^\/group-chat/.test(pathname);
   const { readedIdByBox, dataChat, setReadedIdByBox } = useChatContext();
   const [avaArray, setAvaArray] = useState<string[]>([]);
   const combinedSegments = [
@@ -45,8 +46,8 @@ const RightMiddle = ({
   );
 
   //DISPLAY MESSAGE
-  let groupedMessages: ResponseMessageDTO[] = [];
-  let messagesToDisplay: ResponseMessageDTO[][] = [];
+  let groupedMessages: ResponseMessageDTO[] = []; //Group tin nhắn cuối cùng
+  let messagesToDisplay: ResponseMessageDTO[][] = []; //Một box gồm nhiều group tin nhắn
   combinedSegments.forEach((item, index) => {
     if (groupedMessages.length === 0) {
       groupedMessages.push(item);
@@ -147,8 +148,6 @@ const RightMiddle = ({
     }
   }, [readedIdByBox, boxId]);
 
-  console.log(avaArray, "avatar");
-  console.log(boxId ? readedIdByBox[boxId] : "", "readed");
   return (
     <div
       className="flex w-full h-fit overflow-scroll custom-scrollbar "
@@ -165,11 +164,10 @@ const RightMiddle = ({
           <div className="flex flex-col justify-end items-center w-full h-full gap-[10px] py-4 ">
             {messagesToDisplay.map((group, index) => {
               //Get info receiver
-              const targetId = group[0].createBy;
-              const foundItem = receiverInfo.find(
+              const targetId = group[0].createBy; //Group[0]: tin nhắn đầu trong 1 group tin nhắn
+              const foundItem: UserInfoBox | undefined = receiverInfo.find(
                 (item) => item._id === targetId
               );
-
               const prevGroup = messagesToDisplay[index - 1];
               let timeDifference = 0;
 
@@ -229,6 +227,13 @@ const RightMiddle = ({
                             : "items-start"
                         }`}
                       >
+                        {isGroup && group[0].createBy !== adminId && (
+                          <div className="flex w-full ml-2 h-fit">
+                            <p className="text-dark600_light600 small-light">
+                              {foundItem?.firstName + " " + foundItem?.lastName}
+                            </p>
+                          </div>
+                        )}
                         {group.map((item, itemIndex) => (
                           <div
                             key={itemIndex}
