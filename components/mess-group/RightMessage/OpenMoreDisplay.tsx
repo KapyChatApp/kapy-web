@@ -10,6 +10,7 @@ import SeeAllPhoto from "./MoreActions/SeeAll/SeeAllPhoto";
 import SeeAllVideo from "./MoreActions/SeeAll/SeeAllVideo";
 import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
 import { useLayoutContext } from "@/context/LayoutContext";
+import { useChatContext } from "@/context/ChatContext";
 
 interface OpenMoreDisplayProps {
   detailByBox: MessageBoxInfo | undefined;
@@ -48,7 +49,8 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
     pin: false,
     stranger: false,
     readStatus: false,
-    readedId: []
+    readedId: [],
+    createBy: ""
   };
   if (detailByBox) {
     detail = detailByBox;
@@ -69,11 +71,19 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
       case "find":
         return <FindComponent setActiveComponent={setActiveComponent} />;
       case "manage":
-        return <ManagementComponent setActiveComponent={setActiveComponent} />;
+        return (
+          <ManagementComponent
+            setActiveComponent={setActiveComponent}
+            box={detail}
+          />
+        );
       case "add":
         return (
           <>
-            <AddComponent setActiveComponent={setActiveComponent} />
+            <AddComponent
+              setActiveComponent={setActiveComponent}
+              box={detail}
+            />
             <MoreActions
               propsAll={propsAll}
               relation={relation}

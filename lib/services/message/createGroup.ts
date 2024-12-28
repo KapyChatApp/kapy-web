@@ -22,7 +22,8 @@ function transformToMessageBoxInfo(dto: MessageBoxDTO): MessageBoxInfo {
     pin: dto.pin,
     stranger: dto.stranger,
     readStatus: false,
-    readedId: []
+    readedId: [],
+    createBy: ""
   };
 }
 

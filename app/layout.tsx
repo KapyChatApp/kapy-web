@@ -37,7 +37,10 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className="font-helvetica custom-scrollbar">
+      <body
+        cz-shortcut-listen="true"
+        className="font-helvetica custom-scrollbar "
+      >
         <LayoutProvider>
           <ThemeProvider>
             <ChatProvider>

@@ -2,8 +2,10 @@
 import {
   FileContent,
   MessageBoxInfo,
-  ResponseMessageDTO
+  ResponseMessageDTO,
+  UserInfoBox
 } from "@/lib/DTO/message";
+import { UserInfo } from "os";
 import { createContext, useContext, useState } from "react";
 
 // Tạo kiểu cho context
@@ -22,6 +24,10 @@ interface ChatContextType {
   setFileList: React.Dispatch<
     React.SetStateAction<Record<string, FileContent[]>>
   >;
+  memberList: UserInfoBox[];
+  setMemberList: React.Dispatch<React.SetStateAction<UserInfoBox[]>>;
+  createBy: string;
+  setCreateBy: React.Dispatch<React.SetStateAction<string>>;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
@@ -47,6 +53,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
   children
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
+  const [memberList, setMemberList] = useState<UserInfoBox[]>([]);
+  const [createBy, setCreateBy] = useState("");
   const [fileList, setFileList] = useState<Record<string, FileContent[]>>({});
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
@@ -69,6 +77,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
       value={{
         dataChat,
         setDataChat,
+        memberList,
+        setMemberList,
+        createBy,
+        setCreateBy,
         fileList,
         setFileList,
         messagesByBox,

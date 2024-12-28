@@ -5,6 +5,7 @@ import MoreTop from "./MoreTop";
 import MoreMiddle from "./MoreMiddle";
 import MoreBottom from "./MoreBottom";
 import { SeeAllProps } from "@/types/mess-group";
+import { UserInfoBox } from "@/lib/DTO/message";
 
 interface MoreActionsProps {
   propsAll: SeeAllProps;
@@ -53,17 +54,15 @@ const MoreActions = ({ propsAll, relation, setRelation }: MoreActionsProps) => {
 
       <div className={`flex w-full ${isGroup ? "h-fit" : "h-full"}`}>
         <MoreMiddle
-          detailByBox={detailByBox}
           setActiveComponent={setActiveComponent}
           setItemSent={setItemSent}
-          itemSent={itemSent}
         />
       </div>
       <div className="flex w-full h-fit">
         <MoreBottom
           setActiveComponent={setActiveComponent}
           receiver={detailByBox.receiverInfo}
-          boxId={detailByBox.id}
+          box={detailByBox}
         />
       </div>
     </div>

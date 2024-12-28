@@ -10,7 +10,6 @@ import ReactPlayer from "react-player";
 
 const SeeAllVideo: React.FC<SeeAllProps> = ({
   setActiveComponent,
-  setItemSent,
   itemSent
 }) => {
   const [videoList, setVideoList] = useState<FileContent[]>([]);
