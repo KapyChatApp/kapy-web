@@ -17,6 +17,7 @@ import { fetchMessages } from "@/lib/data/message/dataMessages";
 import { getFileList } from "@/lib/data/message/dataFileList";
 import { getPusherClient } from "@/lib/pusher";
 import { AnimatePresence, motion } from "framer-motion";
+import { SkeletonDemo } from "../UI-Raw/FormLoader";
 
 export interface LeftMessageProps {
   setClickBox?: React.Dispatch<React.SetStateAction<boolean>>;
@@ -133,6 +134,21 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     return <LeftMessageRaw />;
   }
 
+  if (
+    dataChat &&
+    dataChat.every((item) => !item.groupAva && !item.groupName) &&
+    isGroup
+  ) {
+    return <SkeletonDemo />;
+  }
+
+  if (
+    dataChat &&
+    dataChat.every((item) => item.groupAva && item.groupName) &&
+    !isGroup
+  ) {
+    return <SkeletonDemo />;
+  }
   return (
     <>
       <div className="flex flex-col background-light900_dark400 h-full py-[16px] px-[8px] rounded-tl-[12px] rounded-bl-[12px] rounded-tr-[0px] rounded-br-[0px] w-full">
