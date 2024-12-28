@@ -8,7 +8,7 @@ import { useChatContext } from "@/context/ChatContext";
 import { Fancybox } from "@fancyapps/ui";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
-import { FileContent, MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
+import { FileContent, UserInfoBox } from "@/lib/DTO/message";
 import { useUserContext } from "@/context/UserContext";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
@@ -17,14 +17,13 @@ interface props {
     React.SetStateAction<UserInfoBox[] | FileContent[]>
   >;
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
-  createBy: string;
 }
 
-const MoreMiddle = ({ setActiveComponent, setItemSent, createBy }: props) => {
+const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const [boxId, setBoxId] = useState<string>("");
-  const { fileList, memberList } = useChatContext();
+  const { fileList, memberList, createBy } = useChatContext();
   const [images, setImages] = useState<FileContent[]>([]);
   const [videos, setVideos] = useState<FileContent[]>([]);
   const [others, setOthers] = useState<FileContent[]>([]);
@@ -51,7 +50,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent, createBy }: props) => {
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  });
+  }, []);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng

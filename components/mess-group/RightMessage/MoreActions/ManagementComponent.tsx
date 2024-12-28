@@ -13,6 +13,7 @@ import ConfirmModal, {
 } from "@/components/friends/ConfirmModal";
 import { disbandGroup } from "@/lib/services/message/group/disband";
 import { toast } from "@/hooks/use-toast";
+import { useChatContext } from "@/context/ChatContext";
 
 interface props {
   setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
@@ -38,6 +39,7 @@ const manage: ManagementGroup[] = [
   }
 ];
 const ManagementComponent: React.FC<props> = ({ setActiveComponent, box }) => {
+  const { createBy } = useChatContext();
   const [adminId, setAdminId] = useState("");
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
@@ -146,7 +148,7 @@ const ManagementComponent: React.FC<props> = ({ setActiveComponent, box }) => {
             <Switch id="block-mode" />
           </div>
 
-          {box.createBy === adminId && (
+          {createBy === adminId && (
             <div className="flex w-full bg-light-700 dark:bg-dark-400 dark:bg-opacity-80 rounded-lg justify-center items-center">
               <Button
                 className="flex flex-row shadow-none border-none bg-transparent w-full h-auto px-3"

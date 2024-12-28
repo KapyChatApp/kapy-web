@@ -24,7 +24,6 @@ interface MoreDisplay {
 const OpenMoreDisplay = ({ display }: MoreDisplay) => {
   const { detailByBox, setRelation, relation } = display;
   const { openMore } = useLayoutContext();
-  const { setMemberList } = useChatContext();
   let detail: MessageBoxInfo = {
     id: "",
     receiverInfo: {
@@ -55,7 +54,6 @@ const OpenMoreDisplay = ({ display }: MoreDisplay) => {
   };
   if (detailByBox) {
     detail = detailByBox;
-    setMemberList(detail.memberInfo);
   }
   const [activeComponent, setActiveComponent] = useState<string>("");
   const [itemSent, setItemSent] = useState([] as UserInfoBox[] | FileContent[]);

@@ -56,7 +56,6 @@ const MoreActions = ({ propsAll, relation, setRelation }: MoreActionsProps) => {
         <MoreMiddle
           setActiveComponent={setActiveComponent}
           setItemSent={setItemSent}
-          createBy={detailByBox.createBy}
         />
       </div>
       <div className="flex w-full h-fit">

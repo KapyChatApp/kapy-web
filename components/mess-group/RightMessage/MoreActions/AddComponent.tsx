@@ -30,22 +30,22 @@ const AddComponent: React.FC<AddComponentProps> = ({
   const handleBack = () => {
     setActiveComponent("");
   };
-  useEffect(() => {
-    // Gọi API lấy danh sách bạn bè khi component mount
-    const fetchData = async () => {
-      try {
-        await getMyListFriend(setListFriend, setError);
-      } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
-      }
-    };
+  // useEffect(() => {
+  //   // Gọi API lấy danh sách bạn bè khi component mount
+  //   const fetchData = async () => {
+  //     try {
+  //       await getMyListFriend(setListFriend, setError);
+  //     } catch (err) {
+  //       setError("Failed to fetch data.");
+  //       console.error(err);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const filteredMembers = listFriend.filter(
-    (friend) => !box.memberInfo.some((member) => member._id === friend._id)
+    (friend) => !memberList.some((member) => member._id === friend._id)
   );
 
   const handleAdd = async () => {

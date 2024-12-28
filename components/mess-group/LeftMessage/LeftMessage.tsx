@@ -96,7 +96,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
     };
 
     fetchData();
-  }, [isGroup]);
+  }, []);
 
   useEffect(() => {
     const handleNewMessage = (data: ResponseMessageDTO) => {

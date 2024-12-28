@@ -23,7 +23,7 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
   const [boxId, setBoxId] = useState<string>("");
   const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
   const [selectedMemberId, setSelectedMemberId] = useState<string>("");
-  const { dataChat } = useChatContext();
+  const { dataChat, memberList } = useChatContext();
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -51,11 +51,6 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
       }
     }
   }, [boxId, dataChat, setDetailByBox]);
-
-  let memberList: UserInfoBox[] = [];
-  if (boxId && detailByBox) {
-    memberList = detailByBox.memberInfo;
-  }
 
   const { toast } = useToast();
   const handleBack = () => {

@@ -22,6 +22,7 @@ const MoreBottom: React.FC<{
   const [stButton, setFirst] = useState(false);
   const [ndButton, setSecond] = useState(false);
   const { setListFriend } = useFriendContext();
+  const { createBy } = useChatContext();
   const [isConfirm, setIsConfirm] = useState(false);
   const { setMemberList } = useChatContext();
   const [adminId, setAdminId] = useState("");
@@ -86,7 +87,7 @@ const MoreBottom: React.FC<{
 
   const handleLeaveGroup = async () => {
     try {
-      if (box.createBy !== adminId) {
+      if (createBy !== adminId) {
         const result = await removeMemberFromGroup(box.id);
         if (result.success) {
           toast({
@@ -162,7 +163,7 @@ const MoreBottom: React.FC<{
     <>
       <div className="flex flex-col items-center justify-center gap-[8px] w-full mt-auto responsive-moreAction">
         <div className="flex items-center justify-center gap-[8px] w-full rounded-lg bg-light-700 dark:bg-dark-400 dark:bg-opacity-80">
-          {isGroup && box.createBy === adminId ? (
+          {isGroup && createBy === adminId ? (
             <></>
           ) : (
             <Button

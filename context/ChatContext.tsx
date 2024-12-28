@@ -26,6 +26,8 @@ interface ChatContextType {
   >;
   memberList: UserInfoBox[];
   setMemberList: React.Dispatch<React.SetStateAction<UserInfoBox[]>>;
+  createBy: string;
+  setCreateBy: React.Dispatch<React.SetStateAction<string>>;
   messagesByBox: Record<string, ResponseMessageDTO[]>;
   setMessagesByBox: React.Dispatch<
     React.SetStateAction<Record<string, ResponseMessageDTO[]>>
@@ -52,6 +54,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const [dataChat, setDataChat] = useState<MessageBoxInfo[]>([]);
   const [memberList, setMemberList] = useState<UserInfoBox[]>([]);
+  const [createBy, setCreateBy] = useState("");
   const [fileList, setFileList] = useState<Record<string, FileContent[]>>({});
   const [messagesByBox, setMessagesByBox] = useState<
     Record<string, ResponseMessageDTO[]>
@@ -76,6 +79,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({
         setDataChat,
         memberList,
         setMemberList,
+        createBy,
+        setCreateBy,
         fileList,
         setFileList,
         messagesByBox,

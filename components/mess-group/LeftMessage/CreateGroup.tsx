@@ -86,19 +86,19 @@ const CreateGroup = ({ setCreated }: CreateGroupProps) => {
     }
   };
 
-  useEffect(() => {
-    // Gọi API lấy danh sách bạn bè khi component mount
-    const fetchData = async () => {
-      try {
-        await getMyListFriend(setListFriend, setError);
-      } catch (err) {
-        setError("Failed to fetch data.");
-        console.error(err);
-      }
-    };
+  // useEffect(() => {
+  //   // Gọi API lấy danh sách bạn bè khi component mount
+  //   const fetchData = async () => {
+  //     try {
+  //       await getMyListFriend(setListFriend, setError);
+  //     } catch (err) {
+  //       setError("Failed to fetch data.");
+  //       console.error(err);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
   const filteredFriends = listFriend.filter((friend) =>
     `${friend.firstName} ${friend.lastName}`.toLowerCase().includes(searchQuery)
   );
