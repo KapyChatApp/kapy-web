@@ -61,9 +61,8 @@ export async function createGroup(
     );
 
     const result = response.data.result;
-    console.log(result);
     if (result && result.success) {
-      const data: MessageBoxInfo = transformToMessageBoxInfo(result.newBox);
+      const data: MessageBoxInfo = transformToMessageBoxInfo(result.messageBox);
       setDataChat((prev) => [...prev, data]);
     }
     return result;

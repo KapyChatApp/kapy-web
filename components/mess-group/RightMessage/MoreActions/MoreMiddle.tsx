@@ -50,8 +50,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  });
-  console.log(images);
+  }, [boxId, fileList[boxId]]);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng

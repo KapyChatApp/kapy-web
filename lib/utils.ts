@@ -287,11 +287,10 @@ export const handleMessage = async (
   setError: React.Dispatch<React.SetStateAction<string>>,
   router: ReturnType<typeof useRouter>
 ) => {
-  console.log(param);
   const result = await createGroup(param, groupAva, setDataChat, setError);
-  const { success, newBox } = result;
+  const { success, messageBox } = result;
   if (success) {
-    router.push(`/${newBox._id}`);
+    router.push(`/${messageBox._id}`);
   } else {
     toast({
       title: "You can't create message box. Try again please!",
