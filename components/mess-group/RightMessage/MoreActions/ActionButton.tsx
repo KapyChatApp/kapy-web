@@ -1,4 +1,7 @@
 "use client";
+import ConfirmModal, {
+  ConfirmModalProps
+} from "@/components/friends/ConfirmModal";
 import { Button } from "@/components/ui/button";
 import { useFriendContext } from "@/context/FriendContext";
 import { toast } from "@/hooks/use-toast";
@@ -42,6 +45,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const [isBlock, setIsBlock] = useState(false);
   const [isAdd, setIsAdd] = useState(false);
   const [isManage, setIsManage] = useState(false);
+  const [isConfirm, setIsConfirm] = useState(false);
+  const [confirm, setConfirm] = useState<ConfirmModalProps>({
+    setConfirm: () => {},
+    handleAction: () => {},
+    name: "",
+    action: ""
+  });
 
   useEffect(() => {
     if (relation && relation === "bff") {
@@ -72,6 +82,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       };
 
       await unBlockFr(params, setListBlockedFriend);
+      setIsBlock(false);
     } catch (error) {
       console.log(error);
     }
@@ -92,6 +103,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         receiver: userId
       };
       const result = await blockFriend(friendRequest, setListFriend);
+      setIsBlock(true);
       toast({
         title: `Block Successfully`,
         className:
@@ -108,6 +120,26 @@ const ActionButton: React.FC<ActionButtonProps> = ({
     }
   };
 
+  const handleConfirmBlock = async () => {
+    setIsConfirm(true);
+    setConfirm({
+      setConfirm: setIsConfirm,
+      handleAction: handleBlockFriend,
+      name: "this user",
+      action: "block"
+    });
+  };
+
+  const handleConfirmUnBlock = async () => {
+    setIsConfirm(true);
+    setConfirm({
+      setConfirm: setIsConfirm,
+      handleAction: handleUnBlockChat,
+      name: "this user",
+      action: "unblock"
+    });
+  };
+
   const handleButton = () => {
     switch (click) {
       case "notified":
@@ -119,15 +151,13 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         break;
       case "block":
         if (isBlock) {
-          handleUnBlockChat();
-          setIsBlock(false);
+          handleConfirmUnBlock();
         } else {
-          handleBlockFriend();
-          setIsBlock(true);
+          handleConfirmBlock();
         }
         break;
       case "best":
-        setIsBest((prev) => !prev);
+        setIsBest((prev) => prev);
         break;
       case "add":
         setIsAdd((prev) => !prev);
@@ -144,49 +174,52 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   const displayIcon = isNotified ? "mingcute:notification-off-fill" : icon;
 
   return (
-    <div
-      // className={`${
-      //   isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-[57px]"
-      // } flex flex-col items-center justify-center gap-[8px]`}
-      className={`w-fit flex flex-col items-center justify-center gap-[8px]`}
-    >
-      <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
-        <div
-          className={`flex flex-col items-center justify-center rounded-full p-[6px] ${
-            isBest
-              ? "bg-primary-500 bg-opacity-20"
-              : isBlock
-              ? "bg-accent-red bg-opacity-20"
-              : "bg-light-700 dark:bg-dark-400 dar:bg-opacity-80"
-          }`}
-          onClick={handleButton}
-        >
-          <Icon
-            icon={displayIcon}
-            width={24}
-            height={24}
-            className={`${
-              isBest
-                ? "text-primary-500"
-                : isBlock
-                ? "text-accent-red"
-                : "text-dark100_light900"
-            } `}
-          />
-        </div>
-      </Button>
-      <p
-        className={`${
-          isBest
-            ? "text-primary-500 small-regular"
-            : isBlock
-            ? "text-accent-red small-regular"
-            : "text-dark100_light900 small-regular"
-        }`}
+    <>
+      <div
+        // className={`${
+        //   isGroup ? "xl:min-w-[60px] w-fit" : "lg:min-w-[60px] w-[57px]"
+        // } flex flex-col items-center justify-center gap-[8px]`}
+        className={`w-fit flex flex-col items-center justify-center gap-[8px]`}
       >
-        {displayLabel}
-      </p>
-    </div>
+        <Button className="flex items-center justify-center w-fit shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-0">
+          <div
+            className={`flex flex-col items-center justify-center rounded-full p-[6px] ${
+              isBest
+                ? "bg-primary-500 bg-opacity-20"
+                : isBlock
+                ? "bg-accent-red bg-opacity-20"
+                : "bg-light-700 dark:bg-dark-400 dar:bg-opacity-80"
+            }`}
+            onClick={handleButton}
+          >
+            <Icon
+              icon={displayIcon}
+              width={24}
+              height={24}
+              className={`${
+                isBest
+                  ? "text-primary-500"
+                  : isBlock
+                  ? "text-accent-red"
+                  : "text-dark100_light900"
+              } `}
+            />
+          </div>
+        </Button>
+        <p
+          className={`${
+            isBest
+              ? "text-primary-500 small-regular"
+              : isBlock
+              ? "text-accent-red small-regular"
+              : "text-dark100_light900 small-regular"
+          }`}
+        >
+          {displayLabel}
+        </p>
+      </div>
+      {isConfirm && <ConfirmModal confirm={confirm} />}
+    </>
   );
 };
 
