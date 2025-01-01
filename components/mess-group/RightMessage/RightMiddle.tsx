@@ -94,7 +94,7 @@ const RightMiddle = ({
         behavior: "smooth" // Thêm hiệu ứng mượt mà
       });
     }
-  });
+  }, []);
 
   //Texting Event
   useEffect(() => {

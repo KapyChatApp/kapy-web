@@ -23,7 +23,7 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
   const [boxId, setBoxId] = useState<string>("");
   const [detailByBox, setDetailByBox] = useState<MessageBoxInfo>();
   const [selectedMemberId, setSelectedMemberId] = useState<string>("");
-  const { dataChat, memberList } = useChatContext();
+  const { dataChat, memberList, setCreateBy } = useChatContext();
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -68,6 +68,7 @@ const ChangeLeader = ({ setIsChange }: ChangeLeaderProps) => {
     try {
       const response = await changeGroupLeader(boxId, selectedMemberId);
       if (response.success) {
+        setCreateBy(selectedMemberId);
         toast({
           title: "You changed leader of this group successfully!",
           className:
