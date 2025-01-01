@@ -42,10 +42,10 @@ export const loginUser = async (
 
     const data = await response.json();
     const token = data.token;
-    console.log(data, "check");
+    console.log(data.device, "check");
     localStorage.setItem("token", token);
 
-    return { message: data.message, token: token, device: defaultDevice };
+    return { message: data.message, token: token, device: data.device };
   } catch (error) {
     console.error("Error registering user:", error);
     return { message: "Login failed", token: "", device: defaultDevice };

@@ -29,7 +29,6 @@ const Signin = () => {
         password: pass,
         ...getDeviceInfo()
       };
-      console.log(params);
       const result = await loginUser(params);
       if (result.token === "") {
         setError("Login failed");
@@ -43,6 +42,8 @@ const Signin = () => {
       }
       const token = result.token;
       const device = result.device;
+      console.log(result, "check");
+      console.log(device._id, "check");
       localStorage.setItem("token", token);
       localStorage.setItem("deviceId", device._id);
 

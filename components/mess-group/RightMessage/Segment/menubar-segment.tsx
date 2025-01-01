@@ -56,7 +56,6 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       // Gọi API delete tin nhắn
       const response = await DeleteMessage(messageId);
       if (response) {
-        console.log("Delete success");
         toast({
           title: "Message deleted successfully!",
           className:
@@ -112,9 +111,8 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           );
           return; // Không thực hiện tiếp nếu boxId không hợp lệ
         }
-        const fileDelete = messagesByBox[data.boxId].find(
-          (item) => item.id === data.id
-        );
+        const fileDelete =
+          messagesByBox[data.boxId] || [].find((item) => item.id === data.id);
 
         if (fileDelete && fileDelete.contentId) {
           console.log("Updated fileList: ", fileDelete);

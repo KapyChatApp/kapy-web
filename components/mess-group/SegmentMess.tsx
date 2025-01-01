@@ -163,7 +163,6 @@ const SegmentMess: React.FC<SegmentMessage> = ({
       setIsCount(segments.isReact.length);
     }
   }, []);
-  console.log(isReactedByMessage);
   return (
     <>
       <div
