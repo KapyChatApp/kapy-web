@@ -39,7 +39,7 @@ const manage: ManagementGroup[] = [
   }
 ];
 const ManagementComponent: React.FC<props> = ({ setActiveComponent, box }) => {
-  const { createBy } = useChatContext();
+  const { createBy, setDataChat } = useChatContext();
   const [adminId, setAdminId] = useState("");
   const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
@@ -60,6 +60,7 @@ const ManagementComponent: React.FC<props> = ({ setActiveComponent, box }) => {
     try {
       const result = await disbandGroup(box.id);
       if (result.success) {
+        setDataChat((prev) => prev.filter((item) => item.id != box.id));
         toast({
           title: "Group has been disbanded successfully!",
           className:

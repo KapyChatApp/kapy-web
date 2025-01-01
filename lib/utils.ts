@@ -287,11 +287,10 @@ export const handleMessage = async (
   setError: React.Dispatch<React.SetStateAction<string>>,
   router: ReturnType<typeof useRouter>
 ) => {
-  console.log(param);
   const result = await createGroup(param, groupAva, setDataChat, setError);
-  const { success, newBox } = result;
+  const { success, messageBox } = result;
   if (success) {
-    router.push(`/${newBox._id}`);
+    router.push(`/${messageBox._id}`);
   } else {
     toast({
       title: "You can't create message box. Try again please!",
@@ -556,4 +555,70 @@ export const deltaMapStatus = (latitude: number) => {
     (180 / Math.PI);
 
   return { deltaLatitude, deltaLongitude };
+};
+
+export const getDeviceInfo = () => {
+  // Lấy thông tin trình duyệt từ user-agent (dùng window.navigator)
+  const userAgent = window.navigator.userAgent;
+
+  // Phân loại loại thiết bị
+  let deviceType = "DESKTOP"; // Mặc định là DESKTOP
+  if (/android/i.test(userAgent)) {
+    deviceType = "PHONE"; // Android là điện thoại
+  } else if (/iphone/i.test(userAgent)) {
+    deviceType = "PHONE"; // iPhone là điện thoại
+  } else if (/ipad|tablet/i.test(userAgent)) {
+    deviceType = "TABLET"; // iPad hoặc thiết bị tablet
+  } else if (/windows/i.test(userAgent) && /touch/i.test(userAgent)) {
+    deviceType = "TABLET"; // Windows touch device có thể là tablet
+  } else if (/macintosh/i.test(userAgent)) {
+    deviceType = "DESKTOP"; // macOS thường là máy tính để bàn
+  }
+
+  // Lấy ngôn ngữ của trang (document.documentElement.lang) cho vùng
+  const region = document.documentElement.lang || "Unknown";
+
+  // Thông tin về hệ điều hành từ user-agent
+  const osName = userAgent.includes("Windows")
+    ? "Windows"
+    : userAgent.includes("Mac OS X")
+    ? "macOS"
+    : userAgent.includes("Linux")
+    ? "Linux"
+    : "Unknown OS";
+
+  // Thông tin trình duyệt (dựa trên user-agent)
+  const browser = userAgent.includes("Chrome")
+    ? "Chrome"
+    : userAgent.includes("Firefox")
+    ? "Firefox"
+    : userAgent.includes("Safari")
+    ? "Safari"
+    : userAgent.includes("Edge")
+    ? "Edge"
+    : "Unknown Browser";
+
+  // Phiên bản hệ điều hành và trình duyệt (dựa trên user-agent)
+  const osMatch = userAgent.match(
+    /(Windows NT|Mac OS X|Linux|Android|iOS) ([\d._]+)/
+  );
+  const osVersion = osMatch ? osMatch[2] : "Unknown Version";
+
+  // Thông tin về trình duyệt từ window
+  const brand = window.navigator.vendor || "Unknown Vendor"; // Nhà cung cấp trình duyệt
+  const modelName = window.navigator.appName || "Unknown Browser"; // Tên trình duyệt
+
+  // Tạo thông tin thiết bị trả về
+  const deviceInfo = {
+    deviceName: userAgent,
+    deviceType: deviceType,
+    brand: brand,
+    modelName: modelName,
+    osName: osName,
+    osVersion: osVersion,
+    region: region,
+    isSafe: true
+  };
+
+  return deviceInfo;
 };

@@ -30,7 +30,6 @@ export async function getRealTimeOfUser(
 
     // Trả về dữ liệu JSON
     const data = await response.json();
-    console.log("data: ", data);
     return data;
   } catch (error) {
     console.error("Failed to fetch real-time user data:", error);

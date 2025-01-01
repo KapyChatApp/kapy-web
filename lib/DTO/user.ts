@@ -61,6 +61,10 @@ export interface UserUpdateRequest {
   gender: boolean; // true = Nam, false = Nữ
   address: string;
   birthDay: string;
+  job: string;
+  hobbies: string;
+  bio: string;
+  relationShip: string;
 }
 
 export interface UserUpdatePassRequest {
@@ -83,8 +87,15 @@ export interface UserRegisterDTO {
 export interface UserLoginDTO {
   phoneNumber: string;
   password: string;
+  deviceName: string;
+  deviceType: string;
+  brand?: string;
+  modelName?: string;
+  osName?: string;
+  osVersion?: string;
+  region: string;
+  isSafe: boolean;
 }
-
 export interface OnlineEvent {
   userId: string;
   online: boolean;

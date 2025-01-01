@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { deleteMessageBox } from "@/lib/services/message/deleteBox";
 import ConfirmModal, {
@@ -24,7 +24,7 @@ const MoreBottom: React.FC<{
   const { setListFriend } = useFriendContext();
   const { createBy } = useChatContext();
   const [isConfirm, setIsConfirm] = useState(false);
-  const { setMemberList } = useChatContext();
+  const { setMemberList, setDataChat } = useChatContext();
   const [adminId, setAdminId] = useState("");
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -32,12 +32,12 @@ const MoreBottom: React.FC<{
     name: "",
     action: ""
   });
-
   const handleDeleteChat = async (boxId: string) => {
     try {
       const isDeleted = await deleteMessageBox(boxId);
 
       if (isDeleted) {
+        setDataChat((prev) => prev.filter((item) => item.id !== boxId));
         toast({
           title: `Delete box chat successfully`,
           className:
@@ -90,6 +90,7 @@ const MoreBottom: React.FC<{
       if (createBy !== adminId) {
         const result = await removeMemberFromGroup(box.id);
         if (result.success) {
+          setDataChat((prev) => prev.filter((item) => item.id !== box.id));
           toast({
             title: `You left this group successfully!`,
             className:

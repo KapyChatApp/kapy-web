@@ -1,6 +1,5 @@
 // useSearch.ts
 import { FriendResponseDTO, RequestedResponseDTO } from "@/lib/DTO/friend";
-import { HistoryFindFriend, StrangeFriend } from "@/types/friends";
 import { useState } from "react";
 
 const useSearch = (

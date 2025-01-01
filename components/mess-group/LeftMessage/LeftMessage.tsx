@@ -53,14 +53,9 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
           : await fetchMessageBox(adminId, setError);
 
         const messagesMap: Record<string, ResponseMessageDTO[]> = {};
-        const boxLastMessageTimes: Record<string, string | null> = {};
         for (const box of data) {
           const boxMessages = await fetchMessages(box.id);
           messagesMap[box.id] = boxMessages;
-
-          // Lấy tin nhắn cuối cùng (nếu có)
-          const lastMessage = boxMessages[boxMessages.length - 1];
-          boxLastMessageTimes[box.id] = lastMessage?.createAt || null;
         }
 
         const filesMap: Record<string, FileContent[]> = {};
@@ -80,14 +75,7 @@ const LeftMessage = ({ setClickBox, setClickOtherRight }: LeftMessageProps) => {
             [box.id]: box.readedId
           }));
         }
-        const sortedData = [...data].sort((a, b) => {
-          const timeA = boxLastMessageTimes[a.id];
-          const timeB = boxLastMessageTimes[b.id];
-          return (
-            new Date(timeB || 0).getTime() - new Date(timeA || 0).getTime()
-          );
-        });
-        setDataChat(sortedData);
+        setDataChat(data);
         setMessagesByBox(messagesMap);
         setFileList(filesMap);
       } catch (err) {

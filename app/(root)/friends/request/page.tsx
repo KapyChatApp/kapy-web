@@ -21,7 +21,7 @@ const page = () => {
     };
 
     fetchData();
-  }, [setListRequestedFriend]);
+  }, []);
 
   if (!listRequestedFriend) {
     return (

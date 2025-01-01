@@ -25,6 +25,10 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
   };
   const [firstName, setFirstName] = useState(personal.firstName.trim());
   const [lastName, setLastName] = useState(personal.lastName.trim());
+  const [bio, setBio] = useState(personal.bio);
+  const [relationShip, setRelationShip] = useState(personal.relationShip);
+  const [job, setJob] = useState(personal.job);
+  const [hobbies, setHobbies] = useState(personal.hobbies);
   const [gender, setGender] = useState(personal.gender ? "male" : "female");
   const [birthDay, setBirthDay] = useState({
     day: birth.getDate(),
@@ -48,7 +52,11 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
         email: adminInfo.email,
         password: adminInfo.password,
         rePassword: adminInfo.password,
-        address: adminInfo.address
+        address: adminInfo.address,
+        bio,
+        relationShip,
+        job,
+        hobbies
       };
 
       const result = await updateUserProfile(updatedProfile);
@@ -89,7 +97,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
 
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
-        <div className="flex flex-col h-[440px] w-full overflow-scroll scrollable p-4 gap-8">
+        <div className="flex flex-col h-[440px] w-full overflow-scroll scrollable p-4 gap-4">
           <div className="flex flex-col gap-3 w-full h-fit">
             <p className="text-dark100_light900 body-regular">First name</p>
             <Input
@@ -107,6 +115,50 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               onChange={(e) => setLastName(e.target.value)}
               className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
             ></Input>
+          </div>
+
+          <div className="flex flex-row w-full h-fit justify-between items-center">
+            <div className="flex flex-col gap-3 w-[46%] h-fit">
+              <p className="text-dark100_light900 body-regular">Bio</p>
+              <Input
+                type="text"
+                placeholder={personal.bio ? personal.bio : "Enter your bio..."}
+                onChange={(e) => setBio(e.target.value)}
+                className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
+              ></Input>
+            </div>
+            <div className="flex flex-col gap-3 w-[46%] h-fit">
+              <p className="text-dark100_light900 body-regular">Relationship</p>
+              <Input
+                type="text"
+                placeholder={
+                  personal.relationShip ? personal.relationShip : "Enter..."
+                }
+                onChange={(e) => setRelationShip(e.target.value)}
+                className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
+              ></Input>
+            </div>
+          </div>
+
+          <div className="flex flex-row w-full h-fit justify-between items-center">
+            <div className="flex flex-col gap-3 w-[46%] h-fit">
+              <p className="text-dark100_light900 body-regular">Job</p>
+              <Input
+                type="text"
+                placeholder={personal.job ? personal.job : "Enter your job..."}
+                onChange={(e) => setJob(e.target.value)}
+                className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
+              ></Input>
+            </div>
+            <div className="flex flex-col gap-3 w-[46%] h-fit">
+              <p className="text-dark100_light900 body-regular">Hobbies</p>
+              <Input
+                type="text"
+                placeholder={personal.hobbies ? personal.hobbies : "Enter..."}
+                onChange={(e) => setHobbies(e.target.value)}
+                className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
+              ></Input>
+            </div>
           </div>
 
           <div className="flex flex-col gap-6 w-full h-fit">

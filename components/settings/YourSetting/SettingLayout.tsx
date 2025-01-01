@@ -7,6 +7,7 @@ import GeneralSetting from "./GeneralSetting/GeneralSetting";
 import AccountSecurity from "./AccountSecurity/AccountSecurity";
 import PrivacySetting from "./PrivacySetting/PrivacySetting";
 import CallingSetting from "./CallingSetting/CallingSetting";
+import AuthHistory from "./AuthHistory/AuthHistory";
 
 interface SettingProps {
   setSetting: React.Dispatch<React.SetStateAction<boolean>>;
@@ -47,6 +48,8 @@ const SettingLayout = ({ setSetting }: SettingProps) => {
             renderRight={renderRight}
           />
         );
+      case "history":
+        return <AuthHistory />;
       default:
         return (
           <GeneralSetting
