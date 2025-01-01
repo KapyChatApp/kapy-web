@@ -163,7 +163,7 @@ const RightMiddle = ({
         [msg.id]: msg.isReact.length > 0 ? true : false
       }));
     }
-  }, [messagesByBox, boxId]);
+  }, [boxId]);
 
   return (
     <div
