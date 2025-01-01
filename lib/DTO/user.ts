@@ -61,6 +61,10 @@ export interface UserUpdateRequest {
   gender: boolean; // true = Nam, false = Nữ
   address: string;
   birthDay: string;
+  job: string;
+  hobbies: string;
+  bio: string;
+  relationShip: string;
 }
 
 export interface UserUpdatePassRequest {
