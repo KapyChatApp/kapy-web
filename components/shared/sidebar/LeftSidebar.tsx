@@ -73,16 +73,26 @@ const Leftsidebar = () => {
   };
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.BASE_URL}auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const deviceId = localStorage.getItem("deviceId");
+
+      if (!deviceId) {
+        console.warn("No deviceId found");
+        return; // Trả về defaultValue nếu không có token
+      }
+      const response = await fetch(
+        `${process.env.BASE_URL}auth/logout?id=${deviceId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
         }
-      });
+      );
 
       if (response.ok) {
         localStorage.removeItem("token");
         localStorage.removeItem("adminId");
+        localStorage.removeItem("deviceId");
       } else {
         const errorData = await response.json();
         console.error("Logout failed:", errorData.message);
@@ -91,6 +101,26 @@ const Leftsidebar = () => {
       console.error("Error during logout:", error);
     }
   };
+  // const handleLogout = async () => {
+  //   try {
+  //     const response = await fetch(`${process.env.BASE_URL}auth/logout`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       }
+  //     });
+
+  //     if (response.ok) {
+  //       localStorage.removeItem("token");
+  //       localStorage.removeItem("adminId");
+  //     } else {
+  //       const errorData = await response.json();
+  //       console.error("Logout failed:", errorData.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during logout:", error);
+  //   }
+  // };
 
   useEffect(() => {
     const handleResize = () => {

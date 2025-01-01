@@ -21,7 +21,7 @@ const page = () => {
     };
 
     fetchData();
-  }, [setListSuggestedFriend]);
+  }, []);
 
   if (!listSuggestedFriend) {
     return (

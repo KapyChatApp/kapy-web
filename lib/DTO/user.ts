@@ -83,8 +83,15 @@ export interface UserRegisterDTO {
 export interface UserLoginDTO {
   phoneNumber: string;
   password: string;
+  deviceName: string;
+  deviceType: string;
+  brand?: string;
+  modelName?: string;
+  osName?: string;
+  osVersion?: string;
+  region: string;
+  isSafe: boolean;
 }
-
 export interface OnlineEvent {
   userId: string;
   online: boolean;

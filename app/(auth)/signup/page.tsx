@@ -11,6 +11,7 @@ import { SignInSchema } from "@/lib/validation";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { useUserContext } from "@/context/UserContext";
 import { loginUser } from "@/lib/services/auth/login";
+import { getDeviceInfo } from "@/lib/utils";
 
 const Signup = () => {
   const { adminInfo, setAdminInfo } = useUserContext();
@@ -114,7 +115,8 @@ const Signup = () => {
         });
         const loginInfo: UserLoginDTO = {
           phoneNumber,
-          password
+          password,
+          ...getDeviceInfo()
         };
         const result = await loginUser(loginInfo);
 
@@ -129,7 +131,9 @@ const Signup = () => {
           return;
         }
         const token = result.token;
+        const device = result.device;
         localStorage.setItem("token", token);
+        localStorage.setItem("deviceId", device._id);
 
         await getMyProfile(setAdminInfo);
 

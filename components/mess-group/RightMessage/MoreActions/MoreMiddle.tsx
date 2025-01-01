@@ -39,7 +39,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
     if (id) {
       setBoxId(id); // Set boxId là chuỗi
     }
-  }, [boxId]);
+  }, []);
 
   useEffect(() => {
     if (boxId !== "" && fileList && fileList[boxId]) {
@@ -50,7 +50,8 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  }, []);
+  });
+  console.log(images);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
@@ -58,10 +59,7 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
       Toolbar: true,
       Thumbs: true
     });
-    return () => {
-      Fancybox.destroy();
-    };
-  }, []);
+  });
 
   //Show video in more
   useEffect(() => {
@@ -70,9 +68,6 @@ const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
       Toolbar: true,
       Thumbs: true
     });
-    return () => {
-      Fancybox.destroy();
-    };
   }, []);
 
   const handleSeeAllMember = () => {
