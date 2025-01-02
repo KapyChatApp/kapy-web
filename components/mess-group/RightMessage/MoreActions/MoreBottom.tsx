@@ -164,9 +164,7 @@ const MoreBottom: React.FC<{
     <>
       <div className="flex flex-col items-center justify-center gap-[8px] w-full mt-auto responsive-moreAction">
         <div className="flex items-center justify-center gap-[8px] w-full rounded-lg bg-light-700 dark:bg-dark-400 dark:bg-opacity-80">
-          {isGroup && createBy === adminId ? (
-            <></>
-          ) : (
+          {!isGroup && (
             <Button
               className="shadow-none border-none flex items-center justify-center w-full bg-transparent"
               onClick={handleFirstButton}
