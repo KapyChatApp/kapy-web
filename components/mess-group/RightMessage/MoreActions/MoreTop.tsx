@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import ActionButton from "./ActionButton";
 import { usePathname } from "next/navigation";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useChatContext } from "@/context/ChatContext";
 
 export interface Actions {
   icon: string;
@@ -59,7 +60,12 @@ const MoreTop: React.FC<Top> = ({ top, setActiveComponent }) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { ava, name, relation, setRelation, id } = top;
-
+  const [adminId, setAdminId] = useState("");
+  const { createBy } = useChatContext();
+  useEffect(() => {
+    const id = localStorage.getItem("adminId");
+    if (id) setAdminId(id);
+  });
   return isGroup ? (
     <div className="flex flex-col flex-1 items-center justify-center w-full h-fit gap-[12px]">
       <div className="flex items-start md:justify-center justify-start w-full h-fit">
@@ -75,16 +81,30 @@ const MoreTop: React.FC<Top> = ({ top, setActiveComponent }) => {
         </div>
       </div>
       <div className="flex items-center md:justify-between justify-center gap-3 md:gap-0 w-full h-fit">
-        {actionsButton
-          .filter(
-            (action) => action.click !== "best" && action.click !== "block"
-          )
-          .map((item) => (
-            <ActionButton
-              action={item}
-              setActiveComponent={setActiveComponent}
-            />
-          ))}
+        {createBy === adminId
+          ? actionsButton
+              .filter(
+                (action) => action.click !== "best" && action.click !== "block"
+              )
+              .map((item) => (
+                <ActionButton
+                  action={item}
+                  setActiveComponent={setActiveComponent}
+                />
+              ))
+          : actionsButton
+              .filter(
+                (action) =>
+                  action.click !== "best" &&
+                  action.click !== "block" &&
+                  action.click !== "manage"
+              )
+              .map((item) => (
+                <ActionButton
+                  action={item}
+                  setActiveComponent={setActiveComponent}
+                />
+              ))}
       </div>
     </div>
   ) : (
