@@ -205,10 +205,12 @@ const Leftsidebar = () => {
               const isDynamicPath = /^\/[a-zA-Z0-9_-]+$/.test(pathname);
               const isGroupDynamicPath = pathname.startsWith("/group-chat/");
               const isFriendDynamicPath = pathname.startsWith("/friends/");
+              const isCommunityDynamicPath = pathname.startsWith("/community/");
               const isActive =
                 pathname === item.route ||
                 (isGroupDynamicPath && item.route === "/group-chat") ||
                 (isFriendDynamicPath && item.route === "/friends") ||
+                (isCommunityDynamicPath && item.route === "/community") ||
                 (/^\/[a-zA-Z0-9]{24}$/.test(pathname) && item.route === "/");
               return (
                 <Link
