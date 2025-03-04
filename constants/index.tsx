@@ -23,6 +23,11 @@ export const sidebarLinks: SidebarLink[] = [
     label: "Your friends"
   },
   {
+    icon: "octicon:feed-tag-16",
+    route: "/community",
+    label: "New feeds"
+  },
+  {
     icon: "hugeicons:maps-global-01",
     route: "/map",
     label: "Your map"

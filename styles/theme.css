@@ -92,6 +92,14 @@
     @apply text-dark-600 dark:text-light-600;
   }
 
+  .text-dark600_light500 {
+    @apply text-dark-600 dark:text-light-500;
+  }
+
+  .text-light600_dark600 {
+    @apply text-light-600 dark:text-dark-600;
+  }
+
   .text-dark300_light800 {
     @apply text-dark-300 dark:text-light-800;
   }
