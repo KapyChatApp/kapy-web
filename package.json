@@ -59,6 +59,7 @@
     "react-fancybox": "^0.2.5",
     "react-player": "^2.16.0",
     "sentiment": "^5.0.2",
+    "swiper": "^11.2.5",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "ua-parser-js": "^2.0.0",
