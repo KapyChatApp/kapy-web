@@ -7,7 +7,7 @@ import React, { useState } from "react";
 const Community = () => {
   return (
     <div className="h-full w-full py-4 pr-4 flex gap-4">
-      <div className="flex w-3/4 h-full background-light900_dark400 rounded-xl p-4">
+      <div className="flex w-3/4 h-full background-light900_dark400 rounded-xl py-4 pl-4 ">
         <Feeds />
       </div>
 
