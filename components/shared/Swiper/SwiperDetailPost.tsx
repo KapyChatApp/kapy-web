@@ -7,16 +7,16 @@ import "swiper/css/navigation";
 import "swiper/css/pagination";
 
 import "./styles.css";
-import { Swiper, SwiperSlide } from "swiper/react";
 
 // import required modules
-import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
 import Image from "next/image";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import ReactPlayer from "react-player";
 import { FileSegment } from "@/components/ui/file-segment";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Mousewheel, Navigation, Pagination } from "swiper/modules";
 
-export default function SwiperStyle({
+export default function SwiperDetailPost({
   contents
 }: {
   contents: FileResponseDTO[];
@@ -29,14 +29,20 @@ export default function SwiperStyle({
         pagination={true}
         mousewheel={true}
         keyboard={true}
-        modules={[Navigation, Pagination, Mousewheel, Keyboard]}
+        modules={[Navigation, Pagination, Mousewheel]}
         className="mySwiper"
       >
         {contents.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="w-[468px] h-[585px] flex justify-center items-center">
+            <div className="w-full h-full flex justify-center items-center">
               {item.type === "Image" && (
-                <Image alt="" src={item.url} width={468} height={585} />
+                <Image
+                  alt=""
+                  src={item.url}
+                  width={468}
+                  height={585}
+                  className="object-cover w-full h-full"
+                />
               )}
 
               {item.type === "Video" && (
@@ -44,8 +50,8 @@ export default function SwiperStyle({
                   url={item.url}
                   controls
                   width="468px"
-                  height="585px"
-                  className="max-w-full h-auto"
+                  height="668px"
+                  className="w-full h-auto"
                 />
               )}
 

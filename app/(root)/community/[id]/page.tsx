@@ -1,8 +1,20 @@
 "use client";
-import React, { useState } from "react";
-import { Button } from "../ui/button";
-import PostFrame from "./Posts/PostFrame";
+import SwiperDetailPost from "@/components/shared/Swiper/SwiperDetailPost";
+import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useEffect, useState } from "react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger
+} from "@/components/ui/popover";
+import { otherBoxPost } from "@/constants/post";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Header from "@/components/community/Posts/DetailPost/Header";
+import AccountLink from "@/components/community/Posts/DetailPost/AccountLink";
+
 const detailPost: PostResponseDTO = {
   _id: "1",
   firstName: "Junie",
@@ -10,7 +22,7 @@ const detailPost: PostResponseDTO = {
   nickName: "",
   avatar:
     "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-  userId: "",
+  userId: "1",
   likedIds: [
     {
       _id: "1",
@@ -140,59 +152,85 @@ const detailPost: PostResponseDTO = {
     }
   ]
 };
-const Feeds = () => {
-  const [isClickRecent, setIsClickRecent] = useState(true);
-  const [isClickBff, setIsClickBff] = useState(false);
-  //const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
-  return (
-    <div className="flex flex-col w-full h-full ">
-      <div className="flex w-full h-fit items-center justify-between mb-6 pr-4">
-        <span className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
-          Feeds
-        </span>
-        <div className="flex w-fit h-fit gap-2 items-center justify-center">
-          <Button
-            className="bg-transparent p-2 border-none shadow-none"
-            onClick={() => {
-              setIsClickBff(false);
-              setIsClickRecent(true);
-            }}
-          >
-            <span
-              className={`${
-                isClickRecent
-                  ? "body-semibold text-dark100_light900"
-                  : "text-light600_dark600 body-regular"
-              }`}
-            >
-              Recent
-            </span>
-          </Button>
-          <Button
-            className="bg-transparent p-2 border-none shadow-none"
-            onClick={() => setIsClickRecent(false)}
-          >
-            <span
-              className={`${
-                !isClickRecent
-                  ? "body-semibold text-dark100_light900"
-                  : "body-regular text-light600_dark600"
-              }`}
-            >
-              Best friend
-            </span>
-          </Button>
+const page = () => {
+  const [isPop, setPop] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
+
+  const router = useRouter();
+  const handleBack = () => {
+    const scrollPosition = sessionStorage.getItem("scrollPosition");
+    router.back();
+
+    if (scrollPosition) {
+      setTimeout(() => {
+        window.scrollTo(0, parseInt(scrollPosition, 10));
+      }, 100); // Đợi một chút để đảm bảo trang cũ được tải lại trước khi cuộn
+    }
+  };
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  return isMounted ? (
+    <div className="modal-overlay-post">
+      <div className="absolute top-4 right-4">
+        <Button
+          className="flex bg-transparent shadow-none p-2 border-none hover:bg-transparent h-10 w-10"
+          onClick={handleBack}
+        >
+          <Icon
+            icon="mingcute:close-fill"
+            width={40}
+            height={40}
+            className="text-light-700"
+          />
+        </Button>
+      </div>
+      <div className="w-full mx-48 h-[683px] rounded-lg background-light900_dark200 items-center justify-start flex overflow-scroll scrollable">
+        <div className="flex w-full h-full">
+          <div className="flex w-1/2 h-full">
+            <SwiperDetailPost contents={detailPost.contents} />
+          </div>
+
+          <div className="flex-grow h-full flex-col">
+            <Header
+              avatar={detailPost.avatar}
+              userId={detailPost.userId}
+              accountName={detailPost.firstName + " " + detailPost.lastName}
+            />
+
+            {/* Detail */}
+            <div className="flex p-4 w-full h-fit items-center justify-start border-b-[0.6px] border-light500_dark400">
+              <div className="flex w-full h-fit">
+                <div className="w-8 h-8">
+                  <a className="w-8 h-8" href={`/account/${detailPost.userId}`}>
+                    <Image
+                      alt="ava"
+                      src={detailPost.avatar}
+                      width={32}
+                      height={32}
+                      className="object-cover rounded-full"
+                    />
+                  </a>
+                </div>
+                <div className="flex-grow w-full h-full items-start justify-center ml-[14px]">
+                  <div className="w-full h-full flex p-[2px]">
+                    <span className="w-full text-dark100_light900 body-semibold">
+                      <a
+                        className="w-fit transition-opacity duration-300 hover:opacity-40"
+                        href={`/account/${detailPost.userId}`}
+                      >
+                        {detailPost.firstName + " " + detailPost.lastName}
+                      </a>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
-      <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
-        {/* {arrayPost.map((item) => (
-          <PostFrame post={item} />
-        ))} */}
-        <PostFrame post={detailPost} />
-      </div>
     </div>
-  );
+  ) : null;
 };
 
-export default Feeds;
+export default page;

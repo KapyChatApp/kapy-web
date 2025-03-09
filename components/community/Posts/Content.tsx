@@ -1,7 +1,6 @@
 import SwiperStyle from "@/components/shared/Swiper/Swiper";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import React from "react";
-import ReactDOM from "react-dom";
 
 const Content = ({ post }: { post: PostResponseDTO }) => {
   return (
