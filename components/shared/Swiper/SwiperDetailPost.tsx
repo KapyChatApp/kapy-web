@@ -34,7 +34,7 @@ export default function SwiperDetailPost({
       >
         {contents.map((item, index) => (
           <SwiperSlide key={index}>
-            <div className="w-full h-full flex justify-center items-center">
+            <div className="w-full h-full flex justify-center items-center background-light900_dark200 rounded-l-lg">
               {item.type === "Image" && (
                 <Image
                   alt=""
@@ -46,28 +46,32 @@ export default function SwiperDetailPost({
               )}
 
               {item.type === "Video" && (
-                <ReactPlayer
-                  url={item.url}
-                  controls
-                  width="468px"
-                  height="668px"
-                  className="w-full h-auto"
-                />
+                <div className="flex flex-wrap w-full h-full items-center justify-center background-light900_dark200 rounded-l-lg">
+                  <ReactPlayer
+                    url={item.url}
+                    controls
+                    width="468px"
+                    height="668px"
+                    className="w-full h-auto"
+                  />
+                </div>
               )}
 
               {item.type === "Audio" && (
-                <audio
-                  controls
-                  className="h-[54px] w-[300px] md:text-[14px] text-[12px]"
-                >
-                  <source src={item.url} type="audio/ogg" />
-                </audio>
+                <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.25px] border-light500_dark400 background-light900_dark200 rounded-l-lg">
+                  <audio
+                    controls
+                    className="h-[54px] w-[300px] md:text-[14px] text-[12px]"
+                  >
+                    <source src={item.url} type="audio/ogg" />
+                  </audio>
+                </div>
               )}
 
               {item.type !== "Image" &&
                 item.type !== "Video" &&
                 item.type !== "Audio" && (
-                  <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.5px] border-light-500 ">
+                  <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.25px] border-light500_dark400 background-light900_dark200 rounded-l-lg">
                     <FileSegment fileName={item.fileName} url={item.url} />
                   </div>
                 )}
