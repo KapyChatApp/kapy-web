@@ -1,4 +1,3 @@
-"use client";
 import React, { useRef, useState } from "react";
 
 // Import Swiper styles
@@ -40,28 +39,32 @@ export default function SwiperStyle({
               )}
 
               {item.type === "Video" && (
-                <ReactPlayer
-                  url={item.url}
-                  controls
-                  width="468px"
-                  height="585px"
-                  className="max-w-full h-auto"
-                />
+                <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.25px] border-light-500 bg-transparent dark:bg-dark-400">
+                  <ReactPlayer
+                    url={item.url}
+                    controls
+                    width="468px"
+                    height="585px"
+                    className="max-w-full h-auto"
+                  />
+                </div>
               )}
 
               {item.type === "Audio" && (
-                <audio
-                  controls
-                  className="h-[54px] w-[300px] md:text-[14px] text-[12px]"
-                >
-                  <source src={item.url} type="audio/ogg" />
-                </audio>
+                <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.25px] border-light-500 bg-transparent dark:bg-dark-400">
+                  <audio
+                    controls
+                    className="h-[54px] w-[300px] md:text-[14px] text-[12px]"
+                  >
+                    <source src={item.url} type="audio/ogg" />
+                  </audio>
+                </div>
               )}
 
               {item.type !== "Image" &&
                 item.type !== "Video" &&
                 item.type !== "Audio" && (
-                  <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.5px] border-light-500 ">
+                  <div className="flex flex-wrap w-full h-full items-center justify-center border-[0.25px] border-light-500 bg-transparent dark:bg-dark-400">
                     <FileSegment fileName={item.fileName} url={item.url} />
                   </div>
                 )}
