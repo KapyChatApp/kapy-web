@@ -13,7 +13,6 @@ import { otherBoxPost } from "@/constants/post";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Header from "@/components/community/Posts/DetailPost/Header";
-import AccountLink from "@/components/community/Posts/DetailPost/AccountLink";
 
 const detailPost: PostResponseDTO = {
   _id: "1",
@@ -199,33 +198,50 @@ const page = () => {
             />
 
             {/* Detail */}
-            <div className="flex p-4 w-full h-fit items-center justify-start border-b-[0.6px] border-light500_dark400">
-              <div className="flex w-full h-fit">
-                <div className="w-8 h-8">
-                  <a className="w-8 h-8" href={`/account/${detailPost.userId}`}>
-                    <Image
-                      alt="ava"
-                      src={detailPost.avatar}
-                      width={32}
-                      height={32}
-                      className="object-cover rounded-full"
-                    />
-                  </a>
-                </div>
-                <div className="flex-grow w-full h-full items-start justify-center ml-[14px]">
-                  <div className="w-full h-full flex p-[2px]">
-                    <span className="w-full text-dark100_light900 body-semibold">
-                      <a
-                        className="w-fit transition-opacity duration-300 hover:opacity-40"
-                        href={`/account/${detailPost.userId}`}
-                      >
-                        {detailPost.firstName + " " + detailPost.lastName}
-                      </a>
-                    </span>
+            <ul className="flex flex-col p-4 w-full h-fit items-center justify-start border-b-[0.6px] border-light500_dark400">
+              {/* Caption */}
+              {detailPost.caption && (
+                <div className="flex w-full h-fit items-center justify-center">
+                  <div className="w-8 h-8">
+                    <a
+                      className="w-8 h-8"
+                      href={`/account/${detailPost.userId}`}
+                    >
+                      <Image
+                        alt="ava"
+                        src={detailPost.avatar}
+                        width={32}
+                        height={32}
+                        className="object-cover rounded-full"
+                      />
+                    </a>
+                  </div>
+                  <div className="flex-grow w-full h-full items-center justify-center ml-[14px] flex">
+                    <div className="w-fit h-full flex p-[2px]">
+                      <span className="w-full text-dark100_light900 body-semibold">
+                        <a
+                          className="w-fit transition-opacity duration-300 hover:opacity-40"
+                          href={`/account/${detailPost.userId}`}
+                        >
+                          {detailPost.firstName + " " + detailPost.lastName}
+                        </a>
+                      </span>
+                    </div>
+
+                    <div className="flex-grow h-fit w-auto flex items-center justify-start ml-1">
+                      <h2 className="text-dark100_light900 body-regular items-center justify-start">
+                        {detailPost.caption}
+                      </h2>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
+              )}
+
+              <div className="w-fit h-fit"></div>
+
+              {/* Comments */}
+              <div className="flex w-full h-fit"></div>
+            </ul>
           </div>
         </div>
       </div>
