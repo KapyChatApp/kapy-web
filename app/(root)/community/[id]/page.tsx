@@ -4,15 +4,10 @@ import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger
-} from "@/components/ui/popover";
-import { otherBoxPost } from "@/constants/post";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Header from "@/components/community/Posts/DetailPost/Header";
+import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
+import Comments from "@/components/community/Posts/DetailPost/Comments";
 
 const detailPost: PostResponseDTO = {
   _id: "1",
@@ -152,7 +147,6 @@ const detailPost: PostResponseDTO = {
   ]
 };
 const page = () => {
-  const [isPop, setPop] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
@@ -198,50 +192,35 @@ const page = () => {
             />
 
             {/* Detail */}
-            <ul className="flex flex-col p-4 w-full h-fit items-center justify-start border-b-[0.6px] border-light500_dark400">
-              {/* Caption */}
-              {detailPost.caption && (
-                <div className="flex w-full h-fit items-center justify-center">
-                  <div className="w-8 h-8">
-                    <a
-                      className="w-8 h-8"
-                      href={`/account/${detailPost.userId}`}
-                    >
-                      <Image
-                        alt="ava"
-                        src={detailPost.avatar}
-                        width={32}
-                        height={32}
-                        className="object-cover rounded-full"
-                      />
-                    </a>
-                  </div>
-                  <div className="flex-grow w-full h-full items-center justify-center ml-[14px] flex">
-                    <div className="w-fit h-full flex p-[2px]">
-                      <span className="w-full text-dark100_light900 body-semibold">
-                        <a
-                          className="w-fit transition-opacity duration-300 hover:opacity-40"
-                          href={`/account/${detailPost.userId}`}
-                        >
-                          {detailPost.firstName + " " + detailPost.lastName}
-                        </a>
-                      </span>
-                    </div>
+            <div className="flex w-full h-[483px] px-4 border-b-[0.6px] border-light500_dark400  overflow-scroll scrollable">
+              <ul className="flex flex-col py-4 w-full h-full items-center justify-start">
+                {/* Caption */}
+                {detailPost.caption && (
+                  <CaptionCard
+                    userId={detailPost.userId}
+                    avatar={detailPost.avatar}
+                    accountName={
+                      detailPost.firstName + " " + detailPost.lastName
+                    }
+                    caption={detailPost.caption}
+                    createAt={detailPost.createAt}
+                  />
+                )}
 
-                    <div className="flex-grow h-fit w-auto flex items-center justify-start ml-1">
-                      <h2 className="text-dark100_light900 body-regular items-center justify-start">
-                        {detailPost.caption}
-                      </h2>
-                    </div>
-                  </div>
-                </div>
-              )}
+                <div className="w-full h-fit"></div>
 
-              <div className="w-fit h-fit"></div>
+                {/* Comments */}
+                {detailPost.comments.length > 0 && (
+                  <Comments comments={detailPost.comments} />
+                )}
+              </ul>
+            </div>
 
-              {/* Comments */}
-              <div className="flex w-full h-fit"></div>
-            </ul>
+            {/* Interation */}
+            <div>Interaction</div>
+
+            {/* Create comment */}
+            <div>Create Comment</div>
           </div>
         </div>
       </div>

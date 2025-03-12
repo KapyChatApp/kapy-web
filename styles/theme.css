@@ -84,6 +84,10 @@
     @apply bg-light-600 dark:bg-dark-400;
   }
 
+  .background-dark600_light600 {
+    @apply bg-dark-600 dark:bg-light-600;
+  }
+
   .text-dark100_light900 {
     @apply text-dark-100 dark:text-light-900;
   }
