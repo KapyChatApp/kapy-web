@@ -1,29 +1,24 @@
 "use client";
-import { OtherBoxButtonProps } from "@/components/friends/FriendBox";
-import OtherBoxButton from "@/components/friends/OtherBoxButton";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger
 } from "@/components/ui/popover";
+import { otherBoxPost } from "@/constants/post";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { formatDate, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
-import React, { useState } from "react";
-
-const otherBox: OtherBoxButtonProps[] = [
-  {
-    icon: "material-symbols:report-rounded",
-    label: "Report",
-    value: "report"
-  }
-];
+import React, { useEffect, useState } from "react";
 
 const Information = ({ post }: { post: PostResponseDTO }) => {
   const [isPop, setPop] = useState(false);
-  return (
+  const [isMounted, setIsMounted] = useState(false);
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  return isMounted ? (
     <div className="flex w-full h-fit pb-3 pl-1 items-center justify-between">
       <div className="flex w-fit h-fit items-center justify-center">
         <div className="w-[42px] h-[42px] mr-3">
@@ -66,7 +61,7 @@ const Information = ({ post }: { post: PostResponseDTO }) => {
               </span>
             </PopoverTrigger>
             <PopoverContent className="flex flex-col background-light900_dark200 h-fit rounded-lg justify-center items-center dark:border-dark-300 w-[100px] p-1">
-              {otherBox.map((item) => (
+              {otherBoxPost.map((item) => (
                 <div className="flex w-full h-fit">
                   <Button
                     className="flex flex-row p-0 gap-1 shadow-none border-none hover:background-light700_dark400 rounded-lg w-full"
@@ -87,7 +82,7 @@ const Information = ({ post }: { post: PostResponseDTO }) => {
         </div>
       </div>
     </div>
-  );
+  ) : null;
 };
 
 export default Information;

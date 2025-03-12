@@ -80,7 +80,13 @@ const Interaction = ({ post }: { post: PostResponseDTO }) => {
         {totalComments > 0 ? (
           <a
             className="text-dark600_light500 body-light w-fit"
-            href={`/community/post/${post._id}`}
+            href={`/community/${post._id}`}
+            onClick={() => {
+              sessionStorage.setItem(
+                "scrollPosition",
+                window.scrollY.toString()
+              );
+            }}
           >
             View all {totalComments} comments
           </a>
