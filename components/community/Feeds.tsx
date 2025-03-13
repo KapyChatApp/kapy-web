@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { Button } from "../ui/button";
 import PostFrame from "./Posts/PostFrame";
 import { PostResponseDTO } from "@/lib/DTO/post";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import CreatePost from "./Posts/Create/CreatePost";
 const detailPost: PostResponseDTO = {
   _id: "1",
   firstName: "Junie",
@@ -141,57 +143,52 @@ const detailPost: PostResponseDTO = {
   ]
 };
 const Feeds = () => {
-  const [isClickRecent, setIsClickRecent] = useState(true);
-  const [isClickBff, setIsClickBff] = useState(false);
   //const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
+  const [isCreate, setIsCreate] = useState(false);
+  const handleCreatePost = () => {
+    setIsCreate(!isCreate);
+  };
   return (
-    <div className="flex flex-col w-full h-full ">
-      <div className="flex w-full h-fit items-center justify-between mb-6 pr-4">
-        <span className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
-          Feeds
-        </span>
-        <div className="flex w-fit h-fit gap-2 items-center justify-center">
-          <Button
-            className="bg-transparent p-2 border-none shadow-none"
-            onClick={() => {
-              setIsClickBff(false);
-              setIsClickRecent(true);
-            }}
-          >
-            <span
-              className={`${
-                isClickRecent
-                  ? "body-semibold text-dark100_light900"
-                  : "text-light600_dark600 body-regular"
-              }`}
+    <>
+      <div className="flex flex-col w-full h-full ">
+        <div className="flex w-full h-fit items-center justify-between mb-6 pr-4">
+          <span className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
+            Feeds
+          </span>
+          <div className="flex w-fit h-fit gap-2 items-center justify-center">
+            <Button
+              className="bg-primary-500 p-3 border-none shadow-none rounded-2xl hover:bg-primary-500 items-center justify-center"
+              onClick={handleCreatePost}
             >
-              Recent
-            </span>
-          </Button>
-          <Button
-            className="bg-transparent p-2 border-none shadow-none"
-            onClick={() => setIsClickRecent(false)}
-          >
-            <span
-              className={`${
-                !isClickRecent
-                  ? "body-semibold text-dark100_light900"
-                  : "body-regular text-light600_dark600"
-              }`}
-            >
-              Best friend
-            </span>
-          </Button>
+              <div className="flex items-center justify-center h-full">
+                <div className="flex w-4 h-full items-center justify-center mr-1">
+                  <Icon
+                    icon="basil:add-outline"
+                    width={16}
+                    height={16}
+                    className="text-light-900"
+                  />
+                </div>
+                <span
+                  className={`flex items-center justify-center h-full body-regular text-light-900`}
+                >
+                  Create Post
+                </span>
+              </div>
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
+          {/* {arrayPost.map((item) => (
+          <PostFrame post={item} />
+        ))} */}
+          <PostFrame post={detailPost} />
         </div>
       </div>
 
-      <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
-        {/* {arrayPost.map((item) => (
-          <PostFrame post={item} />
-        ))} */}
-        <PostFrame post={detailPost} />
-      </div>
-    </div>
+      {isCreate && <CreatePost setIsCreate={setIsCreate} />}
+    </>
   );
 };
 
