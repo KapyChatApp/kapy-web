@@ -1,7 +1,7 @@
 import React from "react";
 import Information from "./Information";
 import Content from "./Content";
-import Interaction from "./Interaction";
+import Interaction from "./Actions";
 import { PostResponseDTO } from "@/lib/DTO/post";
 
 const PostFrame = ({ post }: { post: PostResponseDTO }) => {

@@ -8,6 +8,9 @@ import { useRouter } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
+import { formatTimeMessageBox } from "@/lib/utils";
+import Interaction from "@/components/community/Posts/Interaction";
+import InputDetail from "@/components/community/Comment/InputDetail";
 
 const detailPost: PostResponseDTO = {
   _id: "1",
@@ -148,7 +151,6 @@ const detailPost: PostResponseDTO = {
 };
 const page = () => {
   const [isMounted, setIsMounted] = useState(false);
-
   const router = useRouter();
   const handleBack = () => {
     const scrollPosition = sessionStorage.getItem("scrollPosition");
@@ -160,11 +162,17 @@ const page = () => {
       }, 100); // Đợi một chút để đảm bảo trang cũ được tải lại trước khi cuộn
     }
   };
+  const [commentContent, setCommentContent] = useState("");
+  const [isTyping, setIsTyping] = useState<boolean>(false);
+  const handleInputChange = (value: string) => {
+    setCommentContent(value);
+  };
   useEffect(() => {
     setIsMounted(true);
   }, []);
   return isMounted ? (
     <div className="modal-overlay-post">
+      {/* Close Button */}
       <div className="absolute top-4 right-4">
         <Button
           className="flex bg-transparent shadow-none p-2 border-none hover:bg-transparent h-10 w-10"
@@ -178,22 +186,28 @@ const page = () => {
           />
         </Button>
       </div>
-      <div className="w-full mx-48 h-[683px] rounded-lg background-light900_dark200 items-center justify-start flex overflow-scroll scrollable">
+
+      <div className="w-full max-w-[1054px] h-[683px] rounded-lg background-light900_dark200 flex items-center justify-start">
         <div className="flex w-full h-full">
+          {/* Ảnh bài post */}
           <div className="flex w-1/2 h-full">
             <SwiperDetailPost contents={detailPost.contents} />
           </div>
 
-          <div className="flex-grow h-full flex-col">
-            <Header
-              avatar={detailPost.avatar}
-              userId={detailPost.userId}
-              accountName={detailPost.firstName + " " + detailPost.lastName}
-            />
+          {/* Phần chi tiết bài post + comment */}
+          <div className="flex flex-col w-1/2 h-full">
+            {/* Header */}
+            <div className="flex h-[56px]">
+              <Header
+                avatar={detailPost.avatar}
+                userId={detailPost.userId}
+                accountName={detailPost.firstName + " " + detailPost.lastName}
+              />
+            </div>
 
-            {/* Detail */}
-            <div className="flex w-full h-[483px] px-4 border-b-[0.6px] border-light500_dark400  overflow-scroll scrollable">
-              <ul className="flex flex-col py-4 w-full h-full items-center justify-start">
+            {/* Detail (Chiều rộng cố định, có thể scroll) */}
+            <div className="flex flex-col flex-grow w-full max-w-[600px] px-4 overflow-y-auto">
+              <ul className="flex flex-col py-4 w-full overflow-hidden">
                 {/* Caption */}
                 {detailPost.caption && (
                   <CaptionCard
@@ -207,8 +221,6 @@ const page = () => {
                   />
                 )}
 
-                <div className="w-full h-fit"></div>
-
                 {/* Comments */}
                 {detailPost.comments.length > 0 && (
                   <Comments comments={detailPost.comments} />
@@ -216,11 +228,29 @@ const page = () => {
               </ul>
             </div>
 
-            {/* Interation */}
-            <div>Interaction</div>
+            {/* Interaction + Ô nhập comment (luôn ở dưới) */}
+            <div className="w-full">
+              {/* Interaction */}
+              <div className="flex flex-col w-full px-4 border-t-[0.6px] border-light500_dark400">
+                <div className="w-full flex pt-[2px] pb-1">
+                  <Interaction />
+                </div>
+                <div className="w-full mb-4">
+                  <span className="text-dark600_light600 small-regular">
+                    {formatTimeMessageBox(detailPost.createAt)}
+                  </span>
+                </div>
+              </div>
 
-            {/* Create comment */}
-            <div>Create Comment</div>
+              {/* Ô nhập comment */}
+              <div className="w-full flex py-[6px] pr-4 border-t-[0.6px] border-light500_dark400">
+                <InputDetail
+                  onCommentChange={handleInputChange}
+                  commentContent={commentContent}
+                  setTyping={setIsTyping}
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>

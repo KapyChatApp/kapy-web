@@ -3,8 +3,8 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
-import ReportPost from "../../ReportPost";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import ReportPost from "../ReportPost";
 
 const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
   return (

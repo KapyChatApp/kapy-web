@@ -4,7 +4,6 @@ import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import ReportPost from "../../ReportPost";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CommentCard from "./CommentCard";
 
