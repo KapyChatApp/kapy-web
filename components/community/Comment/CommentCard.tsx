@@ -3,8 +3,8 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
-import ReportPost from "../../ReportPost";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import OtherPost from "../Other/OtherPost";
 
 const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
   return (
@@ -59,7 +59,7 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
                   </Button>
                   {/* ReportPost xuất hiện bên cạnh Reply */}
                   <div className="absolute left-full top-0 mt-[-2px] hidden group-hover:block ml-2">
-                    <ReportPost />
+                    <OtherPost comment={item} />
                   </div>
                 </div>
               </span>

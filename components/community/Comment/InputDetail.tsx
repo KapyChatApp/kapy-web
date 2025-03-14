@@ -1,15 +1,10 @@
-"use client";
 import { useState } from "react";
+import { Icon } from "@iconify/react";
 import EmojiPicker from "emoji-picker-react";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import { Textarea } from "@/components/ui/textarea";
-interface CommentInputProps {
-  onCommentChange: (value: string) => void;
-  commentContent: string;
-  setTyping: React.Dispatch<React.SetStateAction<boolean>>;
-  handleAction?: () => Promise<void>;
-}
-const CommentInput = ({
+import { CommentInputProps } from "./CommentInput";
+
+const InputDetail = ({
   onCommentChange,
   setTyping,
   commentContent,
@@ -45,13 +40,26 @@ const CommentInput = ({
       }
     }
   };
+
   return (
-    <div className="flex justify-start w-full">
+    <div className="flex items-center w-full h-fit border-none">
+      {/* Biểu tượng emoji */}
+      <button
+        className="flex py-2 px-4"
+        onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+      >
+        <Icon
+          icon="proicons:emoji"
+          width={24}
+          height={24}
+          className="text-dark100_light900 cursor-pointer"
+        />
+      </button>
+
+      {/* Input comment */}
       <div className="relative w-full">
         <Textarea
-          className={`text-dark100_light900 bg-transparent min-h-[20px] h-[20px] border-none text-[14px] p-[2px] overflow-scroll scrollable placeholder:text-dark600_light500 shadow-none ${
-            commentContent.trim().length > 0 ? "w-[400px]" : "w-[440px]"
-          }`}
+          className="text-dark100_light900 bg-transparent h-[40px] min-h-[40px] border-none text-[14px] py-2 px-0 overflow-scroll custom-scrollbar placeholder:text-dark600_light500 shadow-none resize-y w-[92%]"
           value={commentContent}
           onChange={handleChange}
           onInput={handleInput}
@@ -59,9 +67,11 @@ const CommentInput = ({
           onKeyDown={handleKeyDown}
           placeholder="Add a comment..."
         />
+
+        {/* Nút Post */}
         {commentContent.trim().length > 0 && (
           <button
-            className="absolute right-4 top-[50%] transform -translate-y-1/2 mr-6 mt-[-2px]"
+            className="absolute right-0 top-[50%] transform -translate-y-1/2 mt-[-2px]"
             // onClick={() => {
             //   handleKeyDown;
             // }}
@@ -69,27 +79,20 @@ const CommentInput = ({
             <span className="text-accent-blue body-bold">Post</span>
           </button>
         )}
-        <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2"
-          onClick={() => {
-            setShowEmojiPicker(!showEmojiPicker);
-          }}
-        >
-          <Icon
-            icon="heroicons-solid:emoji-happy"
-            width={16}
-            height={16}
-            className="text-primary-500 cursor-pointer w-[16px] h-[16px]"
-          />
-        </button>
-        {showEmojiPicker && (
-          <div className="emoji-picker-wrapper">
-            <EmojiPicker onEmojiClick={onEmojiClick} />
-          </div>
-        )}
       </div>
+
+      {/* Emoji Picker */}
+      {showEmojiPicker && (
+        <div className="absolute bottom-[80px] left-[680px] z-[9999]">
+          <EmojiPicker
+            onEmojiClick={(emoji) =>
+              onCommentChange(commentContent + emoji.emoji)
+            }
+          />
+        </div>
+      )}
     </div>
   );
 };
 
-export default CommentInput;
+export default InputDetail;

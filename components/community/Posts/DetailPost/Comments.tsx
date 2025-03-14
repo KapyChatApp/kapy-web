@@ -1,10 +1,10 @@
 "use client";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import React, { useMemo, useState } from "react";
-import CommentCard from "../Comment/CommentCard";
 import { Button } from "@/components/ui/button";
-import CommentItem from "../Comment/Replies";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import CommentCard from "../../Comment/CommentCard";
+import CommentItem from "../../Comment/Replies";
 
 const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
   const [expandedComments, setExpandedComments] = useState<
@@ -36,9 +36,9 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
       <div className="flex flex-col w-full h-full items-center justify-start">
         {sortedComments.slice(0, visibleComments).map((item) => (
           <div className="w-full h-fit mb-4 group relative">
-            <ul className="flex flex-col w-full h-fit">
+            <ul className="flex flex-col w-full h-fit relative">
               {/* Parent */}
-              <div className="w-full h-fit">
+              <div className="w-full h-fit relative flex">
                 <CommentCard item={item} />
               </div>
               {/* View Replies */}
@@ -69,7 +69,7 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
 
               {/* Danh sách phản hồi */}
               {expandedComments[item._id] && item.replieds.length > 0 && (
-                <ul className="mt-2">
+                <ul className="mt-2 flex">
                   {item.replieds.map((reply) => (
                     <CommentItem key={reply._id} item={reply} level={1} />
                   ))}
@@ -82,7 +82,10 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
         {/* Load More */}
         {visibleComments < sortedComments.length && (
           <li className="w-full">
-            <div className="flex items-center justify-center w-full h-fit p-2 cursor-pointer">
+            <div
+              className="flex items-center justify-center w-full h-fit p-2 cursor-pointer"
+              onClick={loadMoreComments}
+            >
               <Icon
                 icon="gg:add"
                 width={24}

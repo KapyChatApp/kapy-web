@@ -1,9 +1,30 @@
-import { OtherBoxButtonProps } from "@/components/friends/FriendBox";
+export const actionSheet = (
+  setReport: (value: boolean) => void,
+  handleConfirmUnfriend: () => void,
+  setIsBack: (value: boolean) => void,
+  isComment: boolean
+) => {
+  const actions = [
+    {
+      label: "Report",
+      value: true,
+      onClick: () => setReport(true)
+    }
+  ];
 
-export const otherBoxPost: OtherBoxButtonProps[] = [
-  {
-    icon: "material-symbols:report-rounded",
-    label: "Report",
-    value: "report"
+  if (!isComment) {
+    actions.push({
+      label: "Unfriend",
+      value: true,
+      onClick: handleConfirmUnfriend
+    });
   }
-];
+
+  actions.push({
+    label: "Cancel",
+    value: false,
+    onClick: () => setIsBack(false)
+  });
+
+  return actions;
+};
