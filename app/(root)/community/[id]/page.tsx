@@ -198,11 +198,7 @@ const page = () => {
           <div className="flex flex-col w-1/2 h-full">
             {/* Header */}
             <div className="flex h-[56px]">
-              <Header
-                avatar={detailPost.avatar}
-                userId={detailPost.userId}
-                accountName={detailPost.firstName + " " + detailPost.lastName}
-              />
+              <Header post={detailPost} />
             </div>
 
             {/* Detail (Chiều rộng cố định, có thể scroll) */}
