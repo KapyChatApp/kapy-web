@@ -14,85 +14,18 @@ import InputDetail from "@/components/community/Comment/InputDetail";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 
 const defaultDetail: PostResponseDTO = {
-  _id: "1",
-  firstName: "Junie",
-  lastName: "Vu",
+  _id: "",
+  firstName: "",
+  lastName: "",
   nickName: "",
-  avatar:
-    "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
+  avatar: "/assets/ava/default.png",
   userId: "",
-  likedIds: [
-    {
-      _id: "1",
-      firstName: "rose",
-      lastName: "ruby",
-      nickName: "",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "2",
-      firstName: "mei",
-      lastName: "truyn",
-      nickName: "",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "3",
-      firstName: "bay",
-      lastName: "max",
-      nickName: "",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    }
-  ],
+  likedIds: [],
   shares: [],
   comments: [],
-  caption: "hello",
+  caption: "",
   createAt: "2025-01-02T04:47:05.847+00:00",
-  contents: [
-    {
-      _id: "1",
-      fileName: "avatar.png",
-      url: "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "png",
-      type: "Image"
-    },
-    {
-      _id: "2",
-      fileName: "video.mp3",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735799193/Videos/cy0s5a4ljaipis4xk3io.mov",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "MOV",
-      type: "Video"
-    },
-    {
-      _id: "3",
-      fileName: "tests-example.xls",
-      url: "https://res.cloudinary.com/dtn9r75b7/raw/upload/v1735796263/Documents/Documents/tests-example.xls",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "xls",
-      type: "Other"
-    },
-    {
-      _id: "4", // Fix trùng ID
-      fileName: "7.mp3.m4a",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735801570/Audios/Audios/7.mp3.m4a",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "m4a",
-      type: "Audio"
-    }
-  ]
+  contents: []
 };
 
 const page = () => {
