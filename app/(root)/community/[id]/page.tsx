@@ -4,27 +4,29 @@ import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
 import InputDetail from "@/components/community/Comment/InputDetail";
+import { fetchDetailPost } from "@/lib/data/post/detail";
 
-const detailPost: PostResponseDTO = {
+const defaultDetail: PostResponseDTO = {
   _id: "1",
   firstName: "Junie",
   lastName: "Vu",
   nickName: "",
   avatar:
     "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-  userId: "1",
+  userId: "",
   likedIds: [
     {
       _id: "1",
       firstName: "rose",
       lastName: "ruby",
+      nickName: "",
       avatar:
         "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
     },
@@ -32,6 +34,7 @@ const detailPost: PostResponseDTO = {
       _id: "2",
       firstName: "mei",
       lastName: "truyn",
+      nickName: "",
       avatar:
         "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
     },
@@ -39,71 +42,13 @@ const detailPost: PostResponseDTO = {
       _id: "3",
       firstName: "bay",
       lastName: "max",
+      nickName: "",
       avatar:
         "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
     }
   ],
   shares: [],
-  comments: [
-    {
-      _id: "1",
-      firstName: "Nguyễn",
-      lastName: "Văn A",
-      nickName: "A Nguyễn",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "1",
-      likedIds: ["2", "3"],
-      replieds: [
-        {
-          _id: "2",
-          firstName: "Trần",
-          lastName: "Thị B",
-          nickName: "B Trần",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "2",
-          likedIds: ["1"],
-          replieds: [],
-          caption: "Cảm ơn bạn!",
-          createAt: "2024-03-08T10:00:00Z",
-          createBy: "user_002"
-        }
-      ],
-      caption: "Bài viết hay quá!",
-      createAt: "2024-03-08T09:30:00Z",
-      createBy: "1"
-    },
-    {
-      _id: "3",
-      firstName: "Lê",
-      lastName: "Văn C",
-      nickName: "C Lê",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "3",
-      likedIds: ["1", "2"],
-      replieds: [
-        {
-          _id: "4",
-          firstName: "Phạm",
-          lastName: "Thị D",
-          nickName: "D Phạm",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "4",
-          likedIds: ["3"],
-          replieds: [],
-          caption: "Mình đồng ý!",
-          createAt: "2024-03-08T11:00:00Z",
-          createBy: "4"
-        }
-      ],
-      caption: "Thông tin hữu ích, cảm ơn!",
-      createAt: "2024-03-08T10:45:00Z",
-      createBy: "3"
-    }
-  ],
+  comments: [],
   caption: "hello",
   createAt: "2025-01-02T04:47:05.847+00:00",
   contents: [
@@ -138,7 +83,7 @@ const detailPost: PostResponseDTO = {
       type: "Other"
     },
     {
-      _id: "3",
+      _id: "4", // Fix trùng ID
       fileName: "7.mp3.m4a",
       url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735801570/Audios/Audios/7.mp3.m4a",
       bytes: 102400,
@@ -149,7 +94,10 @@ const detailPost: PostResponseDTO = {
     }
   ]
 };
+
 const page = () => {
+  const { id } = useParams();
+  const [detailPost, setDetailPost] = useState<PostResponseDTO>(defaultDetail);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const handleBack = () => {
@@ -167,6 +115,23 @@ const page = () => {
   const handleInputChange = (value: string) => {
     setCommentContent(value);
   };
+  useEffect(() => {
+    const fetchDetail = async () => {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) return;
+      try {
+        const data = await fetchDetailPost(id.toString());
+        if (!data) {
+          console.error("Can't get a post.");
+          return;
+        }
+        setDetailPost(data);
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    };
+    fetchDetail();
+  }, []);
   useEffect(() => {
     setIsMounted(true);
   }, []);
