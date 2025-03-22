@@ -20,7 +20,7 @@ const Action = ({ post }: { post: PostResponseDTO }) => {
   return (
     <>
       <div className="w-full h-fit">
-        <Interaction />
+        <Interaction post={post} />
 
         {/* LIKES */}
         {post.likedIds.length > 0 && (
@@ -37,7 +37,7 @@ const Action = ({ post }: { post: PostResponseDTO }) => {
                     }
                     width={14}
                     height={14}
-                    className="rounded-full"
+                    className="rounded-full object-cover"
                   />
                 </span>
               </a>

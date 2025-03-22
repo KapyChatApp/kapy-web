@@ -28,3 +28,29 @@ export const actionSheet = (
 
   return actions;
 };
+
+export const iconInteraction = (
+  handleLikeClick: () => void,
+  setCommented: (value: boolean) => void,
+  setShared: (value: boolean) => void
+) => {
+  const actions = [
+    {
+      icon: "solar:heart-linear",
+      value: "react",
+      onClick: handleLikeClick // Gọi hàm handleLikeClick thay vì setLiked
+    },
+    {
+      icon: "lineicons:comment-1",
+      value: "comment",
+      onClick: () => setCommented(true)
+    },
+    {
+      icon: "f7:paperplane",
+      value: "share",
+      onClick: () => setShared(true)
+    }
+  ];
+
+  return actions;
+};
