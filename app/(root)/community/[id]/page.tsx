@@ -127,7 +127,7 @@ const page = () => {
               {/* Interaction */}
               <div className="flex flex-col w-full px-4 border-t-[0.6px] border-light500_dark400">
                 <div className="w-full flex pt-[2px] pb-1">
-                  <Interaction />
+                  <Interaction post={detailPost} />
                 </div>
                 <div className="w-full mb-4">
                   <span className="text-dark600_light600 small-regular">

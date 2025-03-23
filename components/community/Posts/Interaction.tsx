@@ -6,6 +6,7 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { dislikePost } from "@/lib/services/post/dislike";
 import { likePost } from "@/lib/services/post/like";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Interaction = ({
@@ -13,8 +14,9 @@ const Interaction = ({
   updateLikes
 }: {
   post: PostResponseDTO;
-  updateLikes: (newLikedUsers: ShortUserResponseDTO[]) => void;
+  updateLikes?: (newLikedUsers: ShortUserResponseDTO[]) => void;
 }) => {
+  const router = useRouter();
   const userId = localStorage.getItem("adminId");
   const { adminInfo } = useUserContext();
   const userLike: ShortUserResponseDTO = {
@@ -40,13 +42,16 @@ const Interaction = ({
       updatedLikes = post.likedIds; // Thêm userLike vào danh sách
       await likePost(post._id);
     }
+    if (updateLikes) updateLikes(updatedLikes); // Gọi callback để cập nhật Actions
+  };
 
-    updateLikes(updatedLikes); // Gọi callback để cập nhật Actions
+  const handleCommentClick = () => {
+    router.push(`/community/${post._id}`);
   };
 
   const interationItem = iconInteraction(
     handleLikeClick,
-    setCommented,
+    handleCommentClick,
     setShared
   );
 
@@ -54,7 +59,7 @@ const Interaction = ({
     if (post && post.likedIds && userId) {
       setLiked(post.likedIds.some((user) => user._id === userId));
     }
-  }, [post, userId]); // Không cần dùng post?.likedIds, chỉ cần post là đủ
+  }, [post, userId]);
 
   return (
     <section className="flex justify-start items-center w-full h-fit my-1 ml-[-8px]">

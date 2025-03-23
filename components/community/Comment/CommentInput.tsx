@@ -47,7 +47,7 @@ const CommentInput = ({
   };
   return (
     <div className="flex justify-start w-full">
-      <div className="relative w-full">
+      <div className="relative w-full flex items-center justify-between">
         <Textarea
           className={`text-dark100_light900 bg-transparent min-h-[20px] h-[20px] border-none text-[14px] p-[2px] overflow-scroll scrollable placeholder:text-dark600_light500 shadow-none resize-y ${
             commentContent.trim().length > 0 ? "w-[400px]" : "w-[440px]"
@@ -69,19 +69,21 @@ const CommentInput = ({
             <span className="text-accent-blue body-bold">Post</span>
           </button>
         )}
-        <button
-          className="absolute right-2 top-1/2 transform -translate-y-1/2"
-          onClick={() => {
-            setShowEmojiPicker(!showEmojiPicker);
-          }}
-        >
-          <Icon
-            icon="heroicons-solid:emoji-happy"
-            width={16}
-            height={16}
-            className="text-primary-500 cursor-pointer w-[16px] h-[16px]"
-          />
-        </button>
+        <div className="flex w-fit h-full items-center justify-center p-1">
+          <button
+            className="w-fit h-fit "
+            onClick={() => {
+              setShowEmojiPicker(!showEmojiPicker);
+            }}
+          >
+            <Icon
+              icon="heroicons-solid:emoji-happy"
+              width={20}
+              height={20}
+              className="text-primary-500 cursor-pointer"
+            />
+          </button>
+        </div>
         {showEmojiPicker && (
           <div className="emoji-picker-wrapper">
             <EmojiPicker onEmojiClick={onEmojiClick} />

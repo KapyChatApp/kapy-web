@@ -31,7 +31,7 @@ export const actionSheet = (
 
 export const iconInteraction = (
   handleLikeClick: () => void,
-  setCommented: (value: boolean) => void,
+  handleCommentClick: () => void,
   setShared: (value: boolean) => void
 ) => {
   const actions = [
@@ -43,7 +43,7 @@ export const iconInteraction = (
     {
       icon: "lineicons:comment-1",
       value: "comment",
-      onClick: () => setCommented(true)
+      onClick: handleCommentClick
     },
     {
       icon: "f7:paperplane",

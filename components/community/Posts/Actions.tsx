@@ -95,7 +95,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
         {/* INPUT */}
         <section className="flex justify-start items-center w-full h-fit mt-2">
           <div className="w-full h-fit">
-            <div className="w-full h-fit">
+            <div className="w-full h-fit pb-4 border-b-[0.5px] border-light-500">
               <CommentInput
                 onCommentChange={handleInputChange}
                 commentContent={commentContent}
