@@ -137,13 +137,13 @@ const UploadFiles = ({
         )}
 
         <label
-          htmlFor="file-upload"
+          htmlFor="file-upload-create"
           className="px-4 py-2 bg-primary-500 body-medium text-white rounded-lg cursor-pointer mt-7"
         >
           Select from computer
         </label>
         <input
-          id="file-upload"
+          id="file-upload-create"
           type="file"
           accept="image/*,video/*"
           multiple

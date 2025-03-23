@@ -27,11 +27,11 @@ const PreCreate = ({ files }: { files: FileResponseDTO[] }) => {
       <div className="w-full h-full px-4">
         {/* Header */}
         <div className="flex items-center h-[60px] space-x-3">
-          <div className="flex w-7 h-7">
+          <div className="flex w-7 h-7 rounded-full overflow-hidden">
             <img
               src={adminInfo.avatar}
               alt="avatar"
-              className="w-7 h-7 rounded-full object-cover"
+              className="w-full h-full object-cover "
             />
           </div>
           <span className="body-semibold text-dark100_light900">

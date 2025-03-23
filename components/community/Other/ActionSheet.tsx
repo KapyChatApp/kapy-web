@@ -21,6 +21,7 @@ const ActionSheet = ({
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const [isReport, setReport] = useState(false);
+  const [isDelete, setDelete] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -63,12 +64,32 @@ const ActionSheet = ({
       action: "unfriend"
     });
   };
-  const actions = actionSheet(
-    setReport,
-    handleConfirmUnfriend,
-    setIsBack,
-    !!comment
-  );
+
+  const handleDeleteComment = async () => {};
+  const adminId = localStorage.getItem("adminId");
+  const checkAdminComment = !!(
+    comment &&
+    adminId &&
+    comment.userId === adminId
+  ); // ✅ Ép kiểu về boolean
+
+  const actions = checkAdminComment
+    ? actionSheet(
+        setReport,
+        handleConfirmUnfriend,
+        setIsBack,
+        !!comment,
+        checkAdminComment,
+        handleDeleteComment
+      )
+    : actionSheet(
+        setReport,
+        handleConfirmUnfriend,
+        setIsBack,
+        !!comment,
+        checkAdminComment // ✅ Đã đảm bảo kiểu boolean
+      );
+
   return (
     <>
       <div className="modal-overlay-post">

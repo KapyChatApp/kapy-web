@@ -14,13 +14,13 @@ const Information = ({ post }: { post: PostResponseDTO }) => {
   return isMounted ? (
     <div className="flex w-full h-fit pb-3 pl-1 items-center justify-between">
       <div className="flex w-fit h-fit items-center justify-center">
-        <div className="w-[42px] h-[42px] mr-3">
+        <div className="w-[42px] h-[42px] mr-3 rounded-full overflow-hidden">
           <Image
             alt="ava"
             src={post.avatar}
             width={42}
             height={42}
-            className="rounded-full object-cover"
+            className="w-full h-full object-cover"
           />
         </div>
         <div className="flex items-center justify-center w-fit h-fit">

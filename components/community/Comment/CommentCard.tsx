@@ -14,13 +14,15 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
           <div className="flex items-start justify-center mr-[18px]">
             <div className="w-8 h-8">
               <a className="w-8 h-8" href={`/account/${item.userId}`}>
-                <Image
-                  alt="ava"
-                  src={item.avatar}
-                  width={32}
-                  height={32}
-                  className="object-cover rounded-full"
-                />
+                <div className="w-8 h-8 rounded-full overflow-hidden">
+                  <Image
+                    alt="ava"
+                    src={item.avatar}
+                    width={32}
+                    height={32}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </a>
             </div>
           </div>
@@ -42,6 +44,28 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
                   {item.caption}
                 </h2>
               </div>
+            </div>
+            <div className="flex w-full h-fit items-center justify-start mt-1">
+              {item.content && (
+                <div
+                  key={item.content._id}
+                  className="w-24 h-36 relative group"
+                >
+                  {item.content.type.startsWith("image") ? (
+                    <img
+                      src={item.content.url}
+                      alt="preview"
+                      className="w-full h-full object-cover rounded-lg"
+                    />
+                  ) : (
+                    <video
+                      src={item.content.url}
+                      className="w-full h-full object-cover rounded-lg"
+                      controls
+                    />
+                  )}
+                </div>
+              )}
             </div>
             <div className="flex items-center justify-start mt-2 mb-1 w-fit h-fit relative">
               <span className="w-auto h-auto flex items-center justify-center">

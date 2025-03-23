@@ -29,6 +29,7 @@ export const fetchDetailPost = async (
         }
       );
 
+      console.log(post);
       return { ...post, likedIds: likedIds || [] };
     } catch (error) {
       console.error(`Error fetching likes for post ${postId}:`, error);

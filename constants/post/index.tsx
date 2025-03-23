@@ -2,13 +2,15 @@ export const actionSheet = (
   setReport: (value: boolean) => void,
   handleConfirmUnfriend: () => void,
   setIsBack: (value: boolean) => void,
-  isComment: boolean
+  isComment: boolean,
+  checkAdminComment: boolean,
+  handleDeleteComment?: () => void
 ) => {
   const actions = [
     {
-      label: "Report",
+      label: checkAdminComment ? "Delete" : "Report",
       value: true,
-      onClick: () => setReport(true)
+      onClick: checkAdminComment ? handleDeleteComment : () => setReport(true)
     }
   ];
 

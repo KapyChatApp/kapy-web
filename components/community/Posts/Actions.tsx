@@ -7,10 +7,18 @@ import CommentInput from "../Comment/CommentInput";
 import Interaction from "./Interaction";
 import DetailLike from "../Other/DetailLike";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { useUserContext } from "@/context/UserContext";
+import { FileResponseDTO } from "@/lib/DTO/map";
+import { createComment } from "@/lib/services/post/comment/create";
+import { CommentResponseDTO } from "@/lib/DTO/comment";
+import { getFileFormat } from "@/lib/utils";
 
 const Actions = ({ post }: { post: PostResponseDTO }) => {
+  const { adminInfo } = useUserContext();
   const totalComments = post.comments.length;
   const [commentContent, setCommentContent] = useState("");
+  const [newComment, setNewComment] = useState<CommentResponseDTO[]>([]);
+  const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isLike, setIsLike] = useState(false);
   const handleInputChange = (value: string) => {
@@ -20,7 +28,47 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
   const handleUpdateLikes = (newLikedUsers: ShortUserResponseDTO[]) => {
     setLikedUsers(newLikedUsers);
   };
-
+  const handleCreateComment = async () => {
+    const replyId = post._id;
+    const targetType = "post";
+    const parsedFile: FileResponseDTO = {
+      _id: "",
+      fileName: files?.name || "",
+      url: files ? URL.createObjectURL(files) : "",
+      bytes: files?.size || 0,
+      width: 0,
+      height: 0,
+      format: getFileFormat(files?.type || "", files?.name || ""),
+      type: files?.type.split("/")[0] || "" //image, video
+    };
+    const newCmt: CommentResponseDTO[] = [
+      {
+        _id: "",
+        firstName: adminInfo.firstName,
+        lastName: adminInfo.lastName,
+        nickName: adminInfo.nickName,
+        avatar: adminInfo.avatar,
+        userId: adminInfo._id,
+        likedIds: [],
+        replieds: [],
+        caption: commentContent,
+        createAt: new Date().toISOString(),
+        createBy: adminInfo._id,
+        content: parsedFile
+      }
+    ];
+    setNewComment(newCmt);
+    const result = await createComment(
+      commentContent,
+      files,
+      replyId,
+      targetType
+    );
+    if (result) {
+      setCommentContent("");
+      setFiles(null);
+    }
+  };
   return (
     <>
       <div className="w-full h-fit">
@@ -92,6 +140,57 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
           )}
         </section>
 
+        {/* NEW COMMENTS */}
+        {newComment.length > 0 && (
+          <section className="flex flex-col justify-start items-center w-full h-fit">
+            {newComment.map((item) => (
+              <div className="flex flex-col w-full h-fit items-start">
+                <div className="flex-grow w-full h-full items-center justify-center flex mt-2">
+                  <div className="w-fit h-full flex p-[2px]">
+                    <span className="w-full text-dark100_light900 body-semibold">
+                      <a
+                        className="w-fit transition-opacity duration-300 hover:opacity-40"
+                        href={`/account/${adminInfo._id}`}
+                      >
+                        {adminInfo.firstName + " " + adminInfo.lastName}
+                      </a>
+                    </span>
+                  </div>
+
+                  <div className="flex-grow h-fit w-auto flex items-center justify-start ml-1">
+                    <h2 className="text-dark100_light900 body-regular items-center justify-start">
+                      {item.caption}
+                    </h2>
+                  </div>
+                </div>
+
+                <div className="flex w-full h-fit items-center justify-start mt-1">
+                  {item.content && (
+                    <div
+                      key={item.content._id}
+                      className="w-24 h-36 relative group"
+                    >
+                      {item.content.type.includes("image") ? (
+                        <img
+                          src={item.content.url}
+                          alt="preview"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      ) : (
+                        <video
+                          src={item.content.url}
+                          className="w-full h-full object-cover rounded-lg"
+                          controls
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </section>
+        )}
+
         {/* INPUT */}
         <section className="flex justify-start items-center w-full h-fit mt-2">
           <div className="w-full h-fit">
@@ -99,8 +198,10 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
               <CommentInput
                 onCommentChange={handleInputChange}
                 commentContent={commentContent}
+                files={files}
+                setFiles={setFiles}
                 setTyping={setIsTyping}
-                /*handleAction={handleAction}*/
+                handleAction={handleCreateComment}
               />
             </div>
           </div>

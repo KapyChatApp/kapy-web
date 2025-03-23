@@ -42,7 +42,7 @@ const DetailLike = ({
             return (
               <a className="flex w-fit h-fit p-1" href={`/account/${item._id}`}>
                 <div className="flex flex-row gap-3 items-center justify-start px-4 py-3">
-                  <div className="w-9 h-9">
+                  <div className="w-9 h-9 rounded-full overflow-hidden">
                     <Image
                       src={
                         item.avatar !== ""
@@ -52,7 +52,7 @@ const DetailLike = ({
                       alt=""
                       width={36}
                       height={36}
-                      className="rounded-full object-cover"
+                      className="w-full h-full object-cover"
                     />
                   </div>
                   <p className="paragraph-15-regular text-dark100_light900">

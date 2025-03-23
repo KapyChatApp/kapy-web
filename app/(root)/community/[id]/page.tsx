@@ -12,6 +12,7 @@ import { formatTimeMessageBox } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
 import InputDetail from "@/components/community/Comment/InputDetail";
 import { fetchDetailPost } from "@/lib/data/post/detail";
+import { FileResponseDTO } from "@/lib/DTO/map";
 
 const defaultDetail: PostResponseDTO = {
   _id: "",
@@ -44,10 +45,12 @@ const page = () => {
     }
   };
   const [commentContent, setCommentContent] = useState("");
+  const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const handleInputChange = (value: string) => {
     setCommentContent(value);
   };
+  const handleCreateComment = async () => {};
   useEffect(() => {
     const fetchDetail = async () => {
       const adminId = localStorage.getItem("adminId");
@@ -100,8 +103,8 @@ const page = () => {
             </div>
 
             {/* Detail (Chiều rộng cố định, có thể scroll) */}
-            <div className="flex flex-col flex-grow w-full max-w-[600px] px-4 overflow-y-auto">
-              <ul className="flex flex-col py-4 w-full overflow-hidden">
+            <div className="flex flex-col flex-grow w-full max-w-[600px] px-4 overflow-scroll scrollable">
+              <ul className="flex flex-col py-4 w-full">
                 {/* Caption */}
                 {detailPost.caption && (
                   <CaptionCard
@@ -142,6 +145,9 @@ const page = () => {
                   onCommentChange={handleInputChange}
                   commentContent={commentContent}
                   setTyping={setIsTyping}
+                  files={files}
+                  setFiles={setFiles}
+                  handleAction={handleCreateComment}
                 />
               </div>
             </div>

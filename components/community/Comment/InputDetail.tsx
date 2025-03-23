@@ -8,6 +8,8 @@ const InputDetail = ({
   onCommentChange,
   setTyping,
   commentContent,
+  files,
+  setFiles,
   handleAction
 }: CommentInputProps) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
