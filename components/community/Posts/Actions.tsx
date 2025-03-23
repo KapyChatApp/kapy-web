@@ -6,24 +6,28 @@ import React, { useState } from "react";
 import CommentInput from "../Comment/CommentInput";
 import Interaction from "./Interaction";
 import DetailLike from "../Other/DetailLike";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
-const Action = ({ post }: { post: PostResponseDTO }) => {
+const Actions = ({ post }: { post: PostResponseDTO }) => {
   const totalComments = post.comments.length;
-  const totalLikes = post.likedIds.length;
   const [commentContent, setCommentContent] = useState("");
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isLike, setIsLike] = useState(false);
   const handleInputChange = (value: string) => {
     setCommentContent(value);
   };
+  const [likedUsers, setLikedUsers] = useState(post.likedIds);
+  const handleUpdateLikes = (newLikedUsers: ShortUserResponseDTO[]) => {
+    setLikedUsers(newLikedUsers);
+  };
 
   return (
     <>
       <div className="w-full h-fit">
-        <Interaction post={post} />
+        <Interaction post={post} updateLikes={handleUpdateLikes} />
 
         {/* LIKES */}
-        {post.likedIds.length > 0 && (
+        {likedUsers.length > 0 && (
           <section className="flex justify-start items-center w-full h-fit">
             <div className="flex mr-1 h-fit w-fit">
               <a className="flex w-fit h-fit" href="">
@@ -31,8 +35,8 @@ const Action = ({ post }: { post: PostResponseDTO }) => {
                   <Image
                     alt="ava"
                     src={
-                      post.likedIds[0].avatar !== ""
-                        ? post.likedIds[0].avatar
+                      likedUsers[0].avatar !== ""
+                        ? likedUsers[0].avatar
                         : "/assets/ava/default.png"
                     }
                     width={14}
@@ -48,18 +52,18 @@ const Action = ({ post }: { post: PostResponseDTO }) => {
                 Liked by
                 <a
                   className="text-dark100_light900 body-semibold"
-                  href={`/account/${post.likedIds[0]._id}`}
+                  href={`/account/${likedUsers[0]._id}`}
                 >
-                  {post.likedIds[0].firstName + " " + post.likedIds[0].lastName}
+                  {likedUsers[0].firstName + " " + likedUsers[0].lastName}
                 </a>
-                {totalLikes > 1 && " and "}
-                {totalLikes > 1 && (
+                {likedUsers.length > 1 && " and "}
+                {likedUsers.length > 1 && (
                   <div
                     className="flex w-fit h-fit cursor-pointer"
                     onClick={() => setIsLike(true)}
                   >
                     <span className="text-dark100_light900 body-semibold">
-                      {totalLikes - 1} others
+                      {likedUsers.length - 1} others
                     </span>
                   </div>
                 )}
@@ -103,9 +107,9 @@ const Action = ({ post }: { post: PostResponseDTO }) => {
         </section>
       </div>
 
-      {isLike && <DetailLike post={post} setIsBack={setIsLike} />}
+      {isLike && <DetailLike likedUsers={likedUsers} setIsBack={setIsLike} />}
     </>
   );
 };
 
-export default Action;
+export default Actions;

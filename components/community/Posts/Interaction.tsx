@@ -8,7 +8,13 @@ import { likePost } from "@/lib/services/post/like";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
 
-const Interaction = ({ post }: { post: PostResponseDTO }) => {
+const Interaction = ({
+  post,
+  updateLikes
+}: {
+  post: PostResponseDTO;
+  updateLikes: (newLikedUsers: ShortUserResponseDTO[]) => void;
+}) => {
   const userId = localStorage.getItem("adminId");
   const { adminInfo } = useUserContext();
   const userLike: ShortUserResponseDTO = {
@@ -23,22 +29,21 @@ const Interaction = ({ post }: { post: PostResponseDTO }) => {
   const [shared, setShared] = useState(false);
 
   const handleLikeClick = async () => {
+    let updatedLikes;
+
     if (liked) {
       setLiked(false);
-      post.likedIds.push(userLike);
-      const result = await dislikePost(post._id);
-      if (result) {
-        setLiked(false);
-      }
+      updatedLikes = post.likedIds.filter((item) => item._id !== userId);
+      await dislikePost(post._id);
     } else {
       setLiked(true);
-      post.likedIds.filter((item) => item._id != userId);
-      const result = await likePost(post._id);
-      if (result) {
-        setLiked(true);
-      }
+      updatedLikes = post.likedIds; // Thêm userLike vào danh sách
+      await likePost(post._id);
     }
+
+    updateLikes(updatedLikes); // Gọi callback để cập nhật Actions
   };
+
   const interationItem = iconInteraction(
     handleLikeClick,
     setCommented,

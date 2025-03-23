@@ -1,16 +1,17 @@
 import UserCheckbox from "@/components/mess-group/RightMessage/MoreActions/UserCheckbox";
 import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React from "react";
 
 const DetailLike = ({
   setIsBack,
-  post
+  likedUsers
 }: {
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
-  post: PostResponseDTO;
+  likedUsers: ShortUserResponseDTO[];
 }) => {
   return (
     <div className="modal-overlay">
@@ -37,7 +38,7 @@ const DetailLike = ({
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
         <div className="flex flex-col h-[307px] w-full overflow-scroll scrollable p-1">
-          {post.likedIds.map((item) => {
+          {likedUsers.map((item) => {
             return (
               <a className="flex w-fit h-fit p-1" href={`/account/${item._id}`}>
                 <div className="flex flex-row gap-3 items-center justify-start px-4 py-3">
