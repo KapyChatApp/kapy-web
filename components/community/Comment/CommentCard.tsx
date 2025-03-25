@@ -5,10 +5,24 @@ import Image from "next/image";
 import React from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import OtherPost from "../Other/OtherPost";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
-const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
+const CommentCard = ({
+  item,
+  onReply
+}: {
+  item: CommentResponseDTO;
+  onReply: (user: ShortUserResponseDTO) => void;
+}) => {
+  const repliedInfo: ShortUserResponseDTO = {
+    _id: item._id,
+    firstName: item.firstName,
+    lastName: item.lastName,
+    nickName: item.nickName,
+    avatar: item.avatar
+  };
   return (
-    <li className="flex w-full pt-3 mt-[-5px] mr-[-2px]">
+    <li className="flex w-full  pt-3 mt-[-5px] mr-[-2px]">
       <div className="flex justify-between items-start w-full">
         <div className="flex w-full h-fit items-start justify-center">
           <div className="flex items-start justify-center mr-[18px]">
@@ -45,8 +59,8 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
                 </h2>
               </div>
             </div>
-            <div className="flex w-full h-fit items-center justify-start mt-1">
-              {item.content && (
+            {item.content && (
+              <div className="flex w-full h-fit items-center justify-start mt-1">
                 <div
                   key={item.content._id}
                   className="w-24 h-36 relative group"
@@ -65,8 +79,8 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
                     />
                   )}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
             <div className="flex items-center justify-start mt-2 mb-1 w-fit h-fit relative">
               <span className="w-auto h-auto flex items-center justify-center">
                 <div className="text-dark600_light600 mr-3 small-regular">
@@ -78,7 +92,10 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
                   </div>
                 )}
                 <div className="relative items-center justify-center flex">
-                  <Button className="p-0 bg-transparent shadow-none border-none h-fit w-fit mr-3">
+                  <Button
+                    className="p-0 bg-transparent shadow-none border-none h-fit w-fit mr-3"
+                    onClick={() => onReply(repliedInfo)}
+                  >
                     <p className="text-dark600_light600 small-bold">Reply</p>
                   </Button>
                   {/* ReportPost xuất hiện bên cạnh Reply */}
@@ -90,7 +107,7 @@ const CommentCard = ({ item }: { item: CommentResponseDTO }) => {
             </div>
           </div>
         </div>
-        <span className="w-4 h-4 mt-[9px] cursor-pointer">
+        <span className="flex-1 w-4 h-4 mt-[9px] cursor-pointer">
           <Icon
             icon="solar:heart-linear"
             width={16}

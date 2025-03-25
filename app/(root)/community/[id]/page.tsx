@@ -10,9 +10,13 @@ import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
-import InputDetail from "@/components/community/Comment/InputDetail";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 import { FileResponseDTO } from "@/lib/DTO/map";
+import CommentArea from "@/components/community/Comment/CommentArea";
+import { handleCreateComment } from "@/utils/commentUtils";
+import { CommentResponseDTO } from "@/lib/DTO/comment";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { useUserContext } from "@/context/UserContext";
 
 const defaultDetail: PostResponseDTO = {
   _id: "",
@@ -31,6 +35,7 @@ const defaultDetail: PostResponseDTO = {
 
 const page = () => {
   const { id } = useParams();
+  const { adminInfo } = useUserContext();
   const [detailPost, setDetailPost] = useState<PostResponseDTO>(defaultDetail);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
@@ -45,12 +50,50 @@ const page = () => {
     }
   };
   const [commentContent, setCommentContent] = useState("");
+  const [replyId, setReplyId] = useState("");
+  const [newComment, setNewComment] = useState<CommentResponseDTO[]>(
+    detailPost.comments
+  );
+  const [newCommentReply, setNewCommentReply] = useState<CommentResponseDTO[]>(
+    []
+  );
   const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const handleReply = (reply: ShortUserResponseDTO) => {
+    setReplyId(reply._id);
+    setCommentContent(`@${reply.firstName} ${reply.lastName} `);
+  };
+
   const handleInputChange = (value: string) => {
     setCommentContent(value);
+    if (value.trim() === "" || !value.includes("@")) {
+      setReplyId("");
+    }
   };
-  const handleCreateComment = async () => {};
+  const handleCommentPost = async () => {
+    await handleCreateComment(
+      detailPost._id,
+      "post",
+      commentContent,
+      files,
+      adminInfo,
+      setNewComment,
+      setCommentContent,
+      setFiles
+    );
+  };
+  const handleCommentReply = async () => {
+    await handleCreateComment(
+      replyId,
+      "reply",
+      commentContent,
+      files,
+      adminInfo,
+      setNewComment,
+      setCommentContent,
+      setFiles
+    );
+  };
   useEffect(() => {
     const fetchDetail = async () => {
       const adminId = localStorage.getItem("adminId");
@@ -62,6 +105,7 @@ const page = () => {
           return;
         }
         setDetailPost(data);
+        setNewComment(data.comments);
       } catch (error) {
         console.error("Error loading chats:", error);
       }
@@ -119,8 +163,8 @@ const page = () => {
                 )}
 
                 {/* Comments */}
-                {detailPost.comments.length > 0 && (
-                  <Comments comments={detailPost.comments} />
+                {newComment.length > 0 && (
+                  <Comments comments={newComment} onReply={handleReply} />
                 )}
               </ul>
             </div>
@@ -141,13 +185,16 @@ const page = () => {
 
               {/* Ô nhập comment */}
               <div className="w-full flex py-[6px] pr-4 border-t-[0.6px] border-light500_dark400">
-                <InputDetail
+                <CommentArea
+                  variant="detail"
                   onCommentChange={handleInputChange}
                   commentContent={commentContent}
                   setTyping={setIsTyping}
                   files={files}
                   setFiles={setFiles}
-                  handleAction={handleCreateComment}
+                  handleAction={
+                    replyId ? handleCommentReply : handleCommentPost
+                  }
                 />
               </div>
             </div>

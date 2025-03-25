@@ -112,14 +112,9 @@ const PersonalFirst = ({ personal, setEdit }: PersonalItemProps) => {
                 data-fancybox="ava"
                 className={` max-w-full h-auto cursor-pointer `}
               >
-                <Image
-                  src={newAva}
-                  alt="ava"
-                  width={80}
-                  height={80}
-                  className="rounded-full"
-                  objectFit="cover"
-                />
+                <div className="w-20 h-20 relative rounded-full overflow-hidden">
+                  <Image src={newAva} alt="ava" fill className="object-cover" />
+                </div>
               </a>
             ) : (
               <a
@@ -127,14 +122,14 @@ const PersonalFirst = ({ personal, setEdit }: PersonalItemProps) => {
                 data-fancybox="ava"
                 className={` max-w-full h-auto cursor-pointer `}
               >
-                <Image
-                  src={user.avatar ? user.avatar : "/assets/ava/default.png"}
-                  alt="ava"
-                  width={80}
-                  height={80}
-                  className="rounded-full"
-                  objectFit="cover"
-                />
+                <div className="w-20 h-20 relative rounded-full overflow-hidden">
+                  <Image
+                    src={user.avatar ? user.avatar : "/assets/ava/default.png"}
+                    alt="ava"
+                    fill
+                    className="object-cover"
+                  />
+                </div>
               </a>
             )}
 

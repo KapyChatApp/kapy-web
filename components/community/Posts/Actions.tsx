@@ -1,17 +1,14 @@
 "use client";
 import { PostResponseDTO } from "@/lib/DTO/post";
-import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useState } from "react";
-import CommentInput from "../Comment/CommentInput";
 import Interaction from "./Interaction";
 import DetailLike from "../Other/DetailLike";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
-import { FileResponseDTO } from "@/lib/DTO/map";
-import { createComment } from "@/lib/services/post/comment/create";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
-import { getFileFormat } from "@/lib/utils";
+import CommentArea from "../Comment/CommentArea";
+import { handleCreateComment } from "@/utils/commentUtils";
 
 const Actions = ({ post }: { post: PostResponseDTO }) => {
   const { adminInfo } = useUserContext();
@@ -28,46 +25,18 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
   const handleUpdateLikes = (newLikedUsers: ShortUserResponseDTO[]) => {
     setLikedUsers(newLikedUsers);
   };
-  const handleCreateComment = async () => {
-    const replyId = post._id;
-    const targetType = "post";
-    const parsedFile: FileResponseDTO = {
-      _id: "",
-      fileName: files?.name || "",
-      url: files ? URL.createObjectURL(files) : "",
-      bytes: files?.size || 0,
-      width: 0,
-      height: 0,
-      format: getFileFormat(files?.type || "", files?.name || ""),
-      type: files?.type.split("/")[0] || "" //image, video
-    };
-    const newCmt: CommentResponseDTO[] = [
-      {
-        _id: "",
-        firstName: adminInfo.firstName,
-        lastName: adminInfo.lastName,
-        nickName: adminInfo.nickName,
-        avatar: adminInfo.avatar,
-        userId: adminInfo._id,
-        likedIds: [],
-        replieds: [],
-        caption: commentContent,
-        createAt: new Date().toISOString(),
-        createBy: adminInfo._id,
-        content: parsedFile
-      }
-    ];
-    setNewComment(newCmt);
-    const result = await createComment(
+
+  const handleCommentPost = async () => {
+    await handleCreateComment(
+      post._id,
+      "post",
       commentContent,
       files,
-      replyId,
-      targetType
+      adminInfo,
+      setNewComment,
+      setCommentContent,
+      setFiles
     );
-    if (result) {
-      setCommentContent("");
-      setFiles(null);
-    }
   };
   return (
     <>
@@ -164,8 +133,8 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
                   </div>
                 </div>
 
-                <div className="flex w-full h-fit items-center justify-start mt-1">
-                  {item.content && (
+                {item.content && (
+                  <div className="flex w-full h-fit items-center justify-start mt-1">
                     <div
                       key={item.content._id}
                       className="w-24 h-36 relative group"
@@ -184,8 +153,8 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
                         />
                       )}
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))}
           </section>
@@ -195,13 +164,14 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
         <section className="flex justify-start items-center w-full h-fit mt-2">
           <div className="w-full h-fit">
             <div className="w-full h-fit pb-4 border-b-[0.5px] border-light-500">
-              <CommentInput
+              <CommentArea
+                variant="default"
                 onCommentChange={handleInputChange}
                 commentContent={commentContent}
+                setTyping={setIsTyping}
                 files={files}
                 setFiles={setFiles}
-                setTyping={setIsTyping}
-                handleAction={handleCreateComment}
+                handleAction={handleCommentPost}
               />
             </div>
           </div>

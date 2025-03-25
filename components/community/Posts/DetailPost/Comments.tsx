@@ -5,8 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CommentCard from "../../Comment/CommentCard";
 import CommentItem from "../../Comment/Replies";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
-const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
+const Comments = ({
+  comments,
+  onReply
+}: {
+  comments: CommentResponseDTO[];
+  onReply: (user: ShortUserResponseDTO) => void;
+}) => {
   const [expandedComments, setExpandedComments] = useState<
     Record<string, boolean>
   >({});
@@ -36,10 +43,10 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
       <div className="flex flex-col w-full h-full items-center justify-start">
         {sortedComments.slice(0, visibleComments).map((item) => (
           <div className="w-full h-fit mb-4 group relative">
-            <ul className="flex flex-col w-full h-fit relative">
+            <ul className="flex flex-col w-full h-fit">
               {/* Parent */}
-              <div className="w-full h-fit relative flex">
-                <CommentCard item={item} />
+              <div className="w-full h-fit">
+                <CommentCard item={item} onReply={onReply} />
               </div>
               {/* View Replies */}
               {item.replieds.length > 0 && (
@@ -69,9 +76,14 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
 
               {/* Danh sách phản hồi */}
               {expandedComments[item._id] && item.replieds.length > 0 && (
-                <ul className="mt-2 flex">
+                <ul className="mt-2 flex flex-col items-start">
                   {item.replieds.map((reply) => (
-                    <CommentItem key={reply._id} item={reply} level={1} />
+                    <CommentItem
+                      key={reply._id}
+                      item={reply}
+                      level={1}
+                      onReply={onReply}
+                    />
                   ))}
                 </ul>
               )}
