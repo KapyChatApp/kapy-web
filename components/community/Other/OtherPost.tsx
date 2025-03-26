@@ -8,10 +8,12 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 
 const OtherPost = ({
   post,
-  comment
+  comment,
+  setComments
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
+  setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
 }) => {
   const [isBack, setIsBack] = useState(false);
   return (
@@ -28,7 +30,12 @@ const OtherPost = ({
         />
       </Button>
       {isBack && (
-        <ActionSheet post={post} setIsBack={setIsBack} comment={comment} />
+        <ActionSheet
+          post={post}
+          setIsBack={setIsBack}
+          comment={comment}
+          setComments={setComments}
+        />
       )}
     </>
   );

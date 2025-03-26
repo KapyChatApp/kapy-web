@@ -8,10 +8,12 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 const CommentItem = ({
   item,
   level,
+  setComments,
   onReply
 }: {
   item: CommentResponseDTO;
   level: number;
+  setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const [expandedReplies, setExpandedReplies] = useState(
@@ -31,7 +33,7 @@ const CommentItem = ({
   return (
     <div className={`w-full h-fit ${marginLeft}`}>
       <div className="mt-2">
-        <CommentCard item={item} onReply={onReply} />
+        <CommentCard item={item} onReply={onReply} setComments={setComments} />
       </div>
 
       {/* Hiển thị nút View/Hide Replies nếu có phản hồi */}
@@ -61,6 +63,7 @@ const CommentItem = ({
               item={reply}
               level={level + 1}
               onReply={onReply}
+              setComments={setComments}
             />
           ))}
         </ul>

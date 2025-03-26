@@ -9,9 +9,11 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const CommentCard = ({
   item,
+  setComments,
   onReply
 }: {
   item: CommentResponseDTO;
+  setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const repliedInfo: ShortUserResponseDTO = {
@@ -100,7 +102,7 @@ const CommentCard = ({
                   </Button>
                   {/* ReportPost xuất hiện bên cạnh Reply */}
                   <div className="absolute left-full top-0 mt-[-2px] hidden group-hover:block ml-2">
-                    <OtherPost comment={item} />
+                    <OtherPost comment={item} setComments={setComments} />
                   </div>
                 </div>
               </span>

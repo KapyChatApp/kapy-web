@@ -9,9 +9,11 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const Comments = ({
   comments,
+  setComments,
   onReply
 }: {
   comments: CommentResponseDTO[];
+  setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const [expandedComments, setExpandedComments] = useState<
@@ -46,7 +48,11 @@ const Comments = ({
             <ul className="flex flex-col w-full h-fit">
               {/* Parent */}
               <div className="w-full h-fit">
-                <CommentCard item={item} onReply={onReply} />
+                <CommentCard
+                  item={item}
+                  onReply={onReply}
+                  setComments={setComments}
+                />
               </div>
               {/* View Replies */}
               {item.replieds.length > 0 && (
@@ -83,6 +89,7 @@ const Comments = ({
                       item={reply}
                       level={1}
                       onReply={onReply}
+                      setComments={setComments}
                     />
                   ))}
                 </ul>

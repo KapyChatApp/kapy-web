@@ -1,9 +1,10 @@
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import { createComment } from "@/lib/services/post/comment/create";
+import { deleteComment } from "@/lib/services/post/comment/delete";
 import { getFileFormat } from "@/lib/utils";
 
-export const handleCreateComment = async (
+export const handleCreate = async (
   replyId: string,
   targetType: string,
   commentContent: string,
@@ -62,5 +63,17 @@ export const handleCreateComment = async (
   if (result) {
     setCommentContent("");
     setFiles(null);
+  }
+};
+
+export const handleDelete = async (
+  commentId: string,
+  setListComment: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>
+) => {
+  const result = await deleteComment(commentId);
+  if (result) {
+    setListComment((items) =>
+      items.filter((cmt: CommentResponseDTO) => cmt._id !== commentId)
+    );
   }
 };

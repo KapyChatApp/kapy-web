@@ -13,10 +13,10 @@ import Interaction from "@/components/community/Posts/Interaction";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import CommentArea from "@/components/community/Comment/CommentArea";
-import { handleCreateComment } from "@/utils/commentUtils";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
+import { handleCreate } from "@/utils/commentUtils";
 
 const defaultDetail: PostResponseDTO = {
   _id: "",
@@ -51,11 +51,8 @@ const page = () => {
   };
   const [commentContent, setCommentContent] = useState("");
   const [replyId, setReplyId] = useState("");
-  const [newComment, setNewComment] = useState<CommentResponseDTO[]>(
+  const [commentList, setCommentList] = useState<CommentResponseDTO[]>(
     detailPost.comments
-  );
-  const [newCommentReply, setNewCommentReply] = useState<CommentResponseDTO[]>(
-    []
   );
   const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
@@ -71,25 +68,25 @@ const page = () => {
     }
   };
   const handleCommentPost = async () => {
-    await handleCreateComment(
+    await handleCreate(
       detailPost._id,
       "post",
       commentContent,
       files,
       adminInfo,
-      setNewComment,
+      setCommentList,
       setCommentContent,
       setFiles
     );
   };
   const handleCommentReply = async () => {
-    await handleCreateComment(
+    await handleCreate(
       replyId,
       "reply",
       commentContent,
       files,
       adminInfo,
-      setNewComment,
+      setCommentList,
       setCommentContent,
       setFiles
     );
@@ -105,7 +102,7 @@ const page = () => {
           return;
         }
         setDetailPost(data);
-        setNewComment(data.comments);
+        setCommentList(data.comments);
       } catch (error) {
         console.error("Error loading chats:", error);
       }
@@ -163,8 +160,12 @@ const page = () => {
                 )}
 
                 {/* Comments */}
-                {newComment.length > 0 && (
-                  <Comments comments={newComment} onReply={handleReply} />
+                {commentList.length > 0 && (
+                  <Comments
+                    comments={commentList}
+                    setComments={setCommentList}
+                    onReply={handleReply}
+                  />
                 )}
               </ul>
             </div>

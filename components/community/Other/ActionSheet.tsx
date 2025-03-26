@@ -10,18 +10,20 @@ import { FriendRequestDTO } from "@/lib/DTO/friend";
 import { unFriend } from "@/lib/services/friend/unfriend";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
+import { handleDelete } from "@/utils/commentUtils";
 
 const ActionSheet = ({
   post,
   comment,
-  setIsBack
+  setIsBack,
+  setComments
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
+  setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
 }) => {
   const [isReport, setReport] = useState(false);
-  const [isDelete, setDelete] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
@@ -65,7 +67,12 @@ const ActionSheet = ({
     });
   };
 
-  const handleDeleteComment = async () => {};
+  const handleDeleteComment = async (commentId: string) => {
+    if (setComments) {
+      await handleDelete(commentId, setComments);
+      setIsBack(false);
+    }
+  };
   const adminId = localStorage.getItem("adminId");
   const checkAdminComment = !!(
     comment &&
@@ -80,7 +87,7 @@ const ActionSheet = ({
         setIsBack,
         !!comment,
         checkAdminComment,
-        handleDeleteComment
+        () => handleDeleteComment(comment._id || "")
       )
     : actionSheet(
         setReport,
