@@ -1,6 +1,5 @@
 "use client";
 import { iconInteraction } from "@/constants/post";
-import { useUserContext } from "@/context/UserContext";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { dislikePost } from "@/lib/services/post/dislike";
@@ -18,16 +17,7 @@ const Interaction = ({
 }) => {
   const router = useRouter();
   const userId = localStorage.getItem("adminId");
-  const { adminInfo } = useUserContext();
-  const userLike: ShortUserResponseDTO = {
-    _id: adminInfo._id,
-    firstName: adminInfo.firstName,
-    lastName: adminInfo.lastName,
-    nickName: adminInfo.nickName,
-    avatar: adminInfo.avatar
-  };
   const [liked, setLiked] = useState(false);
-  const [commented, setCommented] = useState(false);
   const [shared, setShared] = useState(false);
 
   const handleLikeClick = async () => {

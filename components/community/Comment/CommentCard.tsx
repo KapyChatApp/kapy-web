@@ -1,11 +1,13 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import OtherPost from "../Other/OtherPost";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { handleDislike, handleLike } from "@/utils/commentUtils";
 
 const CommentCard = ({
   item,
@@ -16,6 +18,9 @@ const CommentCard = ({
   setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
+  const userId = localStorage.getItem("adminId");
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(item.likedIds.length);
   const repliedInfo: ShortUserResponseDTO = {
     _id: item._id,
     firstName: item.firstName,
@@ -23,6 +28,18 @@ const CommentCard = ({
     nickName: item.nickName,
     avatar: item.avatar
   };
+  const handleReactComment = async () => {
+    if (liked) {
+      await handleDislike(item._id, setLiked, setLikeCount);
+    } else {
+      await handleLike(item._id, setLiked, setLikeCount);
+    }
+  };
+  useEffect(() => {
+    if (item && item.likedIds && userId) {
+      setLiked(item.likedIds.some((user) => user === userId));
+    }
+  }, [item, userId]);
   return (
     <li className="flex w-full  pt-3 mt-[-5px] mr-[-2px]">
       <div className="flex justify-between items-start w-full">
@@ -88,9 +105,9 @@ const CommentCard = ({
                 <div className="text-dark600_light600 mr-3 small-regular">
                   {formatTimeMessageBox(item.createAt)}
                 </div>
-                {item.likedIds.length > 0 && (
+                {likeCount > 0 && (
                   <div className="text-dark600_light600 mr-3 small-bold">
-                    {item.likedIds.length} likes
+                    {likeCount} likes
                   </div>
                 )}
                 <div className="relative items-center justify-center flex">
@@ -109,13 +126,26 @@ const CommentCard = ({
             </div>
           </div>
         </div>
-        <span className="flex-1 w-4 h-4 mt-[9px] cursor-pointer">
-          <Icon
-            icon="solar:heart-linear"
-            width={16}
-            height={16}
-            className="text-dark100_light900 object-cover"
-          />
+        <span
+          className="flex-1 w-4 h-4 mt-[9px] cursor-pointer"
+          onClick={handleReactComment}
+        >
+          {liked ? (
+            <Icon
+              icon="solar:heart-bold"
+              width={16}
+              height={16}
+              className={`text-accent-red`}
+            />
+          ) : (
+            <Icon
+              icon="solar:heart-linear"
+              width={16}
+              height={16}
+              className="
+            text-dark100_light900 object-cover"
+            />
+          )}
         </span>
       </div>
     </li>

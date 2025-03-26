@@ -2,6 +2,8 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import { createComment } from "@/lib/services/post/comment/create";
 import { deleteComment } from "@/lib/services/post/comment/delete";
+import { dislikeComment } from "@/lib/services/post/comment/dislike";
+import { likeComment } from "@/lib/services/post/comment/like";
 import { getFileFormat } from "@/lib/utils";
 
 export const handleCreate = async (
@@ -75,5 +77,45 @@ export const handleDelete = async (
     setListComment((items) =>
       items.filter((cmt: CommentResponseDTO) => cmt._id !== commentId)
     );
+  }
+};
+
+export const handleLike = async (
+  commentId: string,
+  setLiked: React.Dispatch<React.SetStateAction<boolean>>,
+  setLikeCount: React.Dispatch<React.SetStateAction<number>>
+) => {
+  // Cập nhật UI ngay lập tức
+  setLiked(true);
+  setLikeCount((prev) => prev + 1);
+
+  // Gửi request API
+  try {
+    await likeComment(commentId);
+  } catch (error) {
+    console.error("Lỗi khi like:", error);
+    // Nếu API thất bại, rollback lại trạng thái cũ
+    setLiked(false);
+    setLikeCount((prev) => Math.max(prev - 1, 0));
+  }
+};
+
+export const handleDislike = async (
+  commentId: string,
+  setLiked: React.Dispatch<React.SetStateAction<boolean>>,
+  setLikeCount: React.Dispatch<React.SetStateAction<number>>
+) => {
+  // Cập nhật UI ngay lập tức
+  setLiked(false);
+  setLikeCount((prev) => Math.max(prev - 1, 0));
+
+  // Gửi request API
+  try {
+    await dislikeComment(commentId);
+  } catch (error) {
+    console.error("Lỗi khi dislike:", error);
+    // Nếu API thất bại, rollback lại trạng thái cũ
+    setLiked(true);
+    setLikeCount((prev) => prev + 1);
   }
 };
