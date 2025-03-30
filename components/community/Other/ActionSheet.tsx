@@ -16,11 +16,13 @@ const ActionSheet = ({
   post,
   comment,
   setIsBack,
+  setEditingCommentId,
   setComments
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
 }) => {
   const [isReport, setReport] = useState(false);
@@ -73,6 +75,14 @@ const ActionSheet = ({
       setIsBack(false);
     }
   };
+
+  const handleGetEditingCommentId = () => {
+    if (comment && setEditingCommentId) {
+      setEditingCommentId(comment._id);
+      setIsBack(false);
+      console.log("check");
+    }
+  };
   const adminId = localStorage.getItem("adminId");
   const checkAdminComment = !!(
     comment &&
@@ -87,7 +97,8 @@ const ActionSheet = ({
         setIsBack,
         !!comment,
         checkAdminComment,
-        () => handleDeleteComment(comment._id || "")
+        () => handleDeleteComment(comment._id || ""),
+        handleGetEditingCommentId
       )
     : actionSheet(
         setReport,

@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
-import { formatTimeMessageBox } from "@/lib/utils";
+import { formatTimeMessageBox, getFileFormat } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 import { FileResponseDTO } from "@/lib/DTO/map";
@@ -16,7 +16,9 @@ import CommentArea from "@/components/community/Comment/CommentArea";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
-import { handleCreate } from "@/utils/commentUtils";
+import { handleCreate, handleUpdate } from "@/utils/commentUtils";
+import { set } from "date-fns";
+import { editComment } from "@/lib/services/post/comment/edit";
 
 const defaultDetail: PostResponseDTO = {
   _id: "",
@@ -51,6 +53,7 @@ const page = () => {
   };
   const [commentContent, setCommentContent] = useState("");
   const [replyId, setReplyId] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<string>("");
   const [commentList, setCommentList] = useState<CommentResponseDTO[]>(
     detailPost.comments
   );
@@ -67,6 +70,19 @@ const page = () => {
       setReplyId("");
     }
   };
+  const handleUpdateComment = async () => {
+    if (!editingCommentId) return;
+    await handleUpdate(
+      setCommentList,
+      editingCommentId,
+      commentContent,
+      setEditingCommentId,
+      setCommentContent,
+      setFiles,
+      files
+    );
+  };
+
   const handleCommentPost = async () => {
     await handleCreate(
       detailPost._id,
@@ -112,6 +128,7 @@ const page = () => {
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   return isMounted ? (
     <div className="modal-overlay-post">
       {/* Close Button */}
@@ -164,6 +181,7 @@ const page = () => {
                   <Comments
                     comments={commentList}
                     setComments={setCommentList}
+                    setEditingCommentId={setEditingCommentId}
                     onReply={handleReply}
                   />
                 )}
@@ -186,17 +204,30 @@ const page = () => {
 
               {/* Ô nhập comment */}
               <div className="w-full flex py-[6px] pr-4 border-t-[0.6px] border-light500_dark400">
-                <CommentArea
-                  variant="detail"
-                  onCommentChange={handleInputChange}
-                  commentContent={commentContent}
-                  setTyping={setIsTyping}
-                  files={files}
-                  setFiles={setFiles}
-                  handleAction={
-                    replyId ? handleCommentReply : handleCommentPost
-                  }
-                />
+                {!editingCommentId ? (
+                  <CommentArea
+                    variant="detail"
+                    onCommentChange={handleInputChange}
+                    commentContent={commentContent}
+                    setTyping={setIsTyping}
+                    files={files}
+                    setFiles={setFiles}
+                    handleAction={
+                      replyId ? handleCommentReply : handleCommentPost
+                    }
+                  />
+                ) : (
+                  <CommentArea
+                    variant="edit"
+                    onCommentChange={handleInputChange}
+                    commentContent={commentContent}
+                    setTyping={setIsTyping}
+                    setEditingCommentId={setEditingCommentId}
+                    files={files}
+                    setFiles={setFiles}
+                    handleAction={handleUpdateComment}
+                  />
+                )}
               </div>
             </div>
           </div>

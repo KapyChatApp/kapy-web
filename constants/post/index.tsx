@@ -4,7 +4,8 @@ export const actionSheet = (
   setIsBack: (value: boolean) => void,
   isComment: boolean,
   checkAdminComment: boolean,
-  handleDeleteComment?: () => void
+  handleDeleteComment?: () => void,
+  handleGetEditingCommentId?: () => void
 ) => {
   const actions = [
     {
@@ -13,6 +14,14 @@ export const actionSheet = (
       onClick: checkAdminComment ? handleDeleteComment : () => setReport(true)
     }
   ];
+
+  if (isComment && checkAdminComment && handleGetEditingCommentId) {
+    actions.push({
+      label: "Edit",
+      value: true,
+      onClick: handleGetEditingCommentId
+    });
+  }
 
   if (!isComment) {
     actions.push({

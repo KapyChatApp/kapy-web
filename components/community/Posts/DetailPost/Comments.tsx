@@ -6,14 +6,17 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import CommentCard from "../../Comment/CommentCard";
 import CommentItem from "../../Comment/Replies";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import CommentArea from "../../Comment/CommentArea";
 
 const Comments = ({
   comments,
   setComments,
+  setEditingCommentId,
   onReply
 }: {
   comments: CommentResponseDTO[];
   setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setEditingCommentId: React.Dispatch<React.SetStateAction<string>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const [expandedComments, setExpandedComments] = useState<
@@ -26,7 +29,7 @@ const Comments = ({
     }));
   };
 
-  const [visibleComments, setVisibleComments] = useState(20);
+  const [visibleComments, setVisibleComments] = useState(10);
   const sortedComments = useMemo(
     () =>
       [...comments].sort(
@@ -36,10 +39,11 @@ const Comments = ({
     [comments]
   );
 
-  // Load thêm 20 comment khi nhấn
+  // Load thêm 10 comment khi nhấn
   const loadMoreComments = () => {
-    setVisibleComments((prev) => prev + 20);
+    setVisibleComments((prev) => prev + 10);
   };
+
   return (
     <div className="flex w-full h-full">
       <div className="flex flex-col w-full h-full items-center justify-start">
@@ -52,6 +56,7 @@ const Comments = ({
                   item={item}
                   onReply={onReply}
                   setComments={setComments}
+                  setEditingCommentId={setEditingCommentId}
                 />
               </div>
               {/* View Replies */}
@@ -90,6 +95,7 @@ const Comments = ({
                       level={1}
                       onReply={onReply}
                       setComments={setComments}
+                      setEditingCommentId={setEditingCommentId}
                     />
                   ))}
                 </ul>

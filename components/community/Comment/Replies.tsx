@@ -9,11 +9,13 @@ const CommentItem = ({
   item,
   level,
   setComments,
+  setEditingCommentId,
   onReply
 }: {
   item: CommentResponseDTO;
   level: number;
   setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setEditingCommentId: React.Dispatch<React.SetStateAction<string>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const [expandedReplies, setExpandedReplies] = useState(
@@ -33,7 +35,12 @@ const CommentItem = ({
   return (
     <div className={`w-full h-fit ${marginLeft}`}>
       <div className="mt-2">
-        <CommentCard item={item} onReply={onReply} setComments={setComments} />
+        <CommentCard
+          item={item}
+          onReply={onReply}
+          setComments={setComments}
+          setEditingCommentId={setEditingCommentId}
+        />
       </div>
 
       {/* Hiển thị nút View/Hide Replies nếu có phản hồi */}
@@ -64,6 +71,7 @@ const CommentItem = ({
               level={level + 1}
               onReply={onReply}
               setComments={setComments}
+              setEditingCommentId={setEditingCommentId}
             />
           ))}
         </ul>

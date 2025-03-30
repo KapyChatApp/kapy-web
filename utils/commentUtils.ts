@@ -3,6 +3,7 @@ import { FileResponseDTO } from "@/lib/DTO/map";
 import { createComment } from "@/lib/services/post/comment/create";
 import { deleteComment } from "@/lib/services/post/comment/delete";
 import { dislikeComment } from "@/lib/services/post/comment/dislike";
+import { editComment } from "@/lib/services/post/comment/edit";
 import { likeComment } from "@/lib/services/post/comment/like";
 import { getFileFormat } from "@/lib/utils";
 
@@ -85,16 +86,12 @@ export const handleLike = async (
   setLiked: React.Dispatch<React.SetStateAction<boolean>>,
   setLikeCount: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  // Cập nhật UI ngay lập tức
   setLiked(true);
   setLikeCount((prev) => prev + 1);
-
-  // Gửi request API
   try {
     await likeComment(commentId);
   } catch (error) {
     console.error("Lỗi khi like:", error);
-    // Nếu API thất bại, rollback lại trạng thái cũ
     setLiked(false);
     setLikeCount((prev) => Math.max(prev - 1, 0));
   }
@@ -105,17 +102,53 @@ export const handleDislike = async (
   setLiked: React.Dispatch<React.SetStateAction<boolean>>,
   setLikeCount: React.Dispatch<React.SetStateAction<number>>
 ) => {
-  // Cập nhật UI ngay lập tức
   setLiked(false);
   setLikeCount((prev) => Math.max(prev - 1, 0));
 
-  // Gửi request API
   try {
     await dislikeComment(commentId);
   } catch (error) {
     console.error("Lỗi khi dislike:", error);
-    // Nếu API thất bại, rollback lại trạng thái cũ
     setLiked(true);
     setLikeCount((prev) => prev + 1);
   }
+};
+
+export const handleUpdate = async (
+  setCommentList: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>,
+  editingCommentId: string,
+  commentContent: string,
+  setEditingCommentId: React.Dispatch<React.SetStateAction<string>>,
+  setCommentContent: React.Dispatch<React.SetStateAction<string>>,
+  setFiles: React.Dispatch<React.SetStateAction<File | null>>,
+  files?: File | null
+) => {
+  setCommentList((prev) =>
+    prev.map((c) =>
+      c._id === editingCommentId
+        ? {
+            ...c,
+            caption: commentContent,
+            content: files
+              ? {
+                  _id: "",
+                  fileName: files.name,
+                  url: URL.createObjectURL(files),
+                  bytes: files.size,
+                  width: 0,
+                  height: 0,
+                  format: getFileFormat(files.type, files.name),
+                  type: files.type.includes("/") ? files.type.split("/")[0] : ""
+                }
+              : c.content // Giữ nguyên content nếu không có file mới
+          }
+        : c
+    )
+  );
+
+  setEditingCommentId("");
+  setCommentContent("");
+  setFiles(null);
+
+  await editComment(editingCommentId, commentContent, files);
 };

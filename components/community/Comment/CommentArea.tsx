@@ -10,8 +10,9 @@ export interface CommentInputProps {
   files: File | null;
   setFiles: React.Dispatch<React.SetStateAction<File | null>>;
   setTyping: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
   handleAction: () => Promise<void>;
-  variant?: "default" | "detail"; // "comment" cho trang chính, "detail" cho trang chi tiết
+  variant?: "default" | "detail" | "edit"; // "comment" cho trang chính, "detail" cho trang chi tiết
 }
 
 const CommentArea = ({
@@ -19,6 +20,7 @@ const CommentArea = ({
   setFiles,
   files,
   setTyping,
+  setEditingCommentId,
   commentContent,
   handleAction,
   variant = "default"
@@ -76,6 +78,10 @@ const CommentArea = ({
     setFiles(null);
   };
 
+  const handleCancelEdit = () => {
+    if (setEditingCommentId) setEditingCommentId("");
+  };
+
   return (
     <div
       className={`flex flex-col ${
@@ -84,7 +90,7 @@ const CommentArea = ({
     >
       <div className="flex w-full">
         {/* Khu vực icon */}
-        {variant === "detail" && (
+        {(variant === "detail" || variant === "edit") && (
           <div className="flex w-fit h-fit">
             <button
               className="flex py-2 pl-4 pr-2"
@@ -132,7 +138,16 @@ const CommentArea = ({
               className="ml-1 w-fit h-fit p-1"
               onClick={async () => await handleAction()}
             >
-              <span className="text-accent-blue body-bold">Post</span>
+              <span className="text-accent-blue body-bold">
+                {variant === "edit" ? "Edit" : "Post"}
+              </span>
+            </button>
+          )}
+
+          {/* Hiển thị nút Cancel edit khi có nội dung */}
+          {variant === "edit" && (
+            <button className="ml-1 w-fit h-fit p-1" onClick={handleCancelEdit}>
+              <span className="text-accent-red body-bold">Cancel</span>
             </button>
           )}
 

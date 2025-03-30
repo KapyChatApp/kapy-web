@@ -12,10 +12,12 @@ import { handleDislike, handleLike } from "@/utils/commentUtils";
 const CommentCard = ({
   item,
   setComments,
-  onReply
+  onReply,
+  setEditingCommentId
 }: {
   item: CommentResponseDTO;
   setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setEditingCommentId: React.Dispatch<React.SetStateAction<string>>;
   onReply: (user: ShortUserResponseDTO) => void;
 }) => {
   const userId = localStorage.getItem("adminId");
@@ -84,7 +86,8 @@ const CommentCard = ({
                   key={item.content._id}
                   className="w-24 h-36 relative group"
                 >
-                  {item.content.type.startsWith("image") ? (
+                  {item.content.type.startsWith("image") ||
+                  item.content.type === "Image" ? (
                     <img
                       src={item.content.url}
                       alt="preview"
@@ -119,7 +122,11 @@ const CommentCard = ({
                   </Button>
                   {/* ReportPost xuất hiện bên cạnh Reply */}
                   <div className="absolute left-full top-0 mt-[-2px] hidden group-hover:block ml-2">
-                    <OtherPost comment={item} setComments={setComments} />
+                    <OtherPost
+                      comment={item}
+                      setComments={setComments}
+                      setEditingCommentId={setEditingCommentId}
+                    />
                   </div>
                 </div>
               </span>

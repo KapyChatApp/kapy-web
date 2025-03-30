@@ -9,11 +9,13 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 const OtherPost = ({
   post,
   comment,
-  setComments
+  setComments,
+  setEditingCommentId
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
 }) => {
   const [isBack, setIsBack] = useState(false);
   return (
@@ -35,6 +37,7 @@ const OtherPost = ({
           setIsBack={setIsBack}
           comment={comment}
           setComments={setComments}
+          setEditingCommentId={setEditingCommentId}
         />
       )}
     </>
