@@ -1,12 +1,6 @@
 import { CommentResponseDTO } from "./comment";
 import { FileResponseDTO } from "./map";
-
-interface LikeInformation {
-  _id: string;
-  firstName: string;
-  lastName: string;
-  avatar: string;
-}
+import { ShortUserResponseDTO } from "./user";
 
 export interface PostResponseDTO {
   _id: string;
@@ -15,7 +9,7 @@ export interface PostResponseDTO {
   nickName: string;
   avatar: string;
   userId: string;
-  likedIds: LikeInformation[];
+  likedIds: ShortUserResponseDTO[];
   shares: PostResponseDTO[];
   comments: CommentResponseDTO[];
   caption: string;

@@ -21,14 +21,10 @@ const CaptionCard = ({
         <div className="flex items-start justify-center">
           <div className="flex items-center justify-center mr-[14px]">
             <div className="w-8 h-8">
-              <a className="w-8 h-8" href={`/account/${userId}`}>
-                <Image
-                  alt="ava"
-                  src={avatar}
-                  width={32}
-                  height={32}
-                  className="object-cover rounded-full"
-                />
+              <a href={`/account/${userId}`}>
+                <div className="w-8 h-8 rounded-full relative overflow-hidden">
+                  <Image alt="ava" src={avatar} fill className="object-cover" />
+                </div>
               </a>
             </div>
           </div>

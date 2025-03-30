@@ -5,8 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CommentCard from "../../Comment/CommentCard";
 import CommentItem from "../../Comment/Replies";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import CommentArea from "../../Comment/CommentArea";
 
-const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
+const Comments = ({
+  comments,
+  setComments,
+  setEditingCommentId,
+  onReply
+}: {
+  comments: CommentResponseDTO[];
+  setComments: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setEditingCommentId: React.Dispatch<React.SetStateAction<string>>;
+  onReply: (user: ShortUserResponseDTO) => void;
+}) => {
   const [expandedComments, setExpandedComments] = useState<
     Record<string, boolean>
   >({});
@@ -17,7 +29,7 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
     }));
   };
 
-  const [visibleComments, setVisibleComments] = useState(20);
+  const [visibleComments, setVisibleComments] = useState(10);
   const sortedComments = useMemo(
     () =>
       [...comments].sort(
@@ -27,19 +39,25 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
     [comments]
   );
 
-  // Load thêm 20 comment khi nhấn
+  // Load thêm 10 comment khi nhấn
   const loadMoreComments = () => {
-    setVisibleComments((prev) => prev + 20);
+    setVisibleComments((prev) => prev + 10);
   };
+
   return (
     <div className="flex w-full h-full">
       <div className="flex flex-col w-full h-full items-center justify-start">
         {sortedComments.slice(0, visibleComments).map((item) => (
           <div className="w-full h-fit mb-4 group relative">
-            <ul className="flex flex-col w-full h-fit relative">
+            <ul className="flex flex-col w-full h-fit">
               {/* Parent */}
-              <div className="w-full h-fit relative flex">
-                <CommentCard item={item} />
+              <div className="w-full h-fit">
+                <CommentCard
+                  item={item}
+                  onReply={onReply}
+                  setComments={setComments}
+                  setEditingCommentId={setEditingCommentId}
+                />
               </div>
               {/* View Replies */}
               {item.replieds.length > 0 && (
@@ -69,9 +87,16 @@ const Comments = ({ comments }: { comments: CommentResponseDTO[] }) => {
 
               {/* Danh sách phản hồi */}
               {expandedComments[item._id] && item.replieds.length > 0 && (
-                <ul className="mt-2 flex">
+                <ul className="mt-2 flex flex-col items-start">
                   {item.replieds.map((reply) => (
-                    <CommentItem key={reply._id} item={reply} level={1} />
+                    <CommentItem
+                      key={reply._id}
+                      item={reply}
+                      level={1}
+                      onReply={onReply}
+                      setComments={setComments}
+                      setEditingCommentId={setEditingCommentId}
+                    />
                   ))}
                 </ul>
               )}

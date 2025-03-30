@@ -1,149 +1,30 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import PostFrame from "./Posts/PostFrame";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreatePost from "./Posts/Create/CreatePost";
-const detailPost: PostResponseDTO = {
-  _id: "1",
-  firstName: "Junie",
-  lastName: "Vu",
-  nickName: "",
-  avatar:
-    "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-  userId: "",
-  likedIds: [
-    {
-      _id: "1",
-      firstName: "rose",
-      lastName: "ruby",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "2",
-      firstName: "mei",
-      lastName: "truyn",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "3",
-      firstName: "bay",
-      lastName: "max",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    }
-  ],
-  shares: [],
-  comments: [
-    {
-      _id: "1",
-      firstName: "Nguyễn",
-      lastName: "Văn A",
-      nickName: "A Nguyễn",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "1",
-      likedIds: ["2", "3"],
-      replieds: [
-        {
-          _id: "2",
-          firstName: "Trần",
-          lastName: "Thị B",
-          nickName: "B Trần",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "2",
-          likedIds: ["1"],
-          replieds: [],
-          caption: "Cảm ơn bạn!",
-          createAt: "2024-03-08T10:00:00Z",
-          createBy: "user_002"
-        }
-      ],
-      caption: "Bài viết hay quá!",
-      createAt: "2024-03-08T09:30:00Z",
-      createBy: "1"
-    },
-    {
-      _id: "3",
-      firstName: "Lê",
-      lastName: "Văn C",
-      nickName: "C Lê",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "3",
-      likedIds: ["1", "2"],
-      replieds: [
-        {
-          _id: "4",
-          firstName: "Phạm",
-          lastName: "Thị D",
-          nickName: "D Phạm",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "4",
-          likedIds: ["3"],
-          replieds: [],
-          caption: "Mình đồng ý!",
-          createAt: "2024-03-08T11:00:00Z",
-          createBy: "4"
-        }
-      ],
-      caption: "Thông tin hữu ích, cảm ơn!",
-      createAt: "2024-03-08T10:45:00Z",
-      createBy: "3"
-    }
-  ],
-  caption: "hello",
-  createAt: "2025-01-02T04:47:05.847+00:00",
-  contents: [
-    {
-      _id: "1",
-      fileName: "avatar.png",
-      url: "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "png",
-      type: "Image"
-    },
-    {
-      _id: "2",
-      fileName: "video.mp3",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735799193/Videos/cy0s5a4ljaipis4xk3io.mov",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "MOV",
-      type: "Video"
-    },
-    {
-      _id: "3",
-      fileName: "tests-example.xls",
-      url: "https://res.cloudinary.com/dtn9r75b7/raw/upload/v1735796263/Documents/Documents/tests-example.xls",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "xls",
-      type: "Other"
-    },
-    {
-      _id: "3",
-      fileName: "7.mp3.m4a",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735801570/Audios/Audios/7.mp3.m4a",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "m4a",
-      type: "Audio"
-    }
-  ]
-};
+import { fetchPosts } from "@/lib/data/post/dataPost";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+
 const Feeds = () => {
-  //const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
+  const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
+  const [detailLike, setDetailLike] = useState<ShortUserResponseDTO[]>([]);
+  useEffect(() => {
+    const fetchData = async () => {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) return;
+      try {
+        const data: PostResponseDTO[] = await fetchPosts(1, 10);
+        setArrayPost(data);
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    };
+    fetchData();
+  }, []);
+
   const [isCreate, setIsCreate] = useState(false);
   const handleCreatePost = () => {
     setIsCreate(!isCreate);
@@ -180,10 +61,10 @@ const Feeds = () => {
         </div>
 
         <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
-          {/* {arrayPost.map((item) => (
-          <PostFrame post={item} />
-        ))} */}
-          <PostFrame post={detailPost} />
+          {arrayPost.map((item) => (
+            <PostFrame post={item} />
+          ))}
+          {/* <PostFrame post={detailPost} /> */}
         </div>
       </div>
 

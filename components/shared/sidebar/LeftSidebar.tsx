@@ -263,19 +263,24 @@ const Leftsidebar = () => {
                 }`}
               >
                 <div className="flex w-full">
-                  <Image
-                    src={
-                      adminInfo && adminInfo.avatar
-                        ? newAva
+                  <div
+                    className={`${
+                      isParagraphVisible ? "w-7 h-7" : "w-8 h-8"
+                    } relative rounded-full overflow-hidden`}
+                  >
+                    <Image
+                      src={
+                        adminInfo && adminInfo.avatar
                           ? newAva
-                          : adminInfo.avatar
-                        : "/assets/ava/default.png"
-                    }
-                    alt="logo"
-                    width={isParagraphVisible ? 28 : 32}
-                    height={isParagraphVisible ? 28 : 32}
-                    className={`rounded-full`}
-                  />
+                            ? newAva
+                            : adminInfo.avatar
+                          : "/assets/ava/default.png"
+                      }
+                      alt="logo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   {isParagraphVisible && (
                     <div className="flex w-full justify-start items-center">
                       <p className="xl:paragraph-regular lg:body-regular md:small-regular lg:ml-[12px] ml-1 text-dark100_light900">

@@ -1,6 +1,4 @@
 import { FriendProfileResponseDTO } from "@/lib/DTO/friend";
-import { HistoryFindFriend } from "@/types/friends";
-import { User } from "@/types/object";
 import React from "react";
 interface SecondItemProps {
   user: FriendProfileResponseDTO;

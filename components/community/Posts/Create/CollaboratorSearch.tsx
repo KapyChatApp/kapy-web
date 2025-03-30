@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Icon } from "@iconify/react";
+import Image from "next/image";
 
 interface Collaborator {
   id: number;
@@ -98,11 +99,15 @@ const CollaboratorSearch = ({
               onClick={() => handleSelectUser(user)}
             >
               <div className="flex items-center space-x-3">
-                <img
-                  src={user.avatar}
-                  alt={user.username}
-                  className="w-8 h-8 rounded-full"
-                />
+                <div className="w-8 h-8 rounded-full relative overflow-hidden">
+                  <Image
+                    src={user.avatar}
+                    alt={user.username}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+
                 <div>
                   <p className="font-medium">{user.username}</p>
                   <p className="text-sm text-gray-500">{user.name}</p>

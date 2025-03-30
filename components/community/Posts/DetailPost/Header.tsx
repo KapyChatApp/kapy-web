@@ -15,14 +15,15 @@ const Header = ({ post }: { post: PostResponseDTO }) => {
       <header className="flex flex-grow w-full h-full pl-4 py-[14px] pr-1 items-center justify-center">
         <div className="flex w-full h-fit">
           <div className="w-8 h-8">
-            <a className="w-8 h-8" href={`/account/${post.userId}`}>
-              <Image
-                alt="ava"
-                src={post.avatar}
-                width={32}
-                height={32}
-                className="object-cover rounded-full"
-              />
+            <a href={`/account/${post.userId}`}>
+              <div className="w-8 h-8 rounded-full relative overflow-hidden">
+                <Image
+                  alt="ava"
+                  src={post.avatar}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             </a>
           </div>
           <div className="flex-grow w-full h-full items-start justify-center ml-[14px]">

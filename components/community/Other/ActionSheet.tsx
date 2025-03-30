@@ -10,15 +10,20 @@ import { FriendRequestDTO } from "@/lib/DTO/friend";
 import { unFriend } from "@/lib/services/friend/unfriend";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
+import { handleDelete } from "@/utils/commentUtils";
 
 const ActionSheet = ({
   post,
   comment,
-  setIsBack
+  setIsBack,
+  setEditingCommentId,
+  setComments
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
+  setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
+  setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
 }) => {
   const [isReport, setReport] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
@@ -63,12 +68,46 @@ const ActionSheet = ({
       action: "unfriend"
     });
   };
-  const actions = actionSheet(
-    setReport,
-    handleConfirmUnfriend,
-    setIsBack,
-    !!comment
-  );
+
+  const handleDeleteComment = async (commentId: string) => {
+    if (setComments) {
+      await handleDelete(commentId, setComments);
+      setIsBack(false);
+    }
+  };
+
+  const handleGetEditingCommentId = () => {
+    if (comment && setEditingCommentId) {
+      setEditingCommentId(comment._id);
+      setIsBack(false);
+      console.log("check");
+    }
+  };
+  const adminId = localStorage.getItem("adminId");
+  const checkAdminComment = !!(
+    comment &&
+    adminId &&
+    comment.userId === adminId
+  ); // ✅ Ép kiểu về boolean
+
+  const actions = checkAdminComment
+    ? actionSheet(
+        setReport,
+        handleConfirmUnfriend,
+        setIsBack,
+        !!comment,
+        checkAdminComment,
+        () => handleDeleteComment(comment._id || ""),
+        handleGetEditingCommentId
+      )
+    : actionSheet(
+        setReport,
+        handleConfirmUnfriend,
+        setIsBack,
+        !!comment,
+        checkAdminComment // ✅ Đã đảm bảo kiểu boolean
+      );
+
   return (
     <>
       <div className="modal-overlay-post">

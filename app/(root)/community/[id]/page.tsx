@@ -4,152 +4,41 @@ import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
-import { formatTimeMessageBox } from "@/lib/utils";
+import { formatTimeMessageBox, getFileFormat } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
-import InputDetail from "@/components/community/Comment/InputDetail";
+import { fetchDetailPost } from "@/lib/data/post/detail";
+import { FileResponseDTO } from "@/lib/DTO/map";
+import CommentArea from "@/components/community/Comment/CommentArea";
+import { CommentResponseDTO } from "@/lib/DTO/comment";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { useUserContext } from "@/context/UserContext";
+import { handleCreate, handleUpdate } from "@/utils/commentUtils";
+import { set } from "date-fns";
+import { editComment } from "@/lib/services/post/comment/edit";
 
-const detailPost: PostResponseDTO = {
-  _id: "1",
-  firstName: "Junie",
-  lastName: "Vu",
+const defaultDetail: PostResponseDTO = {
+  _id: "",
+  firstName: "",
+  lastName: "",
   nickName: "",
-  avatar:
-    "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-  userId: "1",
-  likedIds: [
-    {
-      _id: "1",
-      firstName: "rose",
-      lastName: "ruby",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "2",
-      firstName: "mei",
-      lastName: "truyn",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    },
-    {
-      _id: "3",
-      firstName: "bay",
-      lastName: "max",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-    }
-  ],
+  avatar: "/assets/ava/default.png",
+  userId: "",
+  likedIds: [],
   shares: [],
-  comments: [
-    {
-      _id: "1",
-      firstName: "Nguyễn",
-      lastName: "Văn A",
-      nickName: "A Nguyễn",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "1",
-      likedIds: ["2", "3"],
-      replieds: [
-        {
-          _id: "2",
-          firstName: "Trần",
-          lastName: "Thị B",
-          nickName: "B Trần",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "2",
-          likedIds: ["1"],
-          replieds: [],
-          caption: "Cảm ơn bạn!",
-          createAt: "2024-03-08T10:00:00Z",
-          createBy: "user_002"
-        }
-      ],
-      caption: "Bài viết hay quá!",
-      createAt: "2024-03-08T09:30:00Z",
-      createBy: "1"
-    },
-    {
-      _id: "3",
-      firstName: "Lê",
-      lastName: "Văn C",
-      nickName: "C Lê",
-      avatar:
-        "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      userId: "3",
-      likedIds: ["1", "2"],
-      replieds: [
-        {
-          _id: "4",
-          firstName: "Phạm",
-          lastName: "Thị D",
-          nickName: "D Phạm",
-          avatar:
-            "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-          userId: "4",
-          likedIds: ["3"],
-          replieds: [],
-          caption: "Mình đồng ý!",
-          createAt: "2024-03-08T11:00:00Z",
-          createBy: "4"
-        }
-      ],
-      caption: "Thông tin hữu ích, cảm ơn!",
-      createAt: "2024-03-08T10:45:00Z",
-      createBy: "3"
-    }
-  ],
-  caption: "hello",
+  comments: [],
+  caption: "",
   createAt: "2025-01-02T04:47:05.847+00:00",
-  contents: [
-    {
-      _id: "1",
-      fileName: "avatar.png",
-      url: "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "png",
-      type: "Image"
-    },
-    {
-      _id: "2",
-      fileName: "video.mp3",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735799193/Videos/cy0s5a4ljaipis4xk3io.mov",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "MOV",
-      type: "Video"
-    },
-    {
-      _id: "3",
-      fileName: "tests-example.xls",
-      url: "https://res.cloudinary.com/dtn9r75b7/raw/upload/v1735796263/Documents/Documents/tests-example.xls",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "xls",
-      type: "Other"
-    },
-    {
-      _id: "3",
-      fileName: "7.mp3.m4a",
-      url: "https://res.cloudinary.com/dtn9r75b7/video/upload/v1735801570/Audios/Audios/7.mp3.m4a",
-      bytes: 102400,
-      width: 500,
-      height: 500,
-      format: "m4a",
-      type: "Audio"
-    }
-  ]
+  contents: []
 };
+
 const page = () => {
+  const { id } = useParams();
+  const { adminInfo } = useUserContext();
+  const [detailPost, setDetailPost] = useState<PostResponseDTO>(defaultDetail);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
   const handleBack = () => {
@@ -163,13 +52,83 @@ const page = () => {
     }
   };
   const [commentContent, setCommentContent] = useState("");
+  const [replyId, setReplyId] = useState("");
+  const [editingCommentId, setEditingCommentId] = useState<string>("");
+  const [commentList, setCommentList] = useState<CommentResponseDTO[]>(
+    detailPost.comments
+  );
+  const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
+  const handleReply = (reply: ShortUserResponseDTO) => {
+    setReplyId(reply._id);
+    setCommentContent(`@${reply.firstName} ${reply.lastName} `);
+  };
+
   const handleInputChange = (value: string) => {
     setCommentContent(value);
+    if (value.trim() === "" || !value.includes("@")) {
+      setReplyId("");
+    }
   };
+  const handleUpdateComment = async () => {
+    if (!editingCommentId) return;
+    await handleUpdate(
+      setCommentList,
+      editingCommentId,
+      commentContent,
+      setEditingCommentId,
+      setCommentContent,
+      setFiles,
+      files
+    );
+  };
+
+  const handleCommentPost = async () => {
+    await handleCreate(
+      detailPost._id,
+      "post",
+      commentContent,
+      files,
+      adminInfo,
+      setCommentList,
+      setCommentContent,
+      setFiles
+    );
+  };
+  const handleCommentReply = async () => {
+    await handleCreate(
+      replyId,
+      "reply",
+      commentContent,
+      files,
+      adminInfo,
+      setCommentList,
+      setCommentContent,
+      setFiles
+    );
+  };
+  useEffect(() => {
+    const fetchDetail = async () => {
+      const adminId = localStorage.getItem("adminId");
+      if (!adminId) return;
+      try {
+        const data = await fetchDetailPost(id.toString());
+        if (!data) {
+          console.error("Can't get a post.");
+          return;
+        }
+        setDetailPost(data);
+        setCommentList(data.comments);
+      } catch (error) {
+        console.error("Error loading chats:", error);
+      }
+    };
+    fetchDetail();
+  }, []);
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   return isMounted ? (
     <div className="modal-overlay-post">
       {/* Close Button */}
@@ -202,8 +161,8 @@ const page = () => {
             </div>
 
             {/* Detail (Chiều rộng cố định, có thể scroll) */}
-            <div className="flex flex-col flex-grow w-full max-w-[600px] px-4 overflow-y-auto">
-              <ul className="flex flex-col py-4 w-full overflow-hidden">
+            <div className="flex flex-col flex-grow w-full max-w-[600px] px-4 overflow-scroll scrollable">
+              <ul className="flex flex-col py-4 w-full">
                 {/* Caption */}
                 {detailPost.caption && (
                   <CaptionCard
@@ -218,8 +177,13 @@ const page = () => {
                 )}
 
                 {/* Comments */}
-                {detailPost.comments.length > 0 && (
-                  <Comments comments={detailPost.comments} />
+                {commentList.length > 0 && (
+                  <Comments
+                    comments={commentList}
+                    setComments={setCommentList}
+                    setEditingCommentId={setEditingCommentId}
+                    onReply={handleReply}
+                  />
                 )}
               </ul>
             </div>
@@ -229,7 +193,7 @@ const page = () => {
               {/* Interaction */}
               <div className="flex flex-col w-full px-4 border-t-[0.6px] border-light500_dark400">
                 <div className="w-full flex pt-[2px] pb-1">
-                  <Interaction />
+                  <Interaction post={detailPost} />
                 </div>
                 <div className="w-full mb-4">
                   <span className="text-dark600_light600 small-regular">
@@ -240,11 +204,30 @@ const page = () => {
 
               {/* Ô nhập comment */}
               <div className="w-full flex py-[6px] pr-4 border-t-[0.6px] border-light500_dark400">
-                <InputDetail
-                  onCommentChange={handleInputChange}
-                  commentContent={commentContent}
-                  setTyping={setIsTyping}
-                />
+                {!editingCommentId ? (
+                  <CommentArea
+                    variant="detail"
+                    onCommentChange={handleInputChange}
+                    commentContent={commentContent}
+                    setTyping={setIsTyping}
+                    files={files}
+                    setFiles={setFiles}
+                    handleAction={
+                      replyId ? handleCommentReply : handleCommentPost
+                    }
+                  />
+                ) : (
+                  <CommentArea
+                    variant="edit"
+                    onCommentChange={handleInputChange}
+                    commentContent={commentContent}
+                    setTyping={setIsTyping}
+                    setEditingCommentId={setEditingCommentId}
+                    files={files}
+                    setFiles={setFiles}
+                    handleAction={handleUpdateComment}
+                  />
+                )}
               </div>
             </div>
           </div>
