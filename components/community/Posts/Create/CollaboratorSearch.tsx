@@ -1,48 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
-
-interface Collaborator {
-  id: number;
-  username: string;
-  name: string;
-  avatar: string;
-}
-
-const mockData: Collaborator[] = [
-  {
-    id: 1,
-    username: "_danthuongngan_",
-    name: "Dan Thuong Ngan",
-    avatar:
-      "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-  },
-  {
-    id: 2,
-    username: "dilysntnl",
-    name: "Như Linh",
-    avatar:
-      "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-  },
-  {
-    id: 3,
-    username: "_dhnguyn_",
-    name: "D. Nguyen",
-    avatar:
-      "https://res.cloudinary.com/dtn9r75b7/image/upload/v1735733280/Avatar/ghlgwprdxd1jxlus3arx.png"
-  }
-];
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { getMyListBestFriend } from "@/lib/data/mine/dataBestFriend";
+import { FriendResponseDTO } from "@/lib/DTO/friend";
 
 const CollaboratorSearch = ({
-  searchCollaborator,
-  setSearchCollaborator
+  setTaggedUser
 }: {
-  searchCollaborator: string;
-  setSearchCollaborator: React.Dispatch<React.SetStateAction<string>>;
+  setTaggedUser: React.Dispatch<React.SetStateAction<ShortUserResponseDTO[]>>;
 }) => {
-  const [filteredUsers, setFilteredUsers] = useState<Collaborator[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<ShortUserResponseDTO[]>(
+    []
+  );
+  const [searchCollaborator, setSearchCollaborator] = useState("");
+  const [listBestFriend, setListBestFriend] = useState<FriendResponseDTO[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [isSelected, setIsSelected] = useState(false); // Trạng thái đã chọn
+  const [isSelected, setIsSelected] = useState(false);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -50,26 +24,43 @@ const CollaboratorSearch = ({
     setIsSelected(false); // Khi gõ lại, reset về trạng thái chưa chọn
 
     if (value.trim() === "") {
-      setFilteredUsers([]);
+      setSearchCollaborator("");
       setShowDropdown(false);
       return;
     }
 
-    const filtered = mockData.filter(
+    const filtered = listBestFriend.filter(
       (user) =>
-        user.username.toLowerCase().includes(value.toLowerCase()) ||
-        user.name.toLowerCase().includes(value.toLowerCase())
+        (user.firstName + user.lastName)
+          .toLowerCase()
+          .includes(value.toLowerCase()) ||
+        user.nickName.toLowerCase().includes(value.toLowerCase())
     );
 
     setFilteredUsers(filtered);
     setShowDropdown(filtered.length > 0);
   };
 
-  const handleSelectUser = (user: Collaborator) => {
-    setSearchCollaborator(user.name);
+  const handleSelectUser = (user: ShortUserResponseDTO) => {
+    const name = user.firstName + user.lastName;
+    setSearchCollaborator(name);
+    setTaggedUser((prev) => [...prev, user]);
     setIsSelected(true); // Đánh dấu là đã chọn
     setShowDropdown(false);
   };
+
+  const fetchData = async () => {
+    try {
+      await getMyListBestFriend(setListBestFriend);
+    } catch (err) {
+      console.error("Failed to fetch data.");
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   return (
     <div className="relative w-full">
@@ -94,23 +85,29 @@ const CollaboratorSearch = ({
         <div className="absolute left-0 w-full mt-2 background-light900_dark200 border border-light500_dark400 rounded-lg shadow-md max-h-60 overflow-y-auto">
           {filteredUsers.map((user) => (
             <div
-              key={user.id}
+              key={user._id}
               className="flex items-center justify-between px-3 py-2 hover:background-light500_dark400 hover:bg-opacity-75 cursor-pointer"
               onClick={() => handleSelectUser(user)}
             >
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 rounded-full relative overflow-hidden">
                   <Image
-                    src={user.avatar}
-                    alt={user.username}
+                    src={
+                      user.avatar !== ""
+                        ? user.avatar
+                        : "/assets/ava/default.png"
+                    }
+                    alt={user.nickName}
                     fill
                     className="object-cover"
                   />
                 </div>
 
                 <div>
-                  <p className="font-medium">{user.username}</p>
-                  <p className="text-sm text-gray-500">{user.name}</p>
+                  <p className="font-medium">
+                    {user.firstName} {user.lastName}
+                  </p>
+                  <p className="text-sm text-gray-500">{user.nickName}</p>
                 </div>
               </div>
               <div className="w-5 h-5 border border-gray-400 rounded-full"></div>

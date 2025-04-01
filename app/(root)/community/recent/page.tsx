@@ -14,7 +14,7 @@ const Community = () => {
         <Feeds />
       </div>
 
-      <div className="h-full p-4">
+      <div className="h-full p-4 flex-grow">
         <Suggestion />
       </div>
     </div>

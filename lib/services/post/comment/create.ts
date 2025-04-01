@@ -23,7 +23,7 @@ export async function createComment(
     formData.append("targetType", targetType);
 
     if (files) {
-      formData.append("files", files);
+      formData.append("file", files);
     }
     Array.from(formData.entries()).forEach(([key, value]) => {
       console.log(`${key}:`, value);

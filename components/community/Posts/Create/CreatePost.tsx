@@ -8,6 +8,8 @@ import React, { useEffect, useState } from "react";
 import UploadFiles from "./UploadFiles";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import PreCreate from "./PreCreate";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { handleCreate } from "@/utils/postUtils";
 
 const CreatePost = ({
   setIsCreate
@@ -17,7 +19,9 @@ const CreatePost = ({
   const [step, setStep] = useState(0); // 0: UploadFiles, 1: PreCreate
   const [isMounted, setIsMounted] = useState(false);
   const [isConfirm, setIsConfirm] = useState(false);
-  const [files, setFiles] = useState<FileResponseDTO[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
+  const [captionContent, setCaptionContent] = useState("");
+  const [taggedUser, setTaggedUser] = useState<ShortUserResponseDTO[]>([]);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
     handleAction: () => {},
@@ -38,10 +42,13 @@ const CreatePost = ({
     });
   };
 
+  const handleShare = async () => {
+    await handleCreate(captionContent, files, taggedUser, handleBack);
+  };
+
   useEffect(() => {
     setIsMounted(true);
   }, []);
-
   return isMounted ? (
     <>
       <div className="modal-overlay-post">
@@ -108,7 +115,10 @@ const CreatePost = ({
               )
             ) : (
               // Nút Share khi ở bước PreCreate
-              <button className="flex items-center justify-center bg-transparent text-primary-500 rounded-full body-semibold">
+              <button
+                className="flex items-center justify-center bg-transparent text-primary-500 rounded-full body-semibold"
+                onClick={handleShare}
+              >
                 Share
               </button>
             )}
@@ -118,7 +128,12 @@ const CreatePost = ({
           {step === 0 ? (
             <UploadFiles files={files} setFiles={setFiles} />
           ) : (
-            <PreCreate files={files} />
+            <PreCreate
+              files={files}
+              captionContent={captionContent}
+              setCaptionContent={setCaptionContent}
+              setTaggedUser={setTaggedUser}
+            />
           )}
         </div>
       </div>

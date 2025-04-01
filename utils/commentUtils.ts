@@ -56,17 +56,9 @@ export const handleCreate = async (
       )
     );
   }
-  const result = await createComment(
-    commentContent,
-    files,
-    replyId,
-    targetType
-  );
-
-  if (result) {
-    setCommentContent("");
-    setFiles(null);
-  }
+  setCommentContent("");
+  setFiles(null);
+  await createComment(commentContent, files, replyId, targetType);
 };
 
 export const handleDelete = async (

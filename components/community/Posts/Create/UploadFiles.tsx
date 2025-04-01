@@ -7,8 +7,8 @@ const UploadFiles = ({
   files,
   setFiles
 }: {
-  files: FileResponseDTO[];
-  setFiles: React.Dispatch<React.SetStateAction<FileResponseDTO[]>>;
+  files: File[];
+  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
 }) => {
   const removeFile = (indexToRemove: number) => {
     setFiles((prevFiles) =>
@@ -19,42 +19,14 @@ const UploadFiles = ({
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
     if (!selectedFiles) return;
-
-    const newFiles: FileResponseDTO[] = Array.from(selectedFiles).map(
-      (file) => ({
-        _id: crypto.randomUUID(),
-        fileName: file.name,
-        url: URL.createObjectURL(file),
-        bytes: file.size,
-        width: 0,
-        height: 0,
-        format: file.name.split(".").pop() || "",
-        type: file.type.split("/")[0] === "image" ? "Image" : "Video"
-      })
-    );
-
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setFiles((prevFiles) => [...prevFiles, ...Array.from(selectedFiles)]);
   };
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
     const droppedFiles = event.dataTransfer.files;
     if (!droppedFiles) return;
-
-    const newFiles: FileResponseDTO[] = Array.from(droppedFiles).map(
-      (file) => ({
-        _id: crypto.randomUUID(),
-        fileName: file.name,
-        url: URL.createObjectURL(file),
-        bytes: file.size,
-        width: 0,
-        height: 0,
-        format: file.name.split(".").pop() || "",
-        type: file.type.split("/")[0] === "image" ? "Image" : "Video"
-      })
-    );
-
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    setFiles((prevFiles) => [...prevFiles, ...Array.from(droppedFiles)]);
   };
 
   return (
@@ -105,15 +77,15 @@ const UploadFiles = ({
             >
               {files.map((file, index) => (
                 <div key={index} className="w-20 h-20 relative group">
-                  {file.type.includes("Image") ? (
+                  {file.type.startsWith("image") || file.type === "Image" ? (
                     <img
-                      src={file.url}
+                      src={URL.createObjectURL(file)}
                       alt="preview"
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
                     <video
-                      src={file.url}
+                      src={URL.createObjectURL(file)}
                       className="w-full h-full object-cover rounded-lg"
                       controls
                     />

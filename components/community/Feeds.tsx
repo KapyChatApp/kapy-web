@@ -6,11 +6,9 @@ import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreatePost from "./Posts/Create/CreatePost";
 import { fetchPosts } from "@/lib/data/post/dataPost";
-import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const Feeds = () => {
   const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
-  const [detailLike, setDetailLike] = useState<ShortUserResponseDTO[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       const adminId = localStorage.getItem("adminId");
@@ -36,7 +34,7 @@ const Feeds = () => {
           <span className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
             Feeds
           </span>
-          <div className="flex w-fit h-fit gap-2 items-center justify-center">
+          <div className="flex w-fit h-fit items-center justify-center">
             <Button
               className="bg-primary-500 p-3 border-none shadow-none rounded-2xl hover:bg-primary-500 items-center justify-center"
               onClick={handleCreatePost}
@@ -64,7 +62,6 @@ const Feeds = () => {
           {arrayPost.map((item) => (
             <PostFrame post={item} />
           ))}
-          {/* <PostFrame post={detailPost} /> */}
         </div>
       </div>
 

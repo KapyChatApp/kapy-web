@@ -15,4 +15,5 @@ export interface PostResponseDTO {
   caption: string;
   createAt: string;
   contents: FileResponseDTO[];
+  tags: ShortUserResponseDTO[];
 }
