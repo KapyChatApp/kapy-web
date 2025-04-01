@@ -29,7 +29,7 @@ export async function createPost(
       console.log(`${key}:`, value);
     });
 
-    const response = await fetch(`${process.env.BASE_URL}post/add`, {
+    const response = await fetch(`${process.env.BASE_URL}post/create`, {
       method: "POST",
       headers: {
         Authorization: `${storedToken}`

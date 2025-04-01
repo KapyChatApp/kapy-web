@@ -3,10 +3,10 @@ import { UserResponseDTO } from "@/lib/DTO/user";
 
 export const getMyListBestFriend = async (
   setListBestFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
-  setError: React.Dispatch<React.SetStateAction<string>>
+  setError?: React.Dispatch<React.SetStateAction<string>>
 ) => {
   const storedToken = localStorage.getItem("token");
-  if (!storedToken) {
+  if (!storedToken && setError) {
     setError("No token found");
     return;
   }
@@ -41,7 +41,7 @@ export const getMyListBestFriend = async (
     setListBestFriend(data);
     return data;
   } catch (err: any) {
-    setError(err.message);
+    console.error(err.message);
     console.error("Error fetching list friend:", err);
   }
 };
