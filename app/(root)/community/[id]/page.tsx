@@ -32,7 +32,8 @@ const defaultDetail: PostResponseDTO = {
   comments: [],
   caption: "",
   createAt: "2025-01-02T04:47:05.847+00:00",
-  contents: []
+  contents: [],
+  tags: []
 };
 
 const page = () => {
@@ -182,6 +183,7 @@ const page = () => {
                       detailPost.firstName + " " + detailPost.lastName
                     }
                     caption={detailPost.caption}
+                    tags={detailPost.tags}
                     createAt={detailPost.createAt}
                   />
                 )}

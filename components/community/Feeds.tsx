@@ -6,11 +6,9 @@ import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import CreatePost from "./Posts/Create/CreatePost";
 import { fetchPosts } from "@/lib/data/post/dataPost";
-import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const Feeds = () => {
   const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
-  const [detailLike, setDetailLike] = useState<ShortUserResponseDTO[]>([]);
   useEffect(() => {
     const fetchData = async () => {
       const adminId = localStorage.getItem("adminId");
@@ -64,7 +62,6 @@ const Feeds = () => {
           {arrayPost.map((item) => (
             <PostFrame post={item} />
           ))}
-          {/* <PostFrame post={detailPost} /> */}
         </div>
       </div>
 

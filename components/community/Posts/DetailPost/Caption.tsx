@@ -1,3 +1,4 @@
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
 import React from "react";
@@ -7,12 +8,14 @@ const CaptionCard = ({
   avatar,
   accountName,
   caption,
+  tags,
   createAt
 }: {
   userId: string;
   avatar: string;
   accountName: string;
   caption: string;
+  tags: ShortUserResponseDTO[];
   createAt: string;
 }) => {
   return (
@@ -29,11 +32,12 @@ const CaptionCard = ({
             </div>
           </div>
           <div className="flex-grow w-full h-auto items-center justify-center flex-col">
-            <div className="flex-grow w-full h-fit items-center justify-center flex">
-              <div className="w-fit h-full flex p-[2px]">
-                <span className="w-full text-dark100_light900 body-semibold">
+            <div className="flex w-full h-fit items-start p-[2px]">
+              {/* Name */}
+              <div className="w-fit h-full flex flex-shrink-0">
+                <span className="text-dark100_light900 body-semibold">
                   <a
-                    className="w-fit transition-opacity duration-300 hover:opacity-40"
+                    className="transition-opacity duration-300 hover:opacity-40"
                     href={`/account/${userId}`}
                   >
                     {accountName}
@@ -41,10 +45,35 @@ const CaptionCard = ({
                 </span>
               </div>
 
-              <div className="flex-grow h-fit w-auto flex items-center justify-start ml-1">
-                <h2 className="text-dark100_light900 body-regular items-center justify-start">
-                  {caption}
-                </h2>
+              {/* Caption */}
+              <div className="flex-grow h-fit flex flex-col ml-2">
+                <div className="w-full break-words whitespace-pre-wrap">
+                  <h2 className="text-dark100_light900 body-regular break-all">
+                    {caption}
+                  </h2>
+                </div>
+
+                <div
+                  className={`w-full h-fit flex flex-wrap ${
+                    tags.length > 0 ? "pt-1" : ""
+                  }`}
+                >
+                  {tags.map((item, index) => (
+                    <div className="w-fit break-words whitespace-pre-wrap">
+                      <a
+                        className={`${index === 0 ? "" : "ml-2"}`}
+                        href={`/account/${item._id}`}
+                      >
+                        <span
+                          key={index}
+                          className={`text-accent-blue body-regular break-all`}
+                        >
+                          @{item.firstName.trim()} {item.lastName}
+                        </span>
+                      </a>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             <div className="flex items-center justify-start mt-2 mb-1 w-fit h-fit">
