@@ -146,15 +146,25 @@ const page = () => {
         </Button>
       </div>
 
-      <div className="w-full max-w-[1054px] h-[683px] rounded-lg background-light900_dark200 flex items-center justify-start">
+      <div
+        className={`w-full ${
+          detailPost.contents.length > 0 ? "max-w-[1054px]" : "max-w-[527px]"
+        } h-[683px] rounded-lg background-light900_dark200 flex items-center justify-start`}
+      >
         <div className="flex w-full h-full">
           {/* Ảnh bài post */}
-          <div className="flex w-1/2 h-full">
-            <SwiperDetailPost contents={detailPost.contents} />
-          </div>
+          {detailPost.contents.length > 0 && (
+            <div className="flex w-1/2 h-full">
+              <SwiperDetailPost contents={detailPost.contents} />
+            </div>
+          )}
 
           {/* Phần chi tiết bài post + comment */}
-          <div className="flex flex-col w-1/2 h-full">
+          <div
+            className={`flex flex-col ${
+              detailPost.contents.length > 0 ? "w-1/2" : "w-full"
+            } h-full`}
+          >
             {/* Header */}
             <div className="flex h-[56px]">
               <Header post={detailPost} />

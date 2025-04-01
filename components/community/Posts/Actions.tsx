@@ -1,7 +1,7 @@
 "use client";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import Interaction from "./Interaction";
 import DetailLike from "../Other/DetailLike";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
@@ -15,6 +15,11 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
   const totalComments = post.comments.length;
   const [commentContent, setCommentContent] = useState("");
   const [newComment, setNewComment] = useState<CommentResponseDTO[]>([]);
+  const mergedComments = useMemo(
+    () => [...post.comments, ...newComment],
+    [post.comments, newComment]
+  );
+
   const [files, setFiles] = useState<File | null>(null);
   const [isTyping, setIsTyping] = useState<boolean>(false);
   const [isLike, setIsLike] = useState(false);
@@ -48,7 +53,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
           <section className="flex justify-start items-center w-full h-fit">
             <div className="flex mr-1 h-fit w-fit">
               <a className="flex w-fit h-fit" href="">
-                <span className="w-[14px] h-[14px] mx-[2px]">
+                <span className="w-[14px] h-[14px] mx-[2px] rounded-full overflow-hidden">
                   <Image
                     alt="ava"
                     src={
@@ -58,7 +63,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
                     }
                     width={14}
                     height={14}
-                    className="rounded-full object-cover"
+                    className="w-full h-full object-cover"
                   />
                 </span>
               </a>
@@ -91,7 +96,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
 
         {/* COMMENTS */}
         <section className="flex justify-start items-center w-full h-fit mt-2">
-          {totalComments > 0 ? (
+          {mergedComments.length > 0 ? (
             <a
               className="text-dark600_light500 body-light w-fit"
               href={`/community/${post._id}`}
@@ -102,7 +107,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
                 );
               }}
             >
-              View all {totalComments} comments
+              View all {mergedComments.length} comments
             </a>
           ) : (
             <span className="text-dark600_light500 body-light">No comment</span>
