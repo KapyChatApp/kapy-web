@@ -370,7 +370,7 @@ export const confirmHandleBlock = (
 
 export const handleUnfr = async (
   param: FriendRequestDTO,
-  setListFriend: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
+  setListFriend?: React.Dispatch<React.SetStateAction<FriendResponseDTO[]>>,
   setRelation?: React.Dispatch<React.SetStateAction<string>>
 ) => {
   try {

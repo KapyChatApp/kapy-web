@@ -36,7 +36,7 @@ const Feeds = () => {
           <span className="text-xl lg:text-2xl font-medium lg:font-bold text-dark100_light900">
             Feeds
           </span>
-          <div className="flex w-fit h-fit gap-2 items-center justify-center">
+          <div className="flex w-fit h-fit items-center justify-center">
             <Button
               className="bg-primary-500 p-3 border-none shadow-none rounded-2xl hover:bg-primary-500 items-center justify-center"
               onClick={handleCreatePost}
