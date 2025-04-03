@@ -9,6 +9,8 @@ import { UserProvider } from "@/context/UserContext";
 import { FriendProvider } from "@/context/FriendContext";
 import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { LayoutProvider } from "@/context/LayoutContext";
+import SocketProvider from "@/providers/SocketProvider";
+import { cn } from "@/lib/utils";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -23,7 +25,6 @@ export const metadata: Metadata = {
     icon: "/assets/images/icon.png"
   }
 };
-
 export default function RootLayout({
   children
 }: {
@@ -37,16 +38,30 @@ export default function RootLayout({
           rel="stylesheet"
         ></link>
       </head>
-      <body className="font-helvetica custom-scrollbar">
+      <body
+        className={cn(
+          lexend.className,
+          "relative font-helvetica custom-scrollbar"
+        )}
+      >
         <LayoutProvider>
           <ThemeProvider>
-            <ChatProvider>
-              <FriendProvider>
-                <UserProvider>{children}</UserProvider>
-              </FriendProvider>
-            </ChatProvider>
+            <UserProvider>
+              {" "}
+              {/* Bọc ngoài để SocketProvider có thể truy cập useUserContext */}
+              <ChatProvider>
+                <FriendProvider>
+                  <SocketProvider>
+                    {" "}
+                    {/* SocketProvider bây giờ có thể dùng useUserContext */}
+                    {children}
+                  </SocketProvider>
+                </FriendProvider>
+              </ChatProvider>
+            </UserProvider>
           </ThemeProvider>
         </LayoutProvider>
+
         <Toaster />
       </body>
     </html>

@@ -9,6 +9,7 @@ import { useUserContext } from "@/context/UserContext";
 import { toast } from "@/hooks/use-toast";
 import { formatTimeMessageBox } from "@/lib/utils";
 import { useLayoutContext } from "@/context/LayoutContext";
+import { useSocketContext } from "@/context/SocketContext";
 
 interface RightTopProps {
   _id: string;
@@ -31,69 +32,74 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   const pathname = usePathname();
   const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { timeOfflineChat } = useUserContext();
+  const { handleCall, onlineUsers } = useSocketContext();
   const { openMore, setOpenMore } = useLayoutContext();
   const [timeOff, setTimeOff] = useState("");
   const handleOpenMore = () => {
     setOpenMore(!openMore);
   };
+  const { adminInfo, isOnlineChat } = useUserContext();
+
+  const client =
+    onlineUsers && onlineUsers.find((user) => user.profile._id === _id);
 
   //Video Call
-  const client = useStreamVideoClient();
-  const { adminInfo, isOnlineChat } = useUserContext();
-  const [values, setValues] = useState({
-    dateTime: new Date(),
-    description: "",
-    link: ""
-  });
-  const [callDetails, setCallDetails] = useState<Call>();
-  const router = useRouter();
-  const handleCreateMeeting = async () => {
-    if (!client || !adminInfo) return;
-    try {
-      if (!values.dateTime) {
-        toast({
-          title: "Please select a date and time",
-          className:
-            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
-        });
-        return;
-      }
-      const id = crypto.randomUUID();
-      const call = client.call("default", id);
+  // const client = useStreamVideoClient();
+  // const { adminInfo, isOnlineChat } = useUserContext();
+  // const [values, setValues] = useState({
+  //   dateTime: new Date(),
+  //   description: "",
+  //   link: ""
+  // });
+  // const [callDetails, setCallDetails] = useState<Call>();
+  // const router = useRouter();
+  // const handleCreateMeeting = async () => {
+  //   if (!client || !adminInfo) return;
+  //   try {
+  //     if (!values.dateTime) {
+  //       toast({
+  //         title: "Please select a date and time",
+  //         className:
+  //           "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+  //       });
+  //       return;
+  //     }
+  //     const id = crypto.randomUUID();
+  //     const call = client.call("default", id);
 
-      if (!call) throw new Error("Fail to create call");
+  //     if (!call) throw new Error("Fail to create call");
 
-      const startsAt =
-        values.dateTime.toISOString() || new Date(Date.now()).toISOString();
+  //     const startsAt =
+  //       values.dateTime.toISOString() || new Date(Date.now()).toISOString();
 
-      const description = values.description || "Instant meeting";
+  //     const description = values.description || "Instant meeting";
 
-      await call.getOrCreate({
-        data: {
-          starts_at: startsAt,
-          custom: {
-            description
-          }
-        }
-      });
+  //     await call.getOrCreate({
+  //       data: {
+  //         starts_at: startsAt,
+  //         custom: {
+  //           description
+  //         }
+  //       }
+  //     });
 
-      setCallDetails(call);
+  //     setCallDetails(call);
 
-      if (!values.description) {
-        // const newTabUrl = `/calling/video/${call.id}`; // Tạo URL mới
-        // window.open(newTabUrl);
-        router.push(`/calling/video/${call.id}`);
-      }
+  //     if (!values.description) {
+  //       // const newTabUrl = `/calling/video/${call.id}`; // Tạo URL mới
+  //       // window.open(newTabUrl);
+  //       router.push(`/calling/video/${call.id}`);
+  //     }
 
-      toast({
-        title: "Create video call",
-        className:
-          "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //     toast({
+  //       title: "Create video call",
+  //       className:
+  //         "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+  //     });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   //Online Status
   useEffect(() => {
@@ -173,7 +179,9 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
       <div className="flex flex-row items-center justify-start h-full gap-[10px] lg:gap-4">
         <Button
           className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
-          onClick={handleCreateMeeting}
+          onClick={() => {
+            if (client && !isActiveGroup) handleCall(client);
+          }}
         >
           <Icon
             icon="fluent:video-20-filled"

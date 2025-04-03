@@ -1,4 +1,5 @@
 "use client";
+import CallNotification from "@/components/mess-group/CallNotification";
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
@@ -119,6 +120,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {children}
         </div>
       </section>
+
+      <CallNotification />
     </main>
   );
 };
