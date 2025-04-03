@@ -39,9 +39,12 @@ export default function RootLayout({
         ></link>
       </head>
       <body
+       
+        cz-shortcut-listen="true"
         className={cn(
           lexend.className,
-          "relative font-helvetica custom-scrollbar"
+          "relative font-helvetica custom-scrollbar "
+      
         )}
       >
         <LayoutProvider>

@@ -2,34 +2,94 @@
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { ActiveComponentProps } from "@/types/mess-group";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import LocalSearch from "@/components/shared/search/localSearchbar";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import UserCheckbox from "./UserCheckbox";
-import useSearch from "@/hooks/use-search";
 import { useFriendContext } from "@/context/FriendContext";
 import useSearchFriendByPhone from "@/hooks/use-search-friend-by-phone";
+import { getMyListFriend } from "@/lib/data/mine/dataAllFriends";
+import { MessageBoxInfo, UserInfoBox } from "@/lib/DTO/message";
+import { addMemberToGroup } from "@/lib/services/message/group/addMember";
+import { useChatContext } from "@/context/ChatContext";
 
-const AddComponent: React.FC<ActiveComponentProps> = ({
-  setActiveComponent
+interface AddComponentProps {
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+  box: MessageBoxInfo;
+}
+
+const AddComponent: React.FC<AddComponentProps> = ({
+  setActiveComponent,
+  box
 }) => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const { listFriend } = useFriendContext();
+  const { listFriend, setListFriend } = useFriendContext();
+  const [error, setError] = useState("");
+  const { setMemberList, memberList } = useChatContext();
   const { toast } = useToast();
   const handleBack = () => {
     setActiveComponent("");
   };
-  const handleAdd = () => {
-    toast({
-      title: "You added members successfully!",
-      className:
-        "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
-    });
-    setActiveComponent("");
+  // useEffect(() => {
+  //   // Gọi API lấy danh sách bạn bè khi component mount
+  //   const fetchData = async () => {
+  //     try {
+  //       await getMyListFriend(setListFriend, setError);
+  //     } catch (err) {
+  //       setError("Failed to fetch data.");
+  //       console.error(err);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  const filteredMembers = listFriend.filter(
+    (friend) => !memberList.some((member) => member._id === friend._id)
+  );
+
+  const handleAdd = async () => {
+    try {
+      const result = await addMemberToGroup(box.id, selectedIds);
+      if (result.success) {
+        const selectedInfo: UserInfoBox[] = filteredMembers
+          .filter((member) => selectedIds.includes(member._id))
+          .map((member) => ({
+            _id: member._id,
+            firstName: member.firstName,
+            lastName: member.lastName,
+            nickName: member.nickName,
+            avatar: member.avatar,
+            isOnline: false
+          }));
+        setMemberList((prev) => [...prev, ...selectedInfo]);
+        console.log(memberList);
+        toast({
+          title: "You added members successfully!",
+          className:
+            "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
+        });
+        setActiveComponent(""); // Đóng component sau khi thêm thành viên
+      } else {
+        toast({
+          title: "Failed to add members.",
+          description: result.message,
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
+      }
+    } catch (error) {
+      toast({
+        title: `Error in add member`,
+        description: error instanceof Error ? error.message : "Unknown error",
+        className:
+          "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+      });
+    }
   };
 
   const { searchTerm, setSearchTerm, filteredFriends } =
-    useSearchFriendByPhone(listFriend);
+    useSearchFriendByPhone(filteredMembers);
 
   const handleCheckboxChange = (id: string, isChecked: boolean) => {
     setSelectedIds((prev) =>
@@ -91,6 +151,7 @@ const AddComponent: React.FC<ActiveComponentProps> = ({
             <Button
               className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
               onClick={handleAdd}
+              disabled={selectedIds.length === 0}
             >
               Confirm
             </Button>

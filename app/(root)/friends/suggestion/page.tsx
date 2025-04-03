@@ -21,8 +21,8 @@ const page = () => {
     };
 
     fetchData();
-  }, [setListSuggestedFriend]);
-
+  }, []);
+  console.log(listSuggestedFriend);
   if (!listSuggestedFriend) {
     return (
       <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">

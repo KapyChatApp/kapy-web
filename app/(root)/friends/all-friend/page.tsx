@@ -40,7 +40,7 @@ const MyFriendPage = () => {
   useEffect(() => {
     fetchData();
     router.push(`/friends/all-friend`);
-  }, [router]);
+  }, [setListFriend, router]);
 
   if (
     !listBestFriend ||

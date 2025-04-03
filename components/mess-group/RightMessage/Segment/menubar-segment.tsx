@@ -56,7 +56,6 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       // Gọi API delete tin nhắn
       const response = await DeleteMessage(messageId);
       if (response) {
-        console.log("Delete success");
         toast({
           title: "Message deleted successfully!",
           className:
@@ -112,9 +111,8 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           );
           return; // Không thực hiện tiếp nếu boxId không hợp lệ
         }
-        const fileDelete = messagesByBox[data.boxId].find(
-          (item) => item.id === data.id
-        );
+        const fileDelete =
+          messagesByBox[data.boxId] || [].find((item) => item.id === data.id);
 
         if (fileDelete && fileDelete.contentId) {
           console.log("Updated fileList: ", fileDelete);
@@ -146,19 +144,21 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
       }
     };
     const handleRevokeMessage = (data: PusherRevoke) => {
-      const fileRevoke = messagesByBox[data.boxId].find(
-        (item) => item.id === data.id
-      );
-      if (fileRevoke && fileRevoke.contentId) {
-        setFileList((prev) => {
-          const fileContent = prev[data.boxId] || [];
-          return {
-            ...prev,
-            [data.boxId]: fileContent.filter(
-              (msg) => msg.url !== fileRevoke.contentId.url
-            )
-          };
-        });
+      if (messagesByBox && messagesByBox[data.boxId]) {
+        const fileRevoke = messagesByBox[data.boxId].find(
+          (item) => item.id === data.id
+        );
+        if (fileRevoke && fileRevoke.contentId) {
+          setFileList((prev) => {
+            const fileContent = prev[data.boxId] || [];
+            return {
+              ...prev,
+              [data.boxId]: fileContent.filter(
+                (msg) => msg.url !== fileRevoke.contentId.url
+              )
+            };
+          });
+        }
       }
       setMessagesByBox((prev) => {
         const currentMessages = prev[data.boxId] || [];

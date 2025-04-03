@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { sidebarLinks } from "@/constants/index";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
@@ -26,6 +26,7 @@ import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
 import { useUserContext } from "@/context/UserContext";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { useLayoutContext } from "@/context/LayoutContext";
+import { toast } from "@/hooks/use-toast";
 
 const Leftsidebar = () => {
   const { setIsParagraphVisible, isParagraphVisible } = useLayoutContext();
@@ -62,7 +63,6 @@ const Leftsidebar = () => {
       setOpenMore(!openMore);
     }
   };
-
   const handleAccount = () => {
     setAccount(!isAccount);
     setDropdownOpen(false);
@@ -71,26 +71,73 @@ const Leftsidebar = () => {
     setSetting(!isSetting);
     setDropdownOpen(false);
   };
+  const router = useRouter();
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${process.env.BASE_URL}auth/logout`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
+      const deviceId = localStorage.getItem("deviceId");
+      if (!deviceId) {
+        toast({
+          title: `Error in logout`,
+          description: "No device found",
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
+        return; // Trả về defaultValue nếu không có token
+      }
+      const storedToken = localStorage.getItem("token");
+      if (!storedToken) {
+        console.error("Token is missing");
+      }
+      const response = await fetch(
+        `${process.env.BASE_URL}auth/logout?id=${deviceId}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${storedToken}`
+          }
         }
-      });
+      );
 
       if (response.ok) {
         localStorage.removeItem("token");
         localStorage.removeItem("adminId");
+        localStorage.removeItem("deviceId");
+        router.push("/signin");
       } else {
         const errorData = await response.json();
-        console.error("Logout failed:", errorData.message);
+        toast({
+          title: `Error in logout`,
+          className:
+            "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
+        });
       }
     } catch (error) {
       console.error("Error during logout:", error);
     }
   };
+
+  // const handleLogout = async () => {
+  //   try {
+  //     const response = await fetch(`${process.env.BASE_URL}auth/logout`, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json"
+  //       }
+  //     });
+
+  //     if (response.ok) {
+  //       localStorage.removeItem("token");
+  //       localStorage.removeItem("adminId");
+  //       router.push("/signin");
+  //     } else {
+  //       const errorData = await response.json();
+  //       console.error("Logout failed:", errorData.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error during logout:", error);
+  //   }
+  // };
 
   useEffect(() => {
     const handleResize = () => {
@@ -158,10 +205,12 @@ const Leftsidebar = () => {
               const isDynamicPath = /^\/[a-zA-Z0-9_-]+$/.test(pathname);
               const isGroupDynamicPath = pathname.startsWith("/group-chat/");
               const isFriendDynamicPath = pathname.startsWith("/friends/");
+              const isCommunityDynamicPath = pathname.startsWith("/community/");
               const isActive =
                 pathname === item.route ||
                 (isGroupDynamicPath && item.route === "/group-chat") ||
                 (isFriendDynamicPath && item.route === "/friends") ||
+                (isCommunityDynamicPath && item.route === "/community") ||
                 (/^\/[a-zA-Z0-9]{24}$/.test(pathname) && item.route === "/");
               return (
                 <Link
@@ -214,19 +263,24 @@ const Leftsidebar = () => {
                 }`}
               >
                 <div className="flex w-full">
-                  <Image
-                    src={
-                      adminInfo && adminInfo.avatar
-                        ? newAva
+                  <div
+                    className={`${
+                      isParagraphVisible ? "w-7 h-7" : "w-8 h-8"
+                    } relative rounded-full overflow-hidden`}
+                  >
+                    <Image
+                      src={
+                        adminInfo && adminInfo.avatar
                           ? newAva
-                          : adminInfo.avatar
-                        : "/assets/ava/default.png"
-                    }
-                    alt="logo"
-                    width={isParagraphVisible ? 28 : 32}
-                    height={isParagraphVisible ? 28 : 32}
-                    className={`rounded-full`}
-                  />
+                            ? newAva
+                            : adminInfo.avatar
+                          : "/assets/ava/default.png"
+                      }
+                      alt="logo"
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
                   {isParagraphVisible && (
                     <div className="flex w-full justify-start items-center">
                       <p className="xl:paragraph-regular lg:body-regular md:small-regular lg:ml-[12px] ml-1 text-dark100_light900">
@@ -379,9 +433,8 @@ const Leftsidebar = () => {
                   <div className="w-full h-[1px] bg-light-500 dark:bg-dark-400"></div>
                 </DropdownMenuSeparator>
                 <DropdownMenuLabel className="hover:bg-light-700 hover:dark:bg-dark-400 hover:dark:bg-opacity-80 hover:rounded-lg">
-                  <Link
+                  <div
                     key="logout"
-                    href="/signin"
                     className="text-dark100_light900 flex flex-1 items-center justify-start bg-transparent w-full"
                     onClick={handleLogout}
                   >
@@ -397,7 +450,7 @@ const Leftsidebar = () => {
                         Log out
                       </p>
                     </div>
-                  </Link>
+                  </div>
                 </DropdownMenuLabel>
               </DropdownMenuContent>
             </DropdownMenu>

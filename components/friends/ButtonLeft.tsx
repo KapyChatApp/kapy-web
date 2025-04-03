@@ -2,6 +2,7 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ButtonLeftProps {
   isClick: boolean;
@@ -25,6 +26,10 @@ const ButtonLeft: React.FC<LeftProps> = ({ buttonLeft }) => {
     setClick(!isClick);
   };
 
+  const router = useRouter();
+  const handleLink = () => {
+    router.push(`/friends/${route}`);
+  };
   return icon !== "" ? (
     <div
       className={`${
@@ -53,6 +58,7 @@ const ButtonLeft: React.FC<LeftProps> = ({ buttonLeft }) => {
             ? "bg-light-700 dark:bg-dark-200 bg-opacity-50 dark:bg-opacity-50"
             : "bg-transparent hover:bg-light-700 dark:hover:bg-dark-200 hover:bg-opacity-30 dark:hover:bg-opacity-30"
         } flex flex-row w-full items-center justify-start gap-3 p-3 rounded-lg shadow-none border-none`}
+        onClick={handleLink}
       >
         <p className="text-dark100_light900 paragraph-regular">{label}</p>
         {number > 0 && (

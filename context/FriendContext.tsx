@@ -17,7 +17,6 @@ export const defaultFriendRequestedDTO: RequestedResponseDTO = {
   lastName: "",
   avatar: "",
   relation: "",
-  status: false,
   createAt: "",
   mutualFriends: []
 };

@@ -306,13 +306,13 @@ const FirstItem = ({ user }: FirstItemProps) => {
 
         <div className="w-full flex items-end justify-start relative z-10 h-fit">
           {/* Avatar */}
-          <div className="mt-[112px] h-fit w-fit">
+          <div className="mt-[112px] h-20 w-20 rounded-full overflow-hidden">
             <Image
               src={user.avatar ? user.avatar : "/assets/ava/default.png"}
               alt="ava"
               width={80}
               height={80}
-              className="rounded-full"
+              className="object-cover w-full h-full"
             />
           </div>
 

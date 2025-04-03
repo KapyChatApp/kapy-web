@@ -16,6 +16,7 @@ import QuantityReact from "./RightMessage/Segment/QuantityReact";
 import { useChatContext } from "@/context/ChatContext";
 import { reactMessage } from "@/lib/services/message/react";
 import { getPusherClient } from "@/lib/pusher";
+import { useParams } from "next/navigation";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -30,9 +31,11 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   length,
   recieverInfo
 }) => {
-  const { createBy, contentId, text, id, isReact } = segments;
+  const { id } = useParams<{ id: string }>() as { id: string };
+  const { createBy, contentId, text, isReact } = segments;
   const { adminInfo } = useUserContext();
-  const { setIsReactedByMessage, isReactedByMessage } = useChatContext();
+  const { setIsReactedByMessage, isReactedByMessage, setMessagesByBox } =
+    useChatContext();
   const adminId = adminInfo._id;
 
   // Render Content
@@ -49,19 +52,61 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   const [listReact, setListReact] = useState<string[]>(segments.isReact);
   const handleReact = async () => {
     try {
-      const resp = await reactMessage(id);
+      const resp = await reactMessage(segments.id);
       if (resp.isReact.length > 0) {
         setIsCount(resp.isReact.length);
         setIsReactedByMessage((prevState) => ({
           ...prevState,
-          [id]: true
+          [segments.id]: true
         }));
+        setMessagesByBox((prevMessagesByBox) => {
+          const currentMessages = prevMessagesByBox[id] || [];
+
+          const updatedMessages = currentMessages.map((msg) => {
+            if (msg.id === segments.id) {
+              const isReactSet = new Set(msg.isReact);
+              if (!isReactSet.has(adminId)) {
+                isReactSet.add(adminId); // Chỉ thêm nếu chưa có
+              }
+
+              return {
+                ...msg,
+                isReact: Array.from(isReactSet) // Chuyển Set thành mảng
+              };
+            }
+            return msg;
+          });
+
+          return {
+            ...prevMessagesByBox,
+            [id]: updatedMessages
+          };
+        });
       } else {
         setIsCount(resp.isReact.length);
         setIsReactedByMessage((prevState) => ({
           ...prevState,
-          [id]: false
+          [segments.id]: false
         }));
+        setMessagesByBox((prevMessagesByBox) => {
+          const currentMessages = prevMessagesByBox[id] || [];
+
+          const updatedMessages = currentMessages.map((msg) =>
+            msg.id === segments.id
+              ? {
+                  ...msg,
+                  isReact: msg.isReact.filter(
+                    (reactedUserId) => reactedUserId !== adminId
+                  )
+                }
+              : msg
+          );
+
+          return {
+            ...prevMessagesByBox,
+            [id]: updatedMessages
+          };
+        });
       }
     } catch (error) {
       console.error("Error reacting to message:", error);
@@ -88,13 +133,13 @@ const SegmentMess: React.FC<SegmentMessage> = ({
         setListReact(data.isReact);
         setIsReactedByMessage((prevState) => ({
           ...prevState,
-          [id]: true
+          [segments.id]: data.isReact.length > 0 ? true : false
         }));
       } else if (data.id === segments.id) {
         setIsCount(0);
         setIsReactedByMessage((prevState) => ({
           ...prevState,
-          [id]: false
+          [segments.id]: data.isReact.length > 0 ? true : false
         }));
       }
     };
@@ -117,7 +162,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({
     if (segments.isReact.length > 0) {
       setIsCount(segments.isReact.length);
     }
-  });
+  }, []);
   return (
     <>
       <div

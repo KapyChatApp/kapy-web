@@ -75,7 +75,8 @@ export const fetchMessageBox = async (
           pin: false,
           readedId: item.readedId,
           readStatus: item.readStatus,
-          stranger: item.stranger
+          stranger: item.stranger,
+          createBy: item.createBy
         };
       })
       .filter((item): item is MessageBoxInfo => item !== null);

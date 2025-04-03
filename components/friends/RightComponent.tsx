@@ -78,7 +78,7 @@ const RightComponent = () => {
 
   useEffect(() => {
     setIsSearching(!!searchTerm.trim());
-  }, [searchTerm]);
+  });
 
   const renderCoveredDiv = () => {
     let render = "";

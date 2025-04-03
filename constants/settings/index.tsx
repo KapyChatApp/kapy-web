@@ -24,6 +24,11 @@ export const sidebarSettingButton: SidebarSettingButton[] = [
     icon: "solar:phone-calling-bold",
     label: "Calling",
     value: "call"
+  },
+  {
+    icon: "solar:login-3-bold",
+    label: "Logged in History",
+    value: "history"
   }
 ];
 

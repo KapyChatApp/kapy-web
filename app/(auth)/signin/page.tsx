@@ -6,6 +6,7 @@ import { toast } from "@/hooks/use-toast";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
 import { UserLoginDTO } from "@/lib/DTO/user";
 import { loginUser } from "@/lib/services/auth/login";
+import { getDeviceInfo } from "@/lib/utils";
 import { InputCustomProps } from "@/types/auth";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Link from "next/link";
@@ -25,11 +26,10 @@ const Signin = () => {
     try {
       const params: UserLoginDTO = {
         phoneNumber: phone,
-        password: pass
+        password: pass,
+        ...getDeviceInfo()
       };
-      console.log(params);
       const result = await loginUser(params);
-
       if (result.token === "") {
         setError("Login failed");
         toast({
@@ -41,7 +41,11 @@ const Signin = () => {
         return;
       }
       const token = result.token;
+      const device = result.device;
+      console.log(result, "check");
+      console.log(device._id, "check");
       localStorage.setItem("token", token);
+      localStorage.setItem("deviceId", device._id);
 
       await getMyProfile(setAdminInfo);
 

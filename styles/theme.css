@@ -84,6 +84,10 @@
     @apply bg-light-600 dark:bg-dark-400;
   }
 
+  .background-dark600_light600 {
+    @apply bg-dark-600 dark:bg-light-600;
+  }
+
   .text-dark100_light900 {
     @apply text-dark-100 dark:text-light-900;
   }
@@ -92,12 +96,24 @@
     @apply text-dark-600 dark:text-light-600;
   }
 
+  .text-dark600_light500 {
+    @apply text-dark-600 dark:text-light-500;
+  }
+
+  .text-light600_dark600 {
+    @apply text-light-600 dark:text-dark-600;
+  }
+
   .text-dark300_light800 {
     @apply text-dark-300 dark:text-light-800;
   }
 
   .border-dark600_light600 {
     @apply border-dark-600 dark:border-light-600;
+  }
+
+  .border-light500_dark400 {
+    @apply border-light-500 dark:border-dark-400;
   }
 
   .border-custom {
@@ -290,7 +306,7 @@
 
   .emoji-picker-wrapper {
     position: absolute;
-    bottom: 50px;
+    bottom: 40px;
     right: 0;
     z-index: 10;
   }
@@ -323,6 +339,19 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+  }
+
+  .modal-overlay-post {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(28, 30, 33, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;

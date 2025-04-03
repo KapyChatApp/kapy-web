@@ -163,7 +163,7 @@ const RightMiddle = ({
         [msg.id]: msg.isReact.length > 0 ? true : false
       }));
     }
-  }, [messagesByBox, boxId]);
+  }, [boxId]);
 
   return (
     <div
@@ -223,7 +223,7 @@ const RightMiddle = ({
                     >
                       {group[0].createBy !== adminId && (
                         <div
-                          className={`flex items-end h-full w-7 flex-shrink-0 relative ${
+                          className={`flex items-end h-7 w-7 rounded-full overflow-hidden flex-shrink-0 relative ${
                             isReactedByMessage[group[group.length - 1].id]
                               ? "pb-5"
                               : ""
@@ -238,7 +238,7 @@ const RightMiddle = ({
                             alt=""
                             width={28}
                             height={28}
-                            className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                            className="w-full h-full cursor-pointer  object-cover"
                           />
                         </div>
                       )}
@@ -337,7 +337,7 @@ const RightMiddle = ({
                   .map(([key, value], index) => (
                     <div
                       key={index}
-                      className={`absolute rounded-full bg-light-800 dark:bg-dark-500 ${
+                      className={`absolute rounded-full bg-light-800 dark:bg-dark-500 w-7 h-7 overflow-hidden${
                         index === 0
                           ? "left-0"
                           : index === 1
@@ -354,7 +354,7 @@ const RightMiddle = ({
                         alt="Avatar"
                         width={28}
                         height={28}
-                        className="w-7 h-7 cursor-pointer rounded-full object-cover"
+                        className="w-full h-full cursor-pointer object-cover"
                       />
                     </div>
                   ))}
@@ -386,14 +386,16 @@ const RightMiddle = ({
           {avaArray.length > 0 && (
             <div className="flex flex-row gap-1 w-full h-fit justify-end items-center">
               {avaArray.slice(0, 5).map((item, index) => (
-                <Image
-                  key={index}
-                  src={item ? item : "/assets/ava/default.png"}
-                  alt="Avatar"
-                  width={10}
-                  height={10}
-                  className="w-5 h-5 rounded-full object-cover"
-                />
+                <div className="w-5 h-5 rounded-full overflow-hidden">
+                  <Image
+                    key={index}
+                    src={item ? item : "/assets/ava/default.png"}
+                    alt="Avatar"
+                    width={10}
+                    height={10}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               ))}
             </div>
           )}

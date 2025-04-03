@@ -16,6 +16,7 @@ import ReportCard from "@/components/shared/ReportCard";
 import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 import { getPusherClient } from "@/lib/pusher";
 import { useLayoutContext } from "@/context/LayoutContext";
+import { getMyListFriend } from "@/lib/data/mine/dataAllFriends";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -24,15 +25,15 @@ interface RightMessageProps {
 const RightMessage = ({ chatItem }: RightMessageProps) => {
   const pathname = usePathname();
   const [isReport, setReport] = useState(false);
+  const [error, setError] = useState("");
   const isGroup = pathname.startsWith("/group-chat");
 
   //FetchMessage Backend
   const { id } = useParams();
   const [relation, setRelation] = useState("");
   const { adminInfo, isOnlineChat } = useUserContext();
-  const { setListBlockedFriend } = useFriendContext();
-  const { messagesByBox, setIsReactedByMessage, isReactedByMessage } =
-    useChatContext();
+  const { setListBlockedFriend, setListFriend } = useFriendContext();
+  const { messagesByBox, setMemberList, setCreateBy } = useChatContext();
   const { openMore, isParagraphVisible } = useLayoutContext();
   const adminId = adminInfo._id;
 
@@ -151,6 +152,8 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
     if (!chatItem) {
       return; // Nếu chưa có chatItem, không thực hiện gì
     }
+    setMemberList(chatItem.memberInfo);
+    setCreateBy(chatItem.createBy);
     let isMounted = true;
     const userId = localStorage.getItem("adminId");
 
@@ -200,6 +203,20 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
       isMounted = false;
     };
   }, [chatItem]);
+  useEffect(() => {
+    // Gọi API lấy danh sách bạn bè khi component mount
+    const fetchData = async () => {
+      try {
+        await getMyListFriend(setListFriend, setError);
+      } catch (err) {
+        setError("Failed to fetch data.");
+        console.error(err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   if (!chatItem) {
     return (
       <div className="flex h-screen w-screen items-center justify-center background-light900_dark400">

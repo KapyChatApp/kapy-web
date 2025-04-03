@@ -244,11 +244,12 @@ const LeafletMap = ({
     });
   };
   useEffect(() => {
-    renderMap();
-    if (userLocation) {
-      renderMapBff();
-    }
-  });
+    renderMap(); // Chỉ render khi đã có userLocation
+  }, [userLocation, isClient]);
+
+  useEffect(() => {
+    renderMapBff(); // Render bạn bè khi mapBff thay đổi
+  }, [mapBff]);
 
   useEffect(() => {
     if (status !== "") {

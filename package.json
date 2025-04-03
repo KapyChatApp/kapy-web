@@ -60,9 +60,14 @@
     "react-fancybox": "^0.2.5",
     "react-player": "^2.16.0",
     "sentiment": "^5.0.2",
+<<<<<<< HEAD
     "socket.io-client": "^4.8.1",
+=======
+    "swiper": "^11.2.5",
+>>>>>>> c684dbdf5f99d9c17b3233a0727f6232ec2f6e5d
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
+    "ua-parser-js": "^2.0.0",
     "yet-another-react-lightbox": "^3.21.7"
   },
   "devDependencies": {

@@ -22,7 +22,8 @@ function transformToMessageBoxInfo(dto: MessageBoxDTO): MessageBoxInfo {
     pin: dto.pin,
     stranger: dto.stranger,
     readStatus: false,
-    readedId: []
+    readedId: [],
+    createBy: ""
   };
 }
 
@@ -60,9 +61,8 @@ export async function createGroup(
     );
 
     const result = response.data.result;
-    console.log(result);
     if (result && result.success) {
-      const data: MessageBoxInfo = transformToMessageBoxInfo(result.newBox);
+      const data: MessageBoxInfo = transformToMessageBoxInfo(result.messageBox);
       setDataChat((prev) => [...prev, data]);
     }
     return result;

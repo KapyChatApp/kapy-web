@@ -12,19 +12,21 @@ import { FileContent, UserInfoBox } from "@/lib/DTO/message";
 import { useUserContext } from "@/context/UserContext";
 import "@fancyapps/ui/dist/fancybox/fancybox.css";
 
-const MoreMiddle = ({
-  setActiveComponent,
-  setItemSent,
-  detailByBox
-}: SeeAllProps) => {
+interface props {
+  setItemSent: React.Dispatch<
+    React.SetStateAction<UserInfoBox[] | FileContent[]>
+  >;
+  setActiveComponent: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const MoreMiddle = ({ setActiveComponent, setItemSent }: props) => {
   const pathname = usePathname();
   const isGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const [boxId, setBoxId] = useState<string>("");
-  const { fileList } = useChatContext();
+  const { fileList, memberList, createBy } = useChatContext();
   const [images, setImages] = useState<FileContent[]>([]);
   const [videos, setVideos] = useState<FileContent[]>([]);
   const [others, setOthers] = useState<FileContent[]>([]);
-  const [members, setMembers] = useState<UserInfoBox[]>([]);
   const { isOnlineChat } = useUserContext();
   //boxId
   useEffect(() => {
@@ -37,7 +39,7 @@ const MoreMiddle = ({
     if (id) {
       setBoxId(id); // Set boxId là chuỗi
     }
-  }, [boxId]);
+  }, []);
 
   useEffect(() => {
     if (boxId !== "" && fileList && fileList[boxId]) {
@@ -48,7 +50,7 @@ const MoreMiddle = ({
       if (videoList) setVideos(videoList);
       if (otherList) setOthers(otherList);
     }
-  });
+  }, [boxId, fileList[boxId]]);
   //Show image in more
   useEffect(() => {
     // Khởi tạo Fancybox sau khi DOM đã sẵn sàng
@@ -56,10 +58,7 @@ const MoreMiddle = ({
       Toolbar: true,
       Thumbs: true
     });
-    return () => {
-      Fancybox.destroy();
-    };
-  }, []);
+  });
 
   //Show video in more
   useEffect(() => {
@@ -68,14 +67,10 @@ const MoreMiddle = ({
       Toolbar: true,
       Thumbs: true
     });
-    return () => {
-      Fancybox.destroy();
-    };
   }, []);
 
   const handleSeeAllMember = () => {
     setActiveComponent("member");
-    setItemSent(detailByBox.memberInfo);
   };
   const handleSeeAllPhoto = () => {
     setActiveComponent("photo");
@@ -109,7 +104,7 @@ const MoreMiddle = ({
             <div className="flex flex-row w-fit items-end">
               <p className="text-dark100_light900 paragraph-bold">Members</p>
               <p className="text-dark100_light900 text-opacity-50 dark:text-opacity-80 body-light ml-[8px]">
-                {detailByBox.memberInfo.length}
+                {memberList.length}
               </p>
             </div>
             <div className="flex flex-grow items-center justify-end">
@@ -122,49 +117,46 @@ const MoreMiddle = ({
             </div>
           </div>
           <div className="flex flex-col items-center w-full gap-[8px]">
-            {detailByBox.memberInfo.length > 0
-              ? // Sắp xếp members để leader đứng đầu
-                detailByBox.memberInfo.slice(0, 3).map((item) => (
-                  <div
-                    className="flex flex-row items-center justify-start w-full gap-[12px]"
-                    key={item._id}
-                  >
-                    <div className="relative flex-shrink-0 w-fit">
-                      <Image
-                        src={item.avatar}
-                        alt="ava"
-                        width={36}
-                        height={36}
-                        className="rounded-full"
-                      />
-                      {isOnlineChat[item._id] && (
-                        <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
-                      )}
-                    </div>
+            {memberList.length > 0
+              ? memberList
+                  .sort((a, b) => {
+                    if (a._id === createBy) return -1;
+                    if (b._id === createBy) return 1;
+                    return 0;
+                  })
+                  .slice(0, 3)
+                  .map((item) => (
+                    <div
+                      className="flex flex-row items-center justify-start w-full gap-[12px]"
+                      key={item._id}
+                    >
+                      <div className="relative flex-shrink-0 w-fit">
+                        <Image
+                          src={item.avatar}
+                          alt="ava"
+                          width={36}
+                          height={36}
+                          className="rounded-full"
+                        />
+                        {isOnlineChat[item._id] && (
+                          <div className="bg-green-600 rounded-full w-[8px] h-[8px] absolute bottom-0 right-0 translate-x-[-35%] translate-y-[5%]"></div>
+                        )}
+                      </div>
 
-                    <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
-                      <p className="paragraph-15-regular h-fit text-dark100_light900">
-                        {item.firstName + " " + item.lastName}
-                      </p>
-                      {/* <div className="flex items-center justify-start w-full min-w-0">
-                            {item.addedBy === "" ? (
-                              <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
-                                Leader
-                              </p>
-                            ) : (
-                              <div className="flex items-center">
-                                <p className="subtle-regular justify-start text-dark100_light900 h-fit">
-                                  Added by
-                                </p>
-                                <p className="subtle-regular ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900 h-fit">
-                                  {item.addedBy}
-                                </p>
-                              </div>
-                            )}
-                          </div> */}
+                      <div className="flex flex-col bg-transparent items-start justify-start gap-[2px] flex-grow overflow-hidden min-w-0">
+                        <p className="paragraph-15-regular h-fit text-dark100_light900">
+                          {item.firstName + " " + item.lastName}
+                        </p>
+                        {createBy === item._id && (
+                          <div className="flex items-center justify-start w-full min-w-0">
+                            <p className="subtle-regular justify-start items-center text-primary-500 h-fit">
+                              Leader
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))
+                  ))
               : null}
           </div>
         </div>
