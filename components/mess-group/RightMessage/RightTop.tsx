@@ -4,12 +4,11 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
 import { usePathname, useRouter } from "next/navigation";
-import { Call, useStreamVideoClient } from "@stream-io/video-react-sdk";
 import { useUserContext } from "@/context/UserContext";
-import { toast } from "@/hooks/use-toast";
 import { formatTimeMessageBox } from "@/lib/utils";
 import { useLayoutContext } from "@/context/LayoutContext";
 import { useSocketContext } from "@/context/SocketContext";
+import { SocketUser } from "@/types";
 
 interface RightTopProps {
   _id: string;
@@ -101,6 +100,14 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   //   }
   // };
 
+  // Video Call
+  const router = useRouter();
+  const handleVideoCall = async (client: SocketUser) => {
+    if (!client) return;
+    router.push(`/socket/${client.socketId}`);
+    handleCall(client);
+  };
+
   //Online Status
   useEffect(() => {
     // Cập nhật ngay khi render lần đầu
@@ -136,7 +143,6 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
       return () => clearInterval(interval);
     }
   }, []);
-
   return (
     <div className="flex flex-row h-fit w-full lg:pl-[6px] pl-0 justify-between items-center">
       <div className="flex flex-row h-full">
@@ -179,9 +185,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
       <div className="flex flex-row items-center justify-start h-full gap-[10px] lg:gap-4">
         <Button
           className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
-          onClick={() => {
-            if (client && !isActiveGroup) handleCall(client);
-          }}
+          onClick={() => client && handleVideoCall(client)}
         >
           <Icon
             icon="fluent:video-20-filled"

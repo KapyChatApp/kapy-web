@@ -68,7 +68,6 @@ const ReportCard = ({
     setError("");
 
     const token = localStorage.getItem("token");
-    console.log(token, "tokennn");
     const userId = localStorage.getItem("userId");
     if (!token) {
       setError("Authentication is required");

@@ -1,5 +1,5 @@
 "use client";
-import { Socket, io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 import {
   createContext,
   useContext,
@@ -15,6 +15,7 @@ interface iSocketContext {
   isSocketConnected: boolean;
   onlineUsers: SocketUser[] | null;
   ongoingCall: OngoingCall | null;
+  localStream: MediaStream | null;
   handleCall: (user: SocketUser) => void;
 }
 
@@ -31,10 +32,54 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const currentSocketUser = onlineUsers?.find(
     (onlineUsers) => onlineUsers.userId === adminInfo?._id
   );
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+
+  const getMediaStream = useCallback(
+    async (faceMode?: string) => {
+      if (localStream) return localStream;
+
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
+        const audioDevices = devices.filter(
+          (device) => device.kind === "audioinput"
+        );
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: {
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 360, ideal: 720, max: 1080 },
+            frameRate: { min: 15, ideal: 30, max: 60 },
+            facingMode: videoDevices.length > 0 ? faceMode : undefined
+          }
+        });
+
+        setLocalStream(stream);
+        return stream;
+      } catch (error) {
+        console.error("Error accessing media devices:", error);
+        setLocalStream(null);
+        return null;
+      }
+    },
+    [localStream]
+  );
 
   const handleCall = useCallback(
-    (user: SocketUser) => {
+    async (user: SocketUser) => {
       if (!currentSocketUser) return;
+
+      const stream = await getMediaStream();
+
+      if (!stream) {
+        console.log("Error: No stream available.");
+        return;
+      }
+
       const participants = { caller: currentSocketUser, receiver: user };
       setOngoingCall({ participants, isRinging: false });
       socket?.emit("call", participants);
@@ -45,17 +90,30 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const onIncomingCall = useCallback(
     (participants: Participants) => {
+      console.log("Cuộc gọi đến từ:", participants.caller);
       setOngoingCall({ participants, isRinging: true });
+      console.log("Cuộc gọi đến từ:", participants.caller);
     },
     [socket, adminInfo, ongoingCall]
   );
+
   //initialize a socket
   useEffect(() => {
     const newSocket = io("http://localhost:3000", {
       transports: ["websocket", "polling"],
-      withCredentials: true // Đảm bảo gửi cookie và session (nếu có)
+      withCredentials: true
     });
+
+    newSocket.on("connect", () => {
+      console.log("Socket connected with ID:", newSocket.id);
+    });
+
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
     setSocket(newSocket);
+
     return () => {
       newSocket.disconnect();
     };
@@ -70,6 +128,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
     function onConnect() {
       setIsSocketConnected(true);
+      console.log("Socket ID after connection:", socket?.id);
     }
     function onDisconnect() {
       setIsSocketConnected(false);
@@ -86,7 +145,10 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   //set online users
   useEffect(() => {
-    if (!socket || !isSocketConnected) return;
+    if (!socket || !isSocketConnected || !adminInfo) {
+      console.warn("Socket or adminInfo is not ready.");
+      return;
+    }
 
     socket.emit("addNewUsers", adminInfo);
     socket.on("getUsers", (res) => {
@@ -105,11 +167,12 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
     if (!socket || !isSocketConnected) return;
 
     socket.on("incomingCall", onIncomingCall);
+    console.log("🔔 Event incomingCall is listening...");
 
     return () => {
       socket.off("incomingCall", onIncomingCall);
     };
-  }, [socket, isSocketConnected, adminInfo, onIncomingCall]);
+  }, [socket, isSocketConnected, onIncomingCall]);
 
   return (
     <SocketContext.Provider
@@ -118,6 +181,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
         isSocketConnected,
         onlineUsers,
         ongoingCall,
+        localStream,
         handleCall
       }}
     >
