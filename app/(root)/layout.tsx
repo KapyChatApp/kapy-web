@@ -1,4 +1,6 @@
 "use client";
+import CallNotification from "@/components/mess-group/Calling/CallNotification";
+import VideoCall from "@/components/mess-group/Calling/VideoCall";
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
@@ -7,6 +9,7 @@ import { getPusherClient } from "@/lib/pusher";
 import { checkTokenFrontend } from "@/lib/services/auth/check-token";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
+import { Video } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -119,6 +122,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
           {children}
         </div>
       </section>
+      <CallNotification />
     </main>
   );
 };

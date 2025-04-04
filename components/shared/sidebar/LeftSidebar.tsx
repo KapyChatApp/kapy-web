@@ -157,11 +157,15 @@ const Leftsidebar = () => {
 
   useEffect(() => {
     const getInfo = async () => {
-      await getMyProfile(setAdminInfo);
+      try {
+        await getMyProfile(setAdminInfo);
+        console.log("Admin info fetched successfully");
+      } catch (error) {
+        console.error("Error fetching admin info:", error);
+      }
     };
     getInfo();
   }, []);
-
   return (
     <>
       <section
