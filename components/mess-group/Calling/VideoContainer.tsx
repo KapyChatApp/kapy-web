@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
 
 interface iVideoContainer {
@@ -19,7 +20,12 @@ const VideoContainer = ({
   }, [stream]);
   return (
     <video
-      className="rounded border w-[800px]"
+      className={cn(
+        "rounded border w-[800px]",
+        isLocalStream &&
+          isOnCall &&
+          "w-[200px] h-auto absolute border-primary-100 border-2 bottom-4 right-4"
+      )}
       ref={videoRef}
       autoPlay
       playsInline

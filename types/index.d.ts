@@ -1,4 +1,5 @@
 import { UserResponseDTO } from "@/lib/DTO/user";
+import Peer from "simple-peer";
 
 export interface SidebarLink {
   icon: string;
@@ -20,4 +21,10 @@ export type Participants = {
 export type OngoingCall = {
   participants: Participants;
   isRinging: boolean;
+};
+
+export type PeerData = {
+  peerConnection: Peer.Instance;
+  stream: MediaStream | undefined;
+  participantUser: SocketUser;
 };

@@ -6,9 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
 const VideoCall = () => {
-  const { localStream } = useSocketContext();
+  const { localStream, peer, ongoingCall } = useSocketContext();
   const [isMicOn, setIsMicOn] = React.useState(true);
   const [isVidOn, setIsVidOn] = React.useState(true);
+
+  console.log("peer>>>", peer?.stream);
 
   useEffect(() => {
     if (localStream) {
@@ -18,6 +20,7 @@ const VideoCall = () => {
       setIsMicOn(audioTrack.enabled);
     }
   }, [localStream]);
+
   const toggleCamera = useCallback(() => {
     if (localStream) {
       const videoTrack = localStream.getVideoTracks()[0];
@@ -34,15 +37,40 @@ const VideoCall = () => {
     }
   }, [localStream]);
 
+  const isOnCall = localStream && peer && ongoingCall ? true : false;
+
+  const handleBack = () => {};
+
   return (
-    <div className="flex flex-row w-full h-full">
-      <div className="background-light900_dark400 rounded-tr-[12px] rounded-br-[12px] pl-[16px] rounded-tl-[0px] rounded-bl-[0px] w-full items-center justify-center flex flex-col h-full">
+    <div className="modal-overlay-post">
+      {/* Close Button */}
+      <div className="absolute top-4 right-4">
+        <Button
+          className="flex bg-transparent shadow-none p-2 border-none hover:bg-transparent h-10 w-10"
+          onClick={handleBack}
+        >
+          <Icon
+            icon="mingcute:close-fill"
+            width={40}
+            height={40}
+            className="text-light-700"
+          />
+        </Button>
+      </div>
+      <div className="max-w-[1054px] h-full rounded-lg flex items-center justify-center flex-col p-4 gap-4">
         <div className="w-full h-auto items-center flex justify-center">
           {localStream && (
             <VideoContainer
               stream={localStream}
               isLocalStream={true}
-              isOnCall={false}
+              isOnCall={isOnCall}
+            />
+          )}
+          {peer && peer.stream && (
+            <VideoContainer
+              stream={peer.stream}
+              isLocalStream={false}
+              isOnCall={isOnCall}
             />
           )}
         </div>
