@@ -4,13 +4,17 @@ import React, { useCallback, useEffect } from "react";
 import VideoContainer from "./VideoContainer";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useRouter } from "next/navigation";
+import { toast } from "@/hooks/use-toast";
 
 const VideoCall = () => {
-  const { localStream, peer, ongoingCall } = useSocketContext();
+  const { localStream, peer, ongoingCall, handleHangup, isCallEnded } =
+    useSocketContext();
   const [isMicOn, setIsMicOn] = React.useState(true);
   const [isVidOn, setIsVidOn] = React.useState(true);
 
   console.log("peer>>>", peer?.stream);
+  console.log("localStream>>>", localStream);
 
   useEffect(() => {
     if (localStream) {
@@ -39,7 +43,33 @@ const VideoCall = () => {
 
   const isOnCall = localStream && peer && ongoingCall ? true : false;
 
-  const handleBack = () => {};
+  const router = useRouter();
+  const handleEndCall = () => {
+    router.push("/");
+    handleHangup({
+      ongoingCall: ongoingCall ? ongoingCall : undefined,
+      isEmitHangup: true
+    });
+  };
+
+  if (!localStream && !peer && !ongoingCall && isCallEnded) {
+    router.push("/");
+    toast({
+      title: "Call Ended",
+      className:
+        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+    });
+    return;
+  }
+  if (isCallEnded) {
+    toast({
+      title: "Call Ended",
+      className:
+        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+    });
+    router.push("/");
+    return null;
+  }
 
   return (
     <div className="modal-overlay-post">
@@ -47,7 +77,7 @@ const VideoCall = () => {
       <div className="absolute top-4 right-4">
         <Button
           className="flex bg-transparent shadow-none p-2 border-none hover:bg-transparent h-10 w-10"
-          onClick={handleBack}
+          onClick={handleEndCall}
         >
           <Icon
             icon="mingcute:close-fill"
@@ -89,7 +119,10 @@ const VideoCall = () => {
             />
           </Button>
 
-          <Button className="border-none bg-accent-red hover:bg-accent-red shadow-none w-full h-fit text-light-900 text-[20px] rounded ">
+          <Button
+            className="border-none bg-accent-red hover:bg-accent-red shadow-none w-full h-fit text-light-900 text-[20px] rounded "
+            onClick={handleEndCall}
+          >
             End Call
           </Button>
 

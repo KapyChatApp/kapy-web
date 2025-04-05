@@ -6,9 +6,11 @@ import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useRouter } from "next/navigation";
 import { OngoingCall } from "@/types";
+import { toast } from "@/hooks/use-toast";
 
 const CallNotification = () => {
-  const { ongoingCall, handleJoinCall } = useSocketContext();
+  const { ongoingCall, handleJoinCall, handleHangup, isCallEnded } =
+    useSocketContext();
 
   if (!ongoingCall?.isRinging) return;
   console.log("calling...");
@@ -18,6 +20,18 @@ const CallNotification = () => {
   const handleAcceptCall = async (ongoingCall: OngoingCall) => {
     router.push(`/socket/${ongoingCall.participants.caller.socketId}`);
     handleJoinCall(ongoingCall);
+  };
+  const handleEndCall = async () => {
+    handleHangup({
+      ongoingCall: ongoingCall ? ongoingCall : undefined,
+      isEmitHangup: true
+    });
+    toast({
+      title: "Call Ended",
+      className:
+        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+    });
+    router.push("/");
   };
 
   return (
@@ -53,7 +67,10 @@ const CallNotification = () => {
               height={24}
             />
           </Button>
-          <Button className="border-none bg-accent-red hover:bg-accent-red   shadow-none w-full h-fit py-4 rounded-full font-bold text-light-900 text-[20px]">
+          <Button
+            className="border-none bg-accent-red hover:bg-accent-red   shadow-none w-full h-fit py-4 rounded-full font-bold text-light-900 text-[20px]"
+            onClick={() => handleEndCall()}
+          >
             <Icon icon="solar:end-call-bold" width={24} height={24} />
           </Button>
         </div>
