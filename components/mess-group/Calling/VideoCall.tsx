@@ -12,16 +12,18 @@ const VideoCall = () => {
     useSocketContext();
   const [isMicOn, setIsMicOn] = React.useState(true);
   const [isVidOn, setIsVidOn] = React.useState(true);
-
-  console.log("peer>>>", peer?.stream);
-  console.log("localStream>>>", localStream);
+  const [isScreenOn, setIsScreenOn] = React.useState(false);
+  const [currentStream, setCurrentStream] = React.useState<MediaStream | null>(
+    null
+  );
 
   useEffect(() => {
     if (localStream) {
+      setCurrentStream(localStream); // Set the current stream to localStream
       const videoTrack = localStream.getVideoTracks()[0];
       const audioTrack = localStream.getAudioTracks()[0];
-      setIsVidOn(videoTrack.enabled);
-      setIsMicOn(audioTrack.enabled);
+      setIsVidOn(videoTrack?.enabled);
+      setIsMicOn(audioTrack?.enabled);
     }
   }, [localStream]);
 
@@ -40,6 +42,49 @@ const VideoCall = () => {
       setIsMicOn(audioTrack.enabled);
     }
   }, [localStream]);
+
+  const toggleScreenShare = async () => {
+    if (!localStream) return;
+
+    const videoSender = (peer as any)?._pc
+      ?.getSenders?.()
+      ?.find((s: RTCRtpSender) => s.track?.kind === "video");
+
+    if (!isScreenOn) {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({
+          video: true
+        });
+        const screenTrack = screenStream.getVideoTracks()[0];
+
+        if (videoSender) {
+          videoSender.replaceTrack(screenTrack);
+        }
+
+        // 👉 hiển thị stream màn hình trên giao diện local
+        const newStream = new MediaStream([
+          screenTrack,
+          ...localStream.getAudioTracks()
+        ]);
+        setCurrentStream(newStream); // new state bạn sẽ thêm bên dưới
+
+        setIsScreenOn(true);
+
+        screenTrack.onended = () => {
+          const cameraTrack = localStream.getVideoTracks()[0];
+
+          if (videoSender) {
+            videoSender.replaceTrack(cameraTrack);
+          }
+
+          setCurrentStream(localStream);
+          setIsScreenOn(false);
+        };
+      } catch (error) {
+        console.error("Error sharing screen:", error);
+      }
+    }
+  };
 
   const isOnCall = localStream && peer && ongoingCall ? true : false;
 
@@ -89,7 +134,7 @@ const VideoCall = () => {
       </div>
       <div className="max-w-[1054px] h-full rounded-lg flex items-center justify-center flex-col p-4 gap-4">
         <div className="w-full h-auto items-center flex justify-center">
-          {localStream && (
+          {currentStream && (
             <VideoContainer
               stream={localStream}
               isLocalStream={true}
@@ -107,12 +152,27 @@ const VideoCall = () => {
 
         <div className="mt-8 flex item-center">
           <Button
-            className="border-none bg-transparent shadow-none w-full h-fit text-dark100_light900"
+            className="border-none bg-transparent shadow-none w-full h-fit text-light500_light700"
+            onClick={() => toggleScreenShare()}
+          >
+            <Icon
+              icon={
+                isScreenOn
+                  ? "fluent:share-screen-person-16-filled"
+                  : "fluent:share-screen-person-16-regular"
+              }
+              width={28}
+              height={28}
+            />
+          </Button>
+
+          <Button
+            className="border-none bg-transparent shadow-none w-full h-fit text-light500_light700"
             onClick={toggleMic}
           >
             <Icon
               icon={
-                isMicOn ? "fluent:mic-off-24-regular" : "fluent:mic-24-regular"
+                isMicOn ? "fluent:mic-24-regular" : "fluent:mic-off-24-regular"
               }
               width={28}
               height={28}
@@ -127,14 +187,14 @@ const VideoCall = () => {
           </Button>
 
           <Button
-            className="border-none bg-transparent shadow-none w-full h-fit text-dark100_light900"
+            className="border-none bg-transparent shadow-none w-full h-fit text-light500_light700"
             onClick={toggleCamera}
           >
             <Icon
               icon={
                 isVidOn
-                  ? "heroicons:video-camera-slash"
-                  : "heroicons:video-camera"
+                  ? "heroicons:video-camera"
+                  : "heroicons:video-camera-slash"
               }
               width={28}
               height={28}

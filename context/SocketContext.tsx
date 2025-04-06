@@ -57,9 +57,6 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
         const videoDevices = devices.filter(
           (device) => device.kind === "videoinput"
         );
-        const audioDevices = devices.filter(
-          (device) => device.kind === "audioinput"
-        );
 
         const stream = await navigator.mediaDevices.getUserMedia({
           audio: true,
@@ -70,7 +67,6 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
             facingMode: videoDevices.length > 0 ? faceMode : undefined
           }
         });
-
         setLocalStream(stream);
         return stream;
       } catch (error) {
