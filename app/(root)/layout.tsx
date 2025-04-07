@@ -1,6 +1,6 @@
 "use client";
-import CallNotification from "@/components/mess-group/Calling/CallNotification";
-import VideoCall from "@/components/mess-group/Calling/VideoCall";
+import CallNotification from "@/components/mess-group/Call/CallNotification";
+import VideoCall from "@/components/mess-group/Call/VideoCall";
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";

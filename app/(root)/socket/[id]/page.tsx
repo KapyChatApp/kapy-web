@@ -1,4 +1,4 @@
-import VideoCall from "@/components/mess-group/Calling/VideoCall";
+import VideoCall from "@/components/mess-group/Call/VideoCall";
 import React from "react";
 
 const page = () => {
