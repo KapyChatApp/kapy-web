@@ -105,7 +105,13 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   const handleVideoCall = async (client: SocketUser) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
-    handleCall(client);
+    handleCall(client, true);
+  };
+
+  const handleAudioCall = async (client: SocketUser) => {
+    if (!client) return;
+    router.push(`/socket/${client.socketId}`);
+    handleCall(client, false);
   };
 
   //Online Status
@@ -195,7 +201,10 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
           />
         </Button>
 
-        <Button className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]">
+        <Button
+          className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
+          onClick={() => client && handleAudioCall(client)}
+        >
           <Icon
             icon="ion:call"
             width={24}

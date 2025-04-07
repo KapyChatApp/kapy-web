@@ -1,22 +1,36 @@
 "use client";
 import { useSocketContext } from "@/context/SocketContext";
-import React, { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import VideoContainer from "./VideoContainer";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
+import Image from "next/image";
 
 const VideoCall = () => {
   const { localStream, peer, ongoingCall, handleHangup, isCallEnded } =
     useSocketContext();
-  const [isMicOn, setIsMicOn] = React.useState(true);
-  const [isVidOn, setIsVidOn] = React.useState(true);
-  const [isScreenOn, setIsScreenOn] = React.useState(false);
-  const [currentStream, setCurrentStream] = React.useState<MediaStream | null>(
-    null
-  );
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isVidOn, setIsVidOn] = useState(true);
+  const [isScreenOn, setIsScreenOn] = useState(false);
+  const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+  const [callDuration, setCallDuration] = useState(0);
+  const isCaller =
+    peer?.participantUser?.userId === ongoingCall?.participants.caller.userId;
+  const avatarUrl = isCaller
+    ? ongoingCall?.participants.caller.profile.avatar
+    : ongoingCall?.participants.receiver.profile.avatar;
+  const namePaticipant = isCaller
+    ? ongoingCall?.participants.caller.profile.firstName +
+      " " +
+      ongoingCall?.participants.caller.profile.lastName
+    : ongoingCall?.participants.receiver.profile.firstName +
+      " " +
+      ongoingCall?.participants.receiver.profile.lastName;
 
+  console.log("ongoingCall", ongoingCall);
+  console.log("peer", peer);
   useEffect(() => {
     if (localStream) {
       setCurrentStream(localStream); // Set the current stream to localStream
@@ -26,6 +40,21 @@ const VideoCall = () => {
       setIsMicOn(audioTrack?.enabled);
     }
   }, [localStream]);
+  useEffect(() => {
+    if (!peer || !localStream) return;
+
+    const interval = setInterval(() => {
+      setCallDuration((prev) => prev + 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [peer, localStream]);
+
+  const formatTime = (seconds: number) => {
+    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const secs = String(seconds % 60).padStart(2, "0");
+    return `${mins}:${secs}`;
+  };
 
   const toggleCamera = useCallback(() => {
     if (localStream) {
@@ -133,27 +162,51 @@ const VideoCall = () => {
         </Button>
       </div>
       <div className="max-w-[1054px] h-full rounded-lg flex items-center justify-center flex-col p-4 gap-4">
-        <div className="w-full h-auto items-center flex justify-center">
-          {currentStream && (
-            <VideoContainer
-              stream={localStream}
-              isLocalStream={true}
-              isOnCall={isOnCall}
-            />
-          )}
-          {peer && peer.stream && (
-            <VideoContainer
-              stream={peer.stream}
-              isLocalStream={false}
-              isOnCall={isOnCall}
-            />
-          )}
-        </div>
+        {ongoingCall &&
+          (ongoingCall.isVideoCall ? (
+            <div className="w-full h-auto items-center flex justify-center">
+              {currentStream && (
+                <VideoContainer
+                  stream={localStream}
+                  isLocalStream={true}
+                  isOnCall={isOnCall}
+                />
+              )}
+              {peer && peer.stream && (
+                <VideoContainer
+                  stream={peer.stream}
+                  isLocalStream={false}
+                  isOnCall={isOnCall}
+                />
+              )}
+            </div>
+          ) : (
+            <div className="background-light850_dark200 min-h-[100px] min-w-[300px] flex flex-col items-center justify-center rounded p-4 gap-4">
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-20 h-20 relative overflow-hidden rounded-lg">
+                  <Image
+                    src={avatarUrl ? avatarUrl : "/assets/ava/default.png"}
+                    alt="ava"
+                    fill
+                    className="object-cover cursor-pointer"
+                  />
+                </div>
+                <h3 className="text-dark100_light900">{namePaticipant}</h3>
+              </div>
+            </div>
+          ))}
+
+        {peer && localStream && (
+          <span className="text-green-500 body-regular">
+            {formatTime(callDuration)}
+          </span>
+        )}
 
         <div className="mt-8 flex item-center">
           <Button
             className="border-none bg-transparent shadow-none w-full h-fit text-light500_light700"
             onClick={() => toggleScreenShare()}
+            disabled={!ongoingCall?.isVideoCall}
           >
             <Icon
               icon={
@@ -189,6 +242,7 @@ const VideoCall = () => {
           <Button
             className="border-none bg-transparent shadow-none w-full h-fit text-light500_light700"
             onClick={toggleCamera}
+            disabled={!ongoingCall?.isVideoCall}
           >
             <Icon
               icon={

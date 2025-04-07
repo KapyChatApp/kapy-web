@@ -21,6 +21,7 @@ export type Participants = {
 export type OngoingCall = {
   participants: Participants;
   isRinging: boolean;
+  isVideoCall: boolean;
 };
 
 export type PeerData = {

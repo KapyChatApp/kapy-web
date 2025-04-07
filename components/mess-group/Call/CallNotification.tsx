@@ -9,12 +9,13 @@ import { OngoingCall } from "@/types";
 import { toast } from "@/hooks/use-toast";
 
 const CallNotification = () => {
-  const { ongoingCall, handleJoinCall, handleHangup, isCallEnded } =
-    useSocketContext();
+  const { ongoingCall, handleJoinCall, handleHangup } = useSocketContext();
 
   if (!ongoingCall?.isRinging) return;
   console.log("calling...");
   console.log("Online users: ", ongoingCall.participants);
+
+  console.log("Ongoing call: ", ongoingCall);
 
   const router = useRouter();
   const handleAcceptCall = async (ongoingCall: OngoingCall) => {
@@ -36,7 +37,7 @@ const CallNotification = () => {
 
   return (
     <div className="modal-overlay flex items-center justify-center z-[9999]">
-      <div className="bg-white min-h-[100px] min-w-[300px] flex flex-col items-center justify-center rounded p-4 gap-4">
+      <div className="background-light850_dark200 min-h-[100px] min-w-[300px] flex flex-col items-center justify-center rounded p-4 gap-4">
         <div className="flex flex-col items-center gap-1">
           <div className="w-20 h-20 relative overflow-hidden rounded-lg">
             <Image
@@ -50,19 +51,23 @@ const CallNotification = () => {
               className="object-cover cursor-pointer"
             />
           </div>
-          <h3>
+          <h3 className="text-dark100_light900">
             {ongoingCall.participants.caller.profile.firstName}{" "}
             {ongoingCall.participants.caller.profile.lastName}
           </h3>
         </div>
-        <p className="body-regular mb-2">Incoming Call</p>
+        <p className="body-regular mb-2 text-dark100_light900">Incoming Call</p>
         <div className="flex gap-8">
           <Button
             className="border-none bg-green-500 hover:bg-green-500 shadow-none w-full h-fit py-4 rounded-full font-bold text-light-900 text-[20px]"
             onClick={() => handleAcceptCall(ongoingCall)}
           >
             <Icon
-              icon="solar:phone-calling-rounded-bold"
+              icon={
+                ongoingCall.isVideoCall
+                  ? "mynaui:video-solid"
+                  : "solar:phone-calling-rounded-bold"
+              }
               width={24}
               height={24}
             />

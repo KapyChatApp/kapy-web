@@ -11,8 +11,6 @@ import {
 import { useUserContext } from "./UserContext";
 import { OngoingCall, Participants, PeerData, SocketUser } from "@/types";
 import Peer, { SignalData } from "simple-peer";
-import { set } from "date-fns";
-import { clear } from "console";
 
 interface iSocketContext {
   socket: Socket | null;
@@ -22,7 +20,7 @@ interface iSocketContext {
   localStream: MediaStream | null;
   peer: PeerData | null;
   isCallEnded: boolean;
-  handleCall: (user: SocketUser) => void;
+  handleCall: (user: SocketUser, isVideoCall: boolean) => void;
   handleJoinCall: (ongoingCall: OngoingCall) => void;
   handleHangup: (data: {
     ongoingCall?: OngoingCall | null;
@@ -58,7 +56,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
           (device) => device.kind === "videoinput"
         );
 
-        const stream = await navigator.mediaDevices.getUserMedia({
+        const constraints: MediaStreamConstraints = {
           audio: true,
           video: {
             width: { min: 640, ideal: 1280, max: 1920 },
@@ -66,7 +64,9 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
             frameRate: { min: 15, ideal: 30, max: 60 },
             facingMode: videoDevices.length > 0 ? faceMode : undefined
           }
-        });
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
         setLocalStream(stream);
         return stream;
       } catch (error) {
@@ -79,7 +79,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 
   const handleCall = useCallback(
-    async (user: SocketUser) => {
+    async (user: SocketUser, isVideoCall: boolean) => {
       setIsCallEnded(false);
       if (!currentSocketUser) return;
 
@@ -91,18 +91,26 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const participants = { caller: currentSocketUser, receiver: user };
-      setOngoingCall({ participants, isRinging: false });
-      socket?.emit("call", participants);
+      setOngoingCall({
+        participants,
+        isRinging: false,
+        isVideoCall: isVideoCall
+      });
+      socket?.emit("call", participants, isVideoCall);
     },
 
     [socket, currentSocketUser, ongoingCall]
   );
 
   const onIncomingCall = useCallback(
-    (participants: Participants) => {
+    (participants: Participants, isVideoCall: boolean) => {
       console.log("Cuộc gọi đến từ:", participants.caller);
-      setOngoingCall({ participants, isRinging: true });
-      console.log("Cuộc gọi đến từ:", participants.caller);
+      setOngoingCall({
+        participants,
+        isRinging: true,
+        isVideoCall: isVideoCall
+      });
+      console.log("Cuộc gọi đến từ:", participants.caller, isVideoCall);
     },
     [socket, adminInfo, ongoingCall]
   );
@@ -215,7 +223,11 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsCallEnded(false);
       setOngoingCall((prev) => {
         if (!prev) return null;
-        return { ...prev, isRinging: false };
+        return {
+          ...prev,
+          isRinging: false,
+          isVideoCall: ongoingCall.isVideoCall
+        };
       });
 
       const stream = await getMediaStream();
