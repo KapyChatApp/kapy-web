@@ -11,6 +11,7 @@ import "@stream-io/video-react-sdk/dist/css/styles.css";
 import { LayoutProvider } from "@/context/LayoutContext";
 import SocketProvider from "@/providers/SocketProvider";
 import { cn } from "@/lib/utils";
+import { GroupCallContextProvider } from "@/context/GroupCallContext";
 
 const lexend = Lexend({
   subsets: ["latin"],
@@ -39,12 +40,10 @@ export default function RootLayout({
         ></link>
       </head>
       <body
-       
         cz-shortcut-listen="true"
         className={cn(
           lexend.className,
           "relative font-helvetica custom-scrollbar "
-      
         )}
       >
         <LayoutProvider>
@@ -55,9 +54,11 @@ export default function RootLayout({
               <ChatProvider>
                 <FriendProvider>
                   <SocketProvider>
-                    {" "}
                     {/* SocketProvider bây giờ có thể dùng useUserContext */}
-                    {children}
+                    <GroupCallContextProvider>
+                      {" "}
+                      {children}
+                    </GroupCallContextProvider>
                   </SocketProvider>
                 </FriendProvider>
               </ChatProvider>

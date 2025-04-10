@@ -8,47 +8,53 @@ import {
   useCallback,
   use
 } from "react";
+import { SocketUser } from "@/types/socket";
+import Peer, { SignalData } from "simple-peer";
 import { useUserContext } from "./UserContext";
 import {
-  OngoingCall,
-  Participants,
-  PeerData,
-  SocketUser
-} from "@/types/socket";
-import Peer, { SignalData } from "simple-peer";
+  OngoingGroupCall,
+  ParticipantsGroup,
+  PeerDataGroup,
+  SocketGroup
+} from "@/types/group-call";
+import { useSocketContext } from "./SocketContext";
 
-interface iSocketContext {
-  socket: Socket | null;
-  setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
+interface iGroupCallContext {
   isSocketConnected: boolean;
-  onlineUsers: SocketUser[] | null;
-  ongoingCall: OngoingCall | null;
+  onlineGroupUsers: SocketUser[] | null;
+  ongoingGroupCall: OngoingGroupCall | null;
   localStream: MediaStream | null;
-  peer: PeerData | null;
+  peer: PeerDataGroup[] | null;
   isCallEnded: boolean;
-  handleCall: (user: SocketUser, isVideoCall: boolean) => void;
-  handleJoinCall: (ongoingCall: OngoingCall) => void;
-  handleHangup: (data: {
-    ongoingCall?: OngoingCall | null;
+  handleGroupCall: (
+    membersOnline: SocketUser[],
+    groupInfo: SocketGroup
+  ) => void;
+  handleJoinGroupCall: (ongoingGroupCall: OngoingGroupCall) => void;
+  handleGroupHangup: (data: {
+    ongoingGroupCall?: OngoingGroupCall | null;
     isEmitHangup?: boolean;
   }) => void;
 }
 
-export const SocketContext = createContext<iSocketContext | null>(null);
+export const GroupCallContext = createContext<iGroupCallContext | null>(null);
 
-export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
-  children
-}) => {
+export const GroupCallContextProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const { adminInfo } = useUserContext();
-  const [socket, setSocket] = useState<Socket | null>(null);
+  const { socket, setSocket } = useSocketContext();
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [onlineUsers, setOnlineUsers] = useState<SocketUser[] | null>(null);
-  const [ongoingCall, setOngoingCall] = useState<OngoingCall | null>(null);
-  const currentSocketUser = onlineUsers?.find(
+  const [onlineGroupUsers, setOnlineGroupUsers] = useState<SocketUser[] | null>(
+    null
+  );
+  const [ongoingGroupCall, setOngoingGroupCall] =
+    useState<OngoingGroupCall | null>(null);
+  const currentSocketUser = onlineGroupUsers?.find(
     (onlineUsers) => onlineUsers.userId === adminInfo?._id
   );
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [peer, setPeer] = useState<PeerData | null>(null);
+  const [peer, setPeer] = useState<PeerDataGroup[] | null>(null);
   const [isCallEnded, setIsCallEnded] = useState(false);
 
   const getMediaStream = useCallback(
@@ -84,56 +90,69 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
     [localStream]
   );
 
-  const handleCall = useCallback(
-    async (user: SocketUser, isVideoCall: boolean) => {
+  const handleGroupCall = useCallback(
+    async (membersOnline: SocketUser[], groupInfo: SocketGroup) => {
       setIsCallEnded(false);
-      if (!currentSocketUser) return;
 
       const stream = await getMediaStream();
-
       if (!stream) {
         console.log("Error: No stream available.");
         return;
       }
 
-      const participants = { caller: currentSocketUser, receiver: user };
-      setOngoingCall({
-        participants,
-        isRinging: false,
-        isVideoCall: isVideoCall
-      });
-      socket?.emit("call", participants, isVideoCall);
-    },
+      const participantsGroup: ParticipantsGroup = {
+        groupDetails: groupInfo,
+        receivers: membersOnline,
+        caller: currentSocketUser as SocketUser
+      };
 
-    [socket, currentSocketUser, ongoingCall]
+      setOngoingGroupCall({
+        participantsGroup,
+        isRinging: false
+      });
+
+      socket?.emit("groupCall", participantsGroup);
+    },
+    [socket, getMediaStream, currentSocketUser]
   );
 
-  const onIncomingCall = useCallback(
-    (participants: Participants, isVideoCall: boolean) => {
-      setOngoingCall({
-        participants,
-        isRinging: true,
-        isVideoCall: isVideoCall
+  const onIncomingGroupCall = useCallback(
+    (group: ParticipantsGroup) => {
+      console.log("Meeting comes from:", group.groupDetails.name);
+      setOngoingGroupCall({
+        participantsGroup: group,
+        isRinging: true
       });
-      console.log("Calling from:", participants.caller, isVideoCall);
     },
-    [socket, adminInfo, ongoingCall]
+    [socket, adminInfo, ongoingGroupCall]
   );
 
-  const handleHangup = useCallback(
-    (data: { ongoingCall?: OngoingCall | null; isEmitHangup?: boolean }) => {
-      if (socket && adminInfo && data?.ongoingCall && data.isEmitHangup) {
-        socket.emit("hangup", {
-          ongoingCall: data.ongoingCall,
+  const handleGroupHangup = useCallback(
+    (data: {
+      ongoingGroupCall?: OngoingGroupCall | null;
+      isEmitHangup?: boolean;
+    }) => {
+      const isHost =
+        data?.ongoingGroupCall?.participantsGroup.caller.userId ===
+        adminInfo._id;
+
+      // Nếu là host thì phát tín hiệu kết thúc cuộc gọi cho cả nhóm
+      if (isHost && socket && data?.ongoingGroupCall && data.isEmitHangup) {
+        socket.emit("groupHangup", {
+          ongoingGroupCall: data.ongoingGroupCall,
           userHangingupId: adminInfo._id
         });
       }
+
+      // Ngắt kết nối local
       setPeer(null);
-      setOngoingCall(null);
+      setOngoingGroupCall(null);
+
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
         setLocalStream(null);
       }
+
       setIsCallEnded(true);
     },
     [socket, adminInfo, localStream]
@@ -169,7 +188,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       });
       peer.on("error", console.error);
       peer.on("close", () => {
-        handleHangup({});
+        handleGroupHangup({});
       });
 
       const rtcPeerConnection: RTCPeerConnection = (peer as any)._pc;
@@ -178,18 +197,18 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
           rtcPeerConnection.iceConnectionState === "disconnected" ||
           rtcPeerConnection.iceConnectionState === "failed"
         ) {
-          handleHangup({});
+          handleGroupHangup({});
         }
       };
       return peer;
     },
-    [ongoingCall, setPeer]
+    [ongoingGroupCall, setPeer]
   );
 
-  const completePeerConnection = useCallback(
+  const completeGroupPeerConnection = useCallback(
     async (connectionData: {
       sdp: SignalData;
-      ongoingCall: OngoingCall;
+      ongoingGroupCall: OngoingGroupCall;
       isCaller: boolean;
     }) => {
       if (!localStream) {
@@ -198,41 +217,42 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       if (peer) {
-        peer.peerConnection.signal(connectionData.sdp);
+        peer.forEach((peerData) => {
+          peerData.peerConnection.signal(connectionData.sdp);
+        });
         return;
       }
 
       const newPeer = createPeer(localStream, true);
-      setPeer({
-        peerConnection: newPeer,
-        stream: undefined,
-        participantUser: connectionData.ongoingCall.participants.receiver
-      });
+      setPeer((prev) => [
+        ...(prev || []),
+        {
+          peerConnection: newPeer,
+          stream: undefined,
+          participantUser:
+            connectionData.ongoingGroupCall.participantsGroup.receivers
+        }
+      ]);
 
       newPeer.on("signal", async (data: SignalData) => {
         if (socket) {
-          console.log("Emit offer");
-          socket.emit("webrtcSignal", {
+          socket.emit("groupWebrtcSignal", {
             sdp: data,
-            ongoingCall,
+            ongoingGroupCall: connectionData.ongoingGroupCall,
             isCaller: true
           });
         }
       });
     },
-    [localStream, createPeer, peer, ongoingCall]
+    [localStream, createPeer, peer, socket]
   );
 
-  const handleJoinCall = useCallback(
-    async (ongoingCall: OngoingCall) => {
+  const handleJoinGroupCall = useCallback(
+    async (ongoingGroupCall: OngoingGroupCall) => {
       setIsCallEnded(false);
-      setOngoingCall((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          isRinging: false,
-          isVideoCall: ongoingCall.isVideoCall
-        };
+      setOngoingGroupCall({
+        ...ongoingGroupCall,
+        isRinging: false
       });
 
       const stream = await getMediaStream();
@@ -242,47 +262,27 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       }
 
       const newPeer = createPeer(stream, true);
-      setPeer({
-        peerConnection: newPeer,
-        stream: undefined,
-        participantUser: ongoingCall.participants.caller
-      });
+      setPeer((prev) => [
+        ...(prev || []),
+        {
+          peerConnection: newPeer,
+          stream: undefined,
+          participantUser: ongoingGroupCall.participantsGroup.receivers
+        }
+      ]);
 
       newPeer.on("signal", async (data: SignalData) => {
         if (socket) {
-          console.log("Emit offer");
-          socket.emit("webrtcSignal", {
+          socket.emit("groupWebrtcSignal", {
             sdp: data,
-            ongoingCall,
+            ongoingGroupCall,
             isCaller: false
           });
         }
       });
     },
-    [socket, currentSocketUser]
+    [socket, getMediaStream]
   );
-
-  //initialize a socket
-  useEffect(() => {
-    const newSocket = io("http://localhost:3000", {
-      transports: ["websocket", "polling"],
-      withCredentials: true
-    });
-
-    newSocket.on("connect", () => {
-      console.log("Socket connected with ID:", newSocket.id);
-    });
-
-    newSocket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-
-    setSocket(newSocket);
-
-    return () => {
-      newSocket.disconnect();
-    };
-  }, [adminInfo]);
 
   useEffect(() => {
     if (socket === null) return;
@@ -317,12 +317,12 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
     socket.emit("addNewUsers", adminInfo);
     socket.on("getUsers", (res) => {
-      setOnlineUsers(res);
+      setOnlineGroupUsers(res);
     });
 
     return () => {
       socket.off("getUsers", (res) => {
-        setOnlineUsers(res);
+        setOnlineGroupUsers(res);
       });
     };
   }, [socket, isSocketConnected, adminInfo]);
@@ -331,27 +331,27 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     if (!socket || !isSocketConnected) return;
 
-    socket.on("incomingCall", onIncomingCall);
-    console.log("🔔 Event incomingCall is listening...");
+    socket.on("incomingGroupCall", onIncomingGroupCall);
+    console.log("🔔 Event group incomingCall is listening...");
 
-    socket.on("webrtcSignal", completePeerConnection);
-    console.log("🔔 Event webrtcSignal is listening...");
+    socket.on("groupWebrtcSignal", completeGroupPeerConnection);
+    console.log("🔔 Event group webrtcSignal is listening...");
 
-    socket.on("hangup", handleHangup);
-    console.log("🔔 Event hangup is listening...");
+    socket.on("groupHangup", handleGroupHangup);
+    console.log("🔔 Event group hangup is listening...");
 
     return () => {
-      socket.off("incomingCall", onIncomingCall);
-      socket.off("webrtcSignal", completePeerConnection);
-      socket.off("hangup", handleHangup);
+      socket.off("incomingGroupCall", onIncomingGroupCall);
+      socket.off("groupWebrtcSignal", completeGroupPeerConnection);
+      socket.off("groupHangup", handleGroupHangup);
     };
   }, [
     socket,
     isSocketConnected,
-    onIncomingCall,
+    onIncomingGroupCall,
     adminInfo,
-    completePeerConnection,
-    handleHangup
+    completeGroupPeerConnection,
+    handleGroupHangup
   ]);
 
   useEffect(() => {
@@ -367,30 +367,30 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [isCallEnded]);
 
   return (
-    <SocketContext.Provider
+    <GroupCallContext.Provider
       value={{
-        socket,
-        setSocket,
         isSocketConnected,
-        onlineUsers,
-        ongoingCall,
+        onlineGroupUsers,
+        ongoingGroupCall,
         localStream,
         peer,
         isCallEnded,
-        handleCall,
-        handleJoinCall,
-        handleHangup
+        handleGroupCall,
+        handleJoinGroupCall,
+        handleGroupHangup
       }}
     >
       {children}
-    </SocketContext.Provider>
+    </GroupCallContext.Provider>
   );
 };
 
-export const useSocketContext = () => {
-  const context = useContext(SocketContext);
+export const useGroupSocketContext = () => {
+  const context = useContext(GroupCallContext);
   if (context === null) {
-    throw new Error("useSocketContext must be used within a SocketProvider");
+    throw new Error(
+      "useGroupCallContext must be used within a GroupCallProvider"
+    );
   }
   return context;
 };

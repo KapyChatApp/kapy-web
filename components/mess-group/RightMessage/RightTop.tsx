@@ -8,13 +8,17 @@ import { useUserContext } from "@/context/UserContext";
 import { formatTimeMessageBox } from "@/lib/utils";
 import { useLayoutContext } from "@/context/LayoutContext";
 import { useSocketContext } from "@/context/SocketContext";
-import { SocketUser } from "@/types";
+import { SocketUser } from "@/types/socket";
+import { useGroupSocketContext } from "@/context/GroupCallContext";
+import { ParticipantsGroup, SocketGroup } from "@/types/group-call";
+import { group } from "console";
+import { UserInfoBox } from "@/lib/DTO/message";
 
 interface RightTopProps {
   _id: string;
   ava: string;
   name: string;
-  membersGroup: string;
+  membersGroup: UserInfoBox[];
   onlineGroup: number;
   openMore: boolean;
   setOpenMore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -32,6 +36,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
   const { timeOfflineChat } = useUserContext();
   const { handleCall, onlineUsers } = useSocketContext();
+  const { handleGroupCall, onlineGroupUsers } = useGroupSocketContext();
   const { openMore, setOpenMore } = useLayoutContext();
   const [timeOff, setTimeOff] = useState("");
   const handleOpenMore = () => {
@@ -41,6 +46,20 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
 
   const client =
     onlineUsers && onlineUsers.find((user) => user.profile._id === _id);
+
+  const membersGroupId =
+    Array.isArray(membersGroup) &&
+    membersGroup
+      .map((member) => member._id)
+      .filter((item) => item !== adminInfo?._id);
+  const clientGroup =
+    onlineGroupUsers &&
+    onlineGroupUsers.filter(
+      (user) => membersGroupId && membersGroupId.includes(user.userId)
+    );
+
+  console.log("client >>>", client);
+  console.log("clientGroup >>>", clientGroup);
 
   //Video Call
   // const client = useStreamVideoClient();
@@ -100,7 +119,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   //   }
   // };
 
-  // Video Call
+  // Call
   const router = useRouter();
   const handleVideoCall = async (client: SocketUser) => {
     if (!client) return;
@@ -112,6 +131,14 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
     handleCall(client, false);
+  };
+
+  const handleMeeting = async (
+    clientGroup: SocketUser[],
+    groupInfo: SocketGroup
+  ) => {
+    router.push(`/socket/${_id}`);
+    handleGroupCall(clientGroup, groupInfo);
   };
 
   //Online Status
@@ -173,7 +200,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
             <div className="flex items-center justify-start">
               {isActiveGroup ? (
                 <p className="small-light text-dark100_light900">
-                  {membersGroup} members, {onlineGroup} onlines
+                  {membersGroup.length} members, {onlineGroup} onlines
                 </p>
               ) : (
                 <p className="small-light text-dark100_light900">
@@ -191,7 +218,22 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
       <div className="flex flex-row items-center justify-start h-full gap-[10px] lg:gap-4">
         <Button
           className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
-          onClick={() => client && handleVideoCall(client)}
+          onClick={() => {
+            if (isActiveGroup) {
+              if (clientGroup) {
+                handleMeeting(clientGroup, {
+                  _id: _id,
+                  name: name,
+                  avatar: ava,
+                  members: membersGroup
+                });
+              }
+            } else {
+              if (client) {
+                handleVideoCall(client);
+              }
+            }
+          }}
         >
           <Icon
             icon="fluent:video-20-filled"
@@ -201,17 +243,19 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
           />
         </Button>
 
-        <Button
-          className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
-          onClick={() => client && handleAudioCall(client)}
-        >
-          <Icon
-            icon="ion:call"
-            width={24}
-            height={24}
-            className="text-primary-500 md:w-6 md:h-6 w-[22px] h-[22px]"
-          />
-        </Button>
+        {!isActiveGroup && (
+          <Button
+            className="flex bg-transparent cursor-pointer shadow-none hover:shadow-none focus:shadow-none outline-none border-none p-[2px]"
+            onClick={() => client && handleAudioCall(client)}
+          >
+            <Icon
+              icon="ion:call"
+              width={24}
+              height={24}
+              className="text-primary-500 md:w-6 md:h-6 w-[22px] h-[22px]"
+            />
+          </Button>
+        )}
 
         <Button
           className={`${
