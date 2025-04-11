@@ -19,13 +19,14 @@ import Peer, { SignalData } from "simple-peer";
 
 interface iSocketContext {
   socket: Socket | null;
-  setSocket: React.Dispatch<React.SetStateAction<Socket | null>>;
   isSocketConnected: boolean;
   onlineUsers: SocketUser[] | null;
   ongoingCall: OngoingCall | null;
   localStream: MediaStream | null;
   peer: PeerData | null;
   isCallEnded: boolean;
+  setLocalStream: React.Dispatch<React.SetStateAction<MediaStream | null>>;
+  getMediaStream: (faceMode?: string) => Promise<MediaStream | null>;
   handleCall: (user: SocketUser, isVideoCall: boolean) => void;
   handleJoinCall: (ongoingCall: OngoingCall) => void;
   handleHangup: (data: {
@@ -90,7 +91,6 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!currentSocketUser) return;
 
       const stream = await getMediaStream();
-
       if (!stream) {
         console.log("Error: No stream available.");
         return;
@@ -370,13 +370,14 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
     <SocketContext.Provider
       value={{
         socket,
-        setSocket,
         isSocketConnected,
         onlineUsers,
         ongoingCall,
         localStream,
         peer,
         isCallEnded,
+        setLocalStream,
+        getMediaStream,
         handleCall,
         handleJoinCall,
         handleHangup

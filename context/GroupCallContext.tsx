@@ -1,12 +1,10 @@
 "use client";
-import { io, Socket } from "socket.io-client";
 import {
   createContext,
   useContext,
   useEffect,
   useState,
-  useCallback,
-  use
+  useCallback
 } from "react";
 import { SocketUser } from "@/types/socket";
 import Peer, { SignalData } from "simple-peer";
@@ -24,7 +22,7 @@ interface iGroupCallContext {
   onlineGroupUsers: SocketUser[] | null;
   ongoingGroupCall: OngoingGroupCall | null;
   localStream: MediaStream | null;
-  peer: PeerDataGroup[] | null;
+  peers: PeerDataGroup[] | null;
   isCallEnded: boolean;
   handleGroupCall: (
     membersOnline: SocketUser[],
@@ -43,7 +41,8 @@ export const GroupCallContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const { adminInfo } = useUserContext();
-  const { socket, setSocket } = useSocketContext();
+  const { socket, getMediaStream, localStream, setLocalStream } =
+    useSocketContext();
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [onlineGroupUsers, setOnlineGroupUsers] = useState<SocketUser[] | null>(
     null
@@ -53,42 +52,8 @@ export const GroupCallContextProvider: React.FC<{
   const currentSocketUser = onlineGroupUsers?.find(
     (onlineUsers) => onlineUsers.userId === adminInfo?._id
   );
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [peer, setPeer] = useState<PeerDataGroup[] | null>(null);
+  const [peers, setPeers] = useState<PeerDataGroup[] | null>(null);
   const [isCallEnded, setIsCallEnded] = useState(false);
-
-  const getMediaStream = useCallback(
-    async (faceMode?: string) => {
-      if (localStream) return localStream;
-
-      try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput"
-        );
-
-        const constraints: MediaStreamConstraints = {
-          audio: true,
-          video: {
-            width: { min: 640, ideal: 1280, max: 1920 },
-            height: { min: 360, ideal: 720, max: 1080 },
-            frameRate: { min: 15, ideal: 30, max: 60 },
-            facingMode: videoDevices.length > 0 ? faceMode : undefined
-          }
-        };
-
-        const stream = await navigator.mediaDevices.getUserMedia(constraints);
-        setLocalStream(stream);
-        return stream;
-      } catch (error) {
-        console.error("Error accessing media devices:", error);
-        setLocalStream(null);
-        return null;
-      }
-    },
-    [localStream]
-  );
 
   const handleGroupCall = useCallback(
     async (membersOnline: SocketUser[], groupInfo: SocketGroup) => {
@@ -145,7 +110,7 @@ export const GroupCallContextProvider: React.FC<{
       }
 
       // Ngắt kết nối local
-      setPeer(null);
+      setPeers([]);
       setOngoingGroupCall(null);
 
       if (localStream) {
@@ -179,13 +144,22 @@ export const GroupCallContextProvider: React.FC<{
           iceServers
         }
       });
+      peer.on("stream", (remoteStream) => {
+        setPeers((prevPeers) => {
+          if (!prevPeers) return prevPeers;
 
-      peer.on("stream", (stream) => {
-        setPeer((prev) => {
-          if (!prev) return prev;
-          return { ...prev, stream };
+          return prevPeers.map((peerObj) => {
+            if ((peerObj.peerConnection as any)._id === (peer as any)._id) {
+              return {
+                ...peerObj,
+                stream: remoteStream
+              };
+            }
+            return peerObj;
+          });
         });
       });
+
       peer.on("error", console.error);
       peer.on("close", () => {
         handleGroupHangup({});
@@ -202,7 +176,7 @@ export const GroupCallContextProvider: React.FC<{
       };
       return peer;
     },
-    [ongoingGroupCall, setPeer]
+    [ongoingGroupCall, setPeers]
   );
 
   const completeGroupPeerConnection = useCallback(
@@ -216,15 +190,16 @@ export const GroupCallContextProvider: React.FC<{
         return;
       }
 
-      if (peer) {
-        peer.forEach((peerData) => {
-          peerData.peerConnection.signal(connectionData.sdp);
+      if (peers && peers.length > 0) {
+        peers.forEach((p) => {
+          p.peerConnection.signal(connectionData.sdp);
         });
         return;
       }
 
       const newPeer = createPeer(localStream, true);
-      setPeer((prev) => [
+
+      setPeers((prev) => [
         ...(prev || []),
         {
           peerConnection: newPeer,
@@ -238,21 +213,24 @@ export const GroupCallContextProvider: React.FC<{
         if (socket) {
           socket.emit("groupWebrtcSignal", {
             sdp: data,
-            ongoingGroupCall: connectionData.ongoingGroupCall,
+            ongoingGroupCall,
             isCaller: true
           });
         }
       });
     },
-    [localStream, createPeer, peer, socket]
+    [localStream, createPeer, peers, ongoingGroupCall]
   );
 
   const handleJoinGroupCall = useCallback(
     async (ongoingGroupCall: OngoingGroupCall) => {
       setIsCallEnded(false);
-      setOngoingGroupCall({
-        ...ongoingGroupCall,
-        isRinging: false
+      setOngoingGroupCall((prev) => {
+        if (!prev) return null;
+        return {
+          ...prev,
+          isRinging: false
+        };
       });
 
       const stream = await getMediaStream();
@@ -262,12 +240,19 @@ export const GroupCallContextProvider: React.FC<{
       }
 
       const newPeer = createPeer(stream, true);
-      setPeer((prev) => [
+      const receiverAccept =
+        ongoingGroupCall.participantsGroup.receivers.filter(
+          (user) => user.userId !== adminInfo._id
+        );
+      setPeers((prev) => [
         ...(prev || []),
         {
           peerConnection: newPeer,
           stream: undefined,
-          participantUser: ongoingGroupCall.participantsGroup.receivers
+          participantUser: [
+            ongoingGroupCall.participantsGroup.caller,
+            ...receiverAccept
+          ]
         }
       ]);
 
@@ -281,7 +266,7 @@ export const GroupCallContextProvider: React.FC<{
         }
       });
     },
-    [socket, getMediaStream]
+    [socket, currentSocketUser, adminInfo]
   );
 
   useEffect(() => {
@@ -373,7 +358,7 @@ export const GroupCallContextProvider: React.FC<{
         onlineGroupUsers,
         ongoingGroupCall,
         localStream,
-        peer,
+        peers,
         isCallEnded,
         handleGroupCall,
         handleJoinGroupCall,

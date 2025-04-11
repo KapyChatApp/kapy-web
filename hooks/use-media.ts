@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 
 interface UseGroupCallControlsProps {
   localStream: MediaStream | null;
-  peer: any;
+  peer: any | any[]; // Có thể là 1 peer hoặc mảng các peer
   ongoingCall: any;
 }
 
@@ -48,9 +48,13 @@ export const useMediaControls = ({
   const toggleScreenShare = async () => {
     if (!localStream) return;
 
-    const videoSender = peer?._pc
-      ?.getSenders?.()
-      ?.find((s: RTCRtpSender) => s.track?.kind === "video");
+    const peers = Array.isArray(peer) ? peer : [peer];
+
+    const videoSenders = peers.map((p) =>
+      p?._pc
+        ?.getSenders?.()
+        .find((s: RTCRtpSender) => s.track?.kind === "video")
+    );
 
     if (!isScreenOn) {
       try {
@@ -59,9 +63,9 @@ export const useMediaControls = ({
         });
         const screenTrack = screenStream.getVideoTracks()[0];
 
-        if (videoSender) {
-          videoSender.replaceTrack(screenTrack);
-        }
+        videoSenders.forEach((sender) => {
+          if (sender) sender.replaceTrack(screenTrack);
+        });
 
         const newStream = new MediaStream([
           screenTrack,
@@ -72,9 +76,9 @@ export const useMediaControls = ({
 
         screenTrack.onended = () => {
           const cameraTrack = localStream.getVideoTracks()[0];
-          if (videoSender) {
-            videoSender.replaceTrack(cameraTrack);
-          }
+          videoSenders.forEach((sender) => {
+            if (sender) sender.replaceTrack(cameraTrack);
+          });
           setCurrentStream(localStream);
           setIsScreenOn(false);
         };
