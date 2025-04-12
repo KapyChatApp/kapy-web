@@ -52,6 +52,10 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [peer, setPeer] = useState<PeerData | null>(null);
   const [isCallEnded, setIsCallEnded] = useState(false);
 
+  console.log("localStream in SocketContext", localStream);
+  console.log("peer in SocketContext", peer);
+  console.log("ongoingCall in SocketContext", ongoingCall);
+
   const getMediaStream = useCallback(
     async (faceMode?: string) => {
       if (localStream) return localStream;
@@ -122,7 +126,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const handleHangup = useCallback(
     (data: { ongoingCall?: OngoingCall | null; isEmitHangup?: boolean }) => {
-      if (socket && adminInfo && data?.ongoingCall && data.isEmitHangup) {
+      if (socket && adminInfo && data?.ongoingCall && data?.isEmitHangup) {
         socket.emit("hangup", {
           ongoingCall: data.ongoingCall,
           userHangingupId: adminInfo._id

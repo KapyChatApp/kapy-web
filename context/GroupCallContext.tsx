@@ -41,8 +41,8 @@ export const GroupCallContextProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const { adminInfo } = useUserContext();
-  const { socket, getMediaStream, localStream, setLocalStream } =
-    useSocketContext();
+  const { socket } = useSocketContext();
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [onlineGroupUsers, setOnlineGroupUsers] = useState<SocketUser[] | null>(
     null
@@ -54,6 +54,43 @@ export const GroupCallContextProvider: React.FC<{
   );
   const [peers, setPeers] = useState<PeerDataGroup[] | null>(null);
   const [isCallEnded, setIsCallEnded] = useState(false);
+
+  console.log("localStream in GroupConst", localStream);
+  console.log("peer in GroupConst", peers);
+  console.log("ongoingCall in GroupConst", ongoingGroupCall);
+
+  const getMediaStream = useCallback(
+    async (faceMode?: string) => {
+      if (localStream) return localStream;
+
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
+
+        const constraints: MediaStreamConstraints = {
+          audio: true,
+          video: {
+            width: { min: 640, ideal: 1280, max: 1920 },
+            height: { min: 360, ideal: 720, max: 1080 },
+            frameRate: { min: 15, ideal: 30, max: 60 },
+            facingMode: videoDevices.length > 0 ? faceMode : undefined
+          }
+        };
+
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
+        setLocalStream(stream);
+        return stream;
+      } catch (error) {
+        console.error("Error accessing media devices:", error);
+        setLocalStream(null);
+        return null;
+      }
+    },
+    [localStream]
+  );
 
   const handleGroupCall = useCallback(
     async (membersOnline: SocketUser[], groupInfo: SocketGroup) => {
@@ -97,30 +134,40 @@ export const GroupCallContextProvider: React.FC<{
       ongoingGroupCall?: OngoingGroupCall | null;
       isEmitHangup?: boolean;
     }) => {
-      const isHost =
-        data?.ongoingGroupCall?.participantsGroup.caller.userId ===
-        adminInfo._id;
-
       // Nếu là host thì phát tín hiệu kết thúc cuộc gọi cho cả nhóm
-      if (isHost && socket && data?.ongoingGroupCall && data.isEmitHangup) {
+      if (socket && adminInfo && data?.ongoingGroupCall && data.isEmitHangup) {
         socket.emit("groupHangup", {
           ongoingGroupCall: data.ongoingGroupCall,
           userHangingupId: adminInfo._id
         });
       }
-
       // Ngắt kết nối local
-      setPeers([]);
+      setPeers(null);
       setOngoingGroupCall(null);
+      setIsCallEnded(true);
 
       if (localStream) {
         localStream.getTracks().forEach((track) => track.stop());
         setLocalStream(null);
       }
-
       setIsCallEnded(true);
     },
     [socket, adminInfo, localStream]
+  );
+
+  const handleLeaveGroup = useCallback(
+    (leaverUserId: string) => {
+      console.log("User left the group call:", leaverUserId);
+      if (peers && peers.length > 0) {
+        setPeers((prev) => {
+          if (!prev) return null;
+          return prev.filter(
+            (p) => !p.participantUser.some((u) => u.userId === leaverUserId)
+          );
+        });
+      }
+    },
+    [socket, peers, ongoingGroupCall, adminInfo]
   );
 
   const createPeer = useCallback(
@@ -325,10 +372,14 @@ export const GroupCallContextProvider: React.FC<{
     socket.on("groupHangup", handleGroupHangup);
     console.log("🔔 Event group hangup is listening...");
 
+    socket.on("groupPeerLeave", handleLeaveGroup);
+    console.log("🔔 Event leaving group is listening...");
+
     return () => {
       socket.off("incomingGroupCall", onIncomingGroupCall);
       socket.off("groupWebrtcSignal", completeGroupPeerConnection);
       socket.off("groupHangup", handleGroupHangup);
+      socket.off("groupPeerLeave", handleLeaveGroup);
     };
   }, [
     socket,

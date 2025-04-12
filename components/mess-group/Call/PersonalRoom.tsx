@@ -40,18 +40,25 @@ const PersonalRoom = () => {
 
   console.log("ongoingCall", ongoingCall);
   console.log("peer", peer);
+  console.log("localStream", localStream);
+  console.log("isCallEnded", isCallEnded);
 
   const router = useRouter();
   const handleEndCall = () => {
-    router.push("/");
+    router.back();
     handleHangup({
       ongoingCall: ongoingCall ? ongoingCall : undefined,
       isEmitHangup: true
     });
+    toast({
+      title: "Call Ended",
+      className:
+        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+    });
   };
 
   if (!localStream && !peer && !ongoingCall && isCallEnded) {
-    router.push("/");
+    router.back();
     toast({
       title: "Call Ended",
       className:

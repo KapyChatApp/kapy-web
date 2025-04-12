@@ -38,12 +38,15 @@ const MeetingRoom = () => {
 
   const router = useRouter();
   const handleEndCall = () => {
-    router.push(
-      "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
-    );
+    router.back();
     handleGroupHangup({
       ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
       isEmitHangup: true
+    });
+    toast({
+      title: "Meeting Ended",
+      className:
+        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
     });
   };
 
