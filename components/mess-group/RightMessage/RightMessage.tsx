@@ -60,6 +60,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
       (member) => isOnlineChat[member._id]
     );
     const isOnline = isOnlineChat[chatItem.receiverInfo._id];
+    const membersGroup = chatItem.memberInfo;
     top = isGroup
       ? {
           _id: chatItem.id,
@@ -67,7 +68,7 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
             ? chatItem.groupAva
             : "/assets/images/icon.png",
           name: chatItem.groupName ? chatItem.groupName : "Group Chat",
-          membersGroup: chatItem.memberInfo.length,
+          membersGroup,
           onlineGroup: chatItem.memberInfo.filter(
             (member) => isOnlineChat[member._id]
           ).length,

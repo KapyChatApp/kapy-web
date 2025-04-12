@@ -9,7 +9,12 @@ import {
   use
 } from "react";
 import { useUserContext } from "./UserContext";
-import { OngoingCall, Participants, PeerData, SocketUser } from "@/types";
+import {
+  OngoingCall,
+  Participants,
+  PeerData,
+  SocketUser
+} from "@/types/socket";
 import Peer, { SignalData } from "simple-peer";
 
 interface iSocketContext {
@@ -20,6 +25,8 @@ interface iSocketContext {
   localStream: MediaStream | null;
   peer: PeerData | null;
   isCallEnded: boolean;
+  setLocalStream: React.Dispatch<React.SetStateAction<MediaStream | null>>;
+  getMediaStream: (faceMode?: string) => Promise<MediaStream | null>;
   handleCall: (user: SocketUser, isVideoCall: boolean) => void;
   handleJoinCall: (ongoingCall: OngoingCall) => void;
   handleHangup: (data: {
@@ -44,6 +51,10 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [peer, setPeer] = useState<PeerData | null>(null);
   const [isCallEnded, setIsCallEnded] = useState(false);
+
+  console.log("localStream in SocketContext", localStream);
+  console.log("peer in SocketContext", peer);
+  console.log("ongoingCall in SocketContext", ongoingCall);
 
   const getMediaStream = useCallback(
     async (faceMode?: string) => {
@@ -84,7 +95,6 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       if (!currentSocketUser) return;
 
       const stream = await getMediaStream();
-
       if (!stream) {
         console.log("Error: No stream available.");
         return;
@@ -104,20 +114,19 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const onIncomingCall = useCallback(
     (participants: Participants, isVideoCall: boolean) => {
-      console.log("Cuộc gọi đến từ:", participants.caller);
       setOngoingCall({
         participants,
         isRinging: true,
         isVideoCall: isVideoCall
       });
-      console.log("Cuộc gọi đến từ:", participants.caller, isVideoCall);
+      console.log("Calling from:", participants.caller, isVideoCall);
     },
     [socket, adminInfo, ongoingCall]
   );
 
   const handleHangup = useCallback(
     (data: { ongoingCall?: OngoingCall | null; isEmitHangup?: boolean }) => {
-      if (socket && adminInfo && data?.ongoingCall && data.isEmitHangup) {
+      if (socket && adminInfo && data?.ongoingCall && data?.isEmitHangup) {
         socket.emit("hangup", {
           ongoingCall: data.ongoingCall,
           userHangingupId: adminInfo._id
@@ -371,6 +380,8 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
         localStream,
         peer,
         isCallEnded,
+        setLocalStream,
+        getMediaStream,
         handleCall,
         handleJoinCall,
         handleHangup

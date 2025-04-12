@@ -5,11 +5,13 @@ interface iVideoContainer {
   stream: MediaStream | null;
   isLocalStream: boolean;
   isOnCall: boolean;
+  isMeetingRoom?: boolean;
 }
 const VideoContainer = ({
   stream,
   isLocalStream,
-  isOnCall
+  isOnCall,
+  isMeetingRoom
 }: iVideoContainer) => {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -18,7 +20,20 @@ const VideoContainer = ({
       videoRef.current.srcObject = stream;
     }
   }, [stream]);
-  return (
+  return isMeetingRoom ? (
+    <video
+      className={cn(
+        "rounded border w-full h-auto max-h-[300px] object-cover",
+        isLocalStream &&
+          isOnCall &&
+          "relative w-full h-auto max-h-[300px] border-primary-500"
+      )}
+      ref={videoRef}
+      autoPlay
+      playsInline
+      muted={isLocalStream}
+    />
+  ) : (
     <video
       className={cn(
         "rounded border w-[800px]",

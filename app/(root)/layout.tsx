@@ -1,6 +1,5 @@
 "use client";
 import CallNotification from "@/components/mess-group/Call/CallNotification";
-import VideoCall from "@/components/mess-group/Call/VideoCall";
 import LeftSidebar from "@/components/shared/sidebar/LeftSidebar";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
@@ -9,8 +8,7 @@ import { getPusherClient } from "@/lib/pusher";
 import { checkTokenFrontend } from "@/lib/services/auth/check-token";
 import { isOffline } from "@/lib/services/user/isOffline";
 import { isOnline } from "@/lib/services/user/isOnline";
-import { Video } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
@@ -112,7 +110,6 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
 
     verifyToken();
   });
-
   return (
     <main className="background-light850_dark200 flex flex-row overflow-scroll scrollable w-full cursor-default h-screen min-w-[492px]">
       <LeftSidebar />
