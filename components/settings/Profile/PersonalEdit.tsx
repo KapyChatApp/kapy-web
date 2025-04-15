@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { Button } from "../../ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Input } from "@/components/ui/input";
-import { PersonalItemProps } from "@/types/settings";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
@@ -17,19 +16,20 @@ import { updateUserProfile } from "@/lib/services/user/updateUser";
 import { UserUpdateRequest } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
 
-const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
-  const birth = new Date(personal.birthDay);
+const adminInfoEdit = ({
+  setIsEdit
+}: {
+  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const { setAdminInfo, adminInfo } = useUserContext();
-  const handleBack = () => {
-    setEdit(false);
-  };
-  const [firstName, setFirstName] = useState(personal.firstName.trim());
-  const [lastName, setLastName] = useState(personal.lastName.trim());
-  const [bio, setBio] = useState(personal.bio);
-  const [relationShip, setRelationShip] = useState(personal.relationShip);
-  const [job, setJob] = useState(personal.job);
-  const [hobbies, setHobbies] = useState(personal.hobbies);
-  const [gender, setGender] = useState(personal.gender ? "male" : "female");
+  const birth = new Date(adminInfo.birthDay);
+  const [firstName, setFirstName] = useState(adminInfo.firstName.trim());
+  const [lastName, setLastName] = useState(adminInfo.lastName.trim());
+  const [bio, setBio] = useState(adminInfo.bio);
+  const [relationShip, setRelationShip] = useState(adminInfo.relationShip);
+  const [job, setJob] = useState(adminInfo.job);
+  const [hobbies, setHobbies] = useState(adminInfo.hobbies);
+  const [gender, setGender] = useState(adminInfo.gender ? "male" : "female");
   const [birthDay, setBirthDay] = useState({
     day: birth.getDate(),
     month: birth.getMonth() + 1,
@@ -68,7 +68,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
         className:
           "border-none rounded-lg bg-primary-200 text-primary-500 paragraph-regular items-center justify-center "
       });
-      setEdit(false);
+      setIsEdit(false);
     } catch (error) {
       toast({
         title: "Failed to update profile",
@@ -84,14 +84,14 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
       <div className="min-w-[376px] max-w-[376px] md:max-w-[400px] lg:w-[400px] h-fit rounded-lg background-light900_dark200 items-center justify-start flex flex-col">
         <div className="flex w-full justify-between px-4 pt-2 pb-4">
           <p className="text-dark100_light900 paragraph-semibold mt-2">
-            Edit your personal information
+            Edit your profile
           </p>
           <Icon
             icon="iconoir:cancel"
             width={24}
             height={24}
             className="text-dark100_light900 cursor-pointer"
-            onClick={handleBack}
+            onClick={() => setIsEdit(false)}
           />
         </div>
 
@@ -102,7 +102,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
             <p className="text-dark100_light900 body-regular">First name</p>
             <Input
               type="text"
-              placeholder={personal.firstName}
+              placeholder={adminInfo.firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
             ></Input>
@@ -111,7 +111,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
             <p className="text-dark100_light900 body-regular">Last name</p>
             <Input
               type="text"
-              placeholder={personal.lastName}
+              placeholder={adminInfo.lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
             ></Input>
@@ -122,7 +122,9 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               <p className="text-dark100_light900 body-regular">Bio</p>
               <Input
                 type="text"
-                placeholder={personal.bio ? personal.bio : "Enter your bio..."}
+                placeholder={
+                  adminInfo.bio ? adminInfo.bio : "Enter your bio..."
+                }
                 onChange={(e) => setBio(e.target.value)}
                 className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
               ></Input>
@@ -132,7 +134,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               <Input
                 type="text"
                 placeholder={
-                  personal.relationShip ? personal.relationShip : "Enter..."
+                  adminInfo.relationShip ? adminInfo.relationShip : "Enter..."
                 }
                 onChange={(e) => setRelationShip(e.target.value)}
                 className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
@@ -145,7 +147,9 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               <p className="text-dark100_light900 body-regular">Job</p>
               <Input
                 type="text"
-                placeholder={personal.job ? personal.job : "Enter your job..."}
+                placeholder={
+                  adminInfo.job ? adminInfo.job : "Enter your job..."
+                }
                 onChange={(e) => setJob(e.target.value)}
                 className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
               ></Input>
@@ -154,7 +158,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
               <p className="text-dark100_light900 body-regular">Hobbies</p>
               <Input
                 type="text"
-                placeholder={personal.hobbies ? personal.hobbies : "Enter..."}
+                placeholder={adminInfo.hobbies ? adminInfo.hobbies : "Enter..."}
                 onChange={(e) => setHobbies(e.target.value)}
                 className="paragraph-regular text-dark100_light900 placeholder:opacity-50 placeholder:dark:opacity-80 no-focus bg-transparent border border-light-500 dark:border-dark-500 shadow-none outline-none w-full h-full placeholder:paragraph-regular rounded-lg p-2"
               ></Input>
@@ -163,7 +167,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
 
           <div className="flex flex-col gap-6 w-full h-fit">
             <p className="text-dark100_light900 body-semibold">
-              Personal information
+              adminInfo information
             </p>
             <RadioGroup
               defaultValue={gender}
@@ -274,7 +278,7 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
         <div className="flex justify-end w-full items-center pr-4 py-2">
           <div className="flex flex-row w-full h-fit gap-6 justify-end">
             <Button
-              onClick={handleBack}
+              onClick={() => setIsEdit(false)}
               className="paragraph-regular text-dark100_light900 py-2 px-3 rounded-lg background-light700_dark400 w-fit"
             >
               Cancel
@@ -292,4 +296,4 @@ const PersonalEdit = ({ setEdit, personal }: PersonalItemProps) => {
   );
 };
 
-export default PersonalEdit;
+export default adminInfoEdit;

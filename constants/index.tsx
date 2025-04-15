@@ -1,3 +1,4 @@
+import { ConfirmModalProps } from "@/components/friends/ConfirmModal";
 import { SidebarLink } from "@/types";
 
 export const themes = [
@@ -33,3 +34,10 @@ export const sidebarLinks: SidebarLink[] = [
     label: "Your map"
   }
 ];
+
+export const defaultConfirm: ConfirmModalProps = {
+  setConfirm: () => {},
+  handleAction: () => {},
+  name: "",
+  action: ""
+};

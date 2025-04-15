@@ -64,7 +64,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [adminInfo, setAdminInfo] = useState<UserResponseDTO>(
     defaultUserResponseDTO
   );
-  const [newAva, setNewAva] = useState<string>("");
+  const [newAva, setNewAva] = useState<string>(adminInfo.avatar);
   return (
     <UserContext.Provider
       value={{
