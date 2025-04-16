@@ -1,4 +1,5 @@
 "use client";
+import { PostResponseDTO } from "@/lib/DTO/post";
 import { UserResponseDTO } from "@/lib/DTO/user";
 import { createContext, useContext, useState } from "react";
 export const defaultUserResponseDTO: UserResponseDTO = {
@@ -47,6 +48,8 @@ interface UserContextType {
   setAdminInfo: React.Dispatch<React.SetStateAction<UserResponseDTO>>;
   newAva: string;
   setNewAva: React.Dispatch<React.SetStateAction<string>>;
+  postData: PostResponseDTO[] | null;
+  setPostData: React.Dispatch<React.SetStateAction<PostResponseDTO[] | null>>;
 }
 
 // Tạo context
@@ -64,7 +67,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
   const [adminInfo, setAdminInfo] = useState<UserResponseDTO>(
     defaultUserResponseDTO
   );
-  const [newAva, setNewAva] = useState<string>("");
+  const [newAva, setNewAva] = useState<string>(adminInfo.avatar);
+  const [postData, setPostData] = useState<PostResponseDTO[] | null>(null);
+
   return (
     <UserContext.Provider
       value={{
@@ -77,7 +82,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
         adminInfo,
         setAdminInfo,
         newAva,
-        setNewAva
+        setNewAva,
+        postData,
+        setPostData
       }}
     >
       {children}
