@@ -70,8 +70,13 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
             </div>
 
             <div className="flex w-full h-fit justify-start items-center">
-              <span className="flex w-full text-dark100_light900 body-regular gap-1">
-                Liked by
+              <span className="flex text-dark100_light900 body-regular gap-1 items-center justify-center">
+                <span
+                  className="cursor-pointer"
+                  onClick={() => setIsLike(true)}
+                >
+                  Liked by
+                </span>
                 <a
                   className="text-dark100_light900 body-semibold"
                   href={`/account/${likedUsers[0]._id}`}
