@@ -1,6 +1,10 @@
+"use client";
 import AccountLayout from "@/components/account/AccountLayout";
+import { useUserContext } from "@/context/UserContext";
+import { FileResponseDTO } from "@/lib/DTO/map";
+import { PostResponseDTO } from "@/lib/DTO/post";
 import { AccountData } from "@/types/account";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const selfAccountData: AccountData = {
   type: "self" as const,
@@ -58,7 +62,7 @@ const friendAccountData: AccountData = {
     relationShip: "In a relationship",
     birthDay: new Date("1998-09-20"),
     attendDate: new Date("2021-06-10"),
-    relation: "friend",
+    relation: "bff",
     mutualFriends: [
       {
         _id: "mf001",
@@ -72,7 +76,91 @@ const friendAccountData: AccountData = {
   }
 };
 
+const avatarUrl =
+  "https://res.cloudinary.com/dtn9r75b7/image/upload/v1743522634/Avatar/hd7umdemusg8r2l4mwmi.png";
+
+const fakeFile: FileResponseDTO = {
+  _id: "f1",
+  fileName: "image.png",
+  url: avatarUrl,
+  bytes: 102400,
+  width: 1080,
+  height: 1080,
+  format: "png",
+  type: "Image"
+};
+
+const fakePosts: PostResponseDTO[] = [
+  {
+    _id: "1",
+    firstName: "Tiffany",
+    lastName: "Young",
+    nickName: "tiffanyyoungofficial",
+    avatar: avatarUrl,
+    userId: "u1",
+    likedIds: [],
+    shares: [],
+    comments: [],
+    caption: "Buổi sáng tuyệt vời 🌞",
+    createAt: "2025-04-10T08:00:00Z",
+    contents: [fakeFile],
+    tags: []
+  },
+  {
+    _id: "2",
+    firstName: "Tiffany",
+    lastName: "Young",
+    nickName: "tiffanyyoungofficial",
+    avatar: avatarUrl,
+    userId: "u1",
+    likedIds: [],
+    shares: [],
+    comments: [],
+    caption: "Chill vibes only 🍃",
+    createAt: "2025-04-11T14:20:00Z",
+    contents: [{ ...fakeFile, _id: "f2" }],
+    tags: []
+  },
+  {
+    _id: "3",
+    firstName: "Tiffany",
+    lastName: "Young",
+    nickName: "tiffanyyoungofficial",
+    avatar: avatarUrl,
+    userId: "u1",
+    likedIds: [],
+    shares: [],
+    comments: [],
+    caption: "Lên đồ đi dạo phố 👜",
+    createAt: "2025-04-12T18:45:00Z",
+    contents: [
+      { ...fakeFile, _id: "f3" },
+      { ...fakeFile, _id: "f5" }
+    ],
+    tags: []
+  },
+  {
+    _id: "4",
+    firstName: "Tiffany",
+    lastName: "Young",
+    nickName: "tiffanyyoungofficial",
+    avatar: avatarUrl,
+    userId: "u1",
+    likedIds: [],
+    shares: [],
+    comments: [],
+    caption: "Behind the scenes 🎬",
+    createAt: "2025-04-13T21:10:00Z",
+    contents: [{ ...fakeFile, _id: "f4" }],
+    tags: []
+  }
+];
+
 const page = () => {
+  const { setPostData } = useUserContext();
+  useEffect(() => {
+    setPostData(fakePosts);
+  }, []);
   return (
     <section className="h-screen w-full py-[16px] pr-[16px]">
       <main className="flex w-full h-full overflow-x-auto custom-scrollbar background-light900_dark400  rounded-xl">

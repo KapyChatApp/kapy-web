@@ -73,7 +73,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
       const param = {
         label: "Edit profile",
         icon: "",
-        colorBackground: "background-light700_dark400",
+        colorBackground: "background-light500_dark500",
         colorText: "text-dark100_light900",
         handleAction: () => setIsEdit(true)
       };
@@ -95,7 +95,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Unfriend",
             icon: "mingcute:user-x-line",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () =>
               confirmHandleUnfr(
@@ -134,7 +134,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Unfriend",
             icon: "mingcute:user-x-line",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () =>
               confirmHandleUnfr(
@@ -166,7 +166,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Unfriend",
             icon: "mingcute:user-x-line",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () => handleUnfr(param, setListFriend, setRelation)
           };
@@ -189,7 +189,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Message",
             icon: "",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () => handleRouteMessage()
           };
@@ -213,7 +213,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Deny",
             icon: "",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () => handleUnfr(param, setListFriend, setRelation)
           };
@@ -241,7 +241,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Deny",
             icon: "",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () =>
               handleUnBff(param, setListBestFriend, setRelation)
@@ -265,7 +265,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
           const param2 = {
             label: "Message",
             icon: "",
-            colorBackground: "background-light700_dark400",
+            colorBackground: "background-light500_dark500",
             colorText: "text-dark100_light900",
             handleAction: () => handleRouteMessage()
           };
