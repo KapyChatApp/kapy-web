@@ -11,16 +11,19 @@ import { unFriend } from "@/lib/services/friend/unfriend";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { handleDelete } from "@/utils/commentUtils";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const ActionSheet = ({
   post,
   comment,
+  user,
   setIsBack,
   setEditingCommentId,
   setComments
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
+  user?: ShortUserResponseDTO;
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
   setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
@@ -156,8 +159,8 @@ const ActionSheet = ({
       {isReport && (
         <ReportCard
           onClose={() => setReport(false)}
-          type="Post"
-          reportedId={comment?._id || post?._id || ""}
+          type={post ? "Post" : comment ? "Comment" : user ? "User" : "Unknown"}
+          reportedId={comment?._id || post?._id || user?._id || ""}
         />
       )}
       {isUnfr && <ConfirmModal confirm={confirm} />}

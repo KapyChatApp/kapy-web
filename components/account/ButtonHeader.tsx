@@ -23,6 +23,8 @@ import { useChatContext } from "@/context/ChatContext";
 import { useFriendContext } from "@/context/FriendContext";
 import { useUserContext } from "@/context/UserContext";
 import PersonalEdit from "../settings/Profile/PersonalEdit";
+import OtherPost from "../community/Other/OtherPost";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
 const ButtonHeader = ({ account }: { account: AccountData }) => {
   const { adminInfo } = useUserContext();
@@ -55,6 +57,13 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
     } else {
       router.push(`/${response}`);
     }
+  };
+  const user: ShortUserResponseDTO = {
+    _id: account.data._id,
+    firstName: account.data.firstName,
+    lastName: account.data.lastName,
+    avatar: account.data.avatar,
+    nickName: account.data.nickName
   };
 
   useEffect(() => {
@@ -292,6 +301,11 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
             : adminInfo.lastName}
         </span>
         {renderActionButton()}
+        {account.type === "friend" && (
+          <div className="flex h-full items-center justify-center">
+            <OtherPost user={user} />
+          </div>
+        )}
       </section>
 
       {isConfirm && <ConfirmModal confirm={confirm} />}

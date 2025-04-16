@@ -20,7 +20,9 @@ const TabContent = ({
       </div>
     );
   }
-  const isBff = account.type === "friend" && account.data.relation === "bff";
+  const isPost =
+    (account.type === "friend" && account.data.relation === "bff") ||
+    account.type === "self";
   const allImages = postData
     .flatMap((post) => post.contents)
     .filter((content) => content.type === "Image");
@@ -38,7 +40,7 @@ const TabContent = ({
         return <MediaGrid mediaList={allReels} isPhoto={false} />;
     }
   };
-  return isBff ? (
+  return isPost ? (
     <div className="flex-1 h-auto pb-5">{renderGrid()}</div>
   ) : (
     <div className="flex w-full h-full items-center justify-center pb-5">

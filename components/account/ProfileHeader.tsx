@@ -1,12 +1,14 @@
 "use client";
 import { AccountData } from "@/types/account";
-import React from "react";
+import React, { useState } from "react";
 import AvatarHeader from "./AvatarHeader";
 import ButtonHeader from "./ButtonHeader";
 import { useUserContext } from "@/context/UserContext";
+import DetailListUser from "../shared/modal/DetailListUser";
 
 const ProfileHeader = ({ account }: { account: AccountData }) => {
   const { adminInfo } = useUserContext();
+  const [renderMutual, setRenderMutual] = useState(false);
   return (
     <>
       <header className="grid grid-cols-[1fr_2fr] items-start justify-center w-full">
@@ -19,7 +21,12 @@ const ProfileHeader = ({ account }: { account: AccountData }) => {
         {/* Section 3: Thống kê */}
         <section className="row-start-2 col-start-2 flex gap-6 mb-5">
           {/* Mutual friends */}
-          <span className="flex gap-2 items-center justify-center">
+          <span
+            className={`${
+              account.type === "friend" ? "cursor-pointer" : ""
+            } flex gap-2 items-center justify-center`}
+            onClick={() => setRenderMutual(true)}
+          >
             <span className="paragraph-semibold text-dark100_light900">
               {"mutualFriends" in account.data
                 ? account.data.mutualFriends.length
@@ -54,6 +61,14 @@ const ProfileHeader = ({ account }: { account: AccountData }) => {
           </span>
         </section>
       </header>
+
+      {renderMutual && account.type === "friend" && (
+        <DetailListUser
+          list={account.data.mutualFriends}
+          setIsBack={setRenderMutual}
+          label="Muatual friends"
+        />
+      )}
     </>
   );
 };
