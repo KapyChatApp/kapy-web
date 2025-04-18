@@ -21,6 +21,7 @@ import {
   handleUnBff,
   handleUnfr
 } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface VerticalBoxProps {
   request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
@@ -34,7 +35,7 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
   const { adminInfo } = useUserContext();
   const { setListRequestedFriend, setListBestFriend, setListFriend } =
     useFriendContext();
-
+  const router = useRouter();
   const object = request as RequestedResponseDTO;
 
   let label = "";
@@ -123,15 +124,8 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
       }
     }
   };
-
-  const [isClick, setClick] = useState(false);
   const handleClick = () => {
-    setClick(!isClick);
-  };
-
-  const account = {
-    user: object,
-    setAccount: setClick
+    router.push(`/account/${object._id}`);
   };
 
   return (
@@ -183,8 +177,6 @@ const VerticalRequestBox: React.FC<VerticalBoxProps> = ({
       </Button>
 
       {/* {isRemove && <ConfirmModal confirm={confirm} />} */}
-
-      {isClick && <AccountModal account={account} />}
     </>
   );
 };

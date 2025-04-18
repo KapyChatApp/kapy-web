@@ -22,7 +22,7 @@ const adminInfoEdit = ({
   setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
   const { setAdminInfo, adminInfo } = useUserContext();
-  const birth = new Date(adminInfo.birthDay);
+  const birth = adminInfo.birthDay ? new Date(adminInfo.birthDay) : null;
   const [firstName, setFirstName] = useState(adminInfo.firstName.trim());
   const [lastName, setLastName] = useState(adminInfo.lastName.trim());
   const [bio, setBio] = useState(adminInfo.bio);
@@ -30,18 +30,27 @@ const adminInfoEdit = ({
   const [job, setJob] = useState(adminInfo.job);
   const [hobbies, setHobbies] = useState(adminInfo.hobbies);
   const [gender, setGender] = useState(adminInfo.gender ? "male" : "female");
-  const [birthDay, setBirthDay] = useState({
-    day: birth.getDate(),
-    month: birth.getMonth() + 1,
-    year: birth.getFullYear()
-  });
+  const [birthDay, setBirthDay] = useState(
+    birth
+      ? {
+          day: birth.getDate(),
+          month: birth.getMonth() + 1,
+          year: birth.getFullYear()
+        }
+      : null
+  );
+
   const handleEdit = async () => {
     try {
-      const formattedDate = new Date(
-        `${birthDay.year}-${birthDay.month
-          .toString()
-          .padStart(2, "0")}-${birthDay.day.toString().padStart(2, "0")}`
-      ).toISOString();
+      const formattedDate =
+        birthDay !== null
+          ? new Date(
+              `${birthDay.year}-${birthDay.month
+                .toString()
+                .padStart(2, "0")}-${birthDay.day.toString().padStart(2, "0")}`
+            ).toISOString()
+          : "";
+
       const updatedProfile: UserUpdateRequest = {
         firstName,
         lastName,
@@ -58,7 +67,6 @@ const adminInfoEdit = ({
         job,
         hobbies
       };
-
       const result = await updateUserProfile(updatedProfile);
       console.log(result.newProfile);
       setAdminInfo(result.newProfile);
@@ -195,14 +203,16 @@ const adminInfoEdit = ({
               <p className="text-dark100_light900 body-regular">Birthdate</p>
               <div className="flex flex-row gap-3 w-full h-fit">
                 <Select
-                  value={birthDay.day.toString()}
+                  value={birthDay ? birthDay.day.toString() : ""}
                   onValueChange={(value) =>
-                    setBirthDay((prev) => ({ ...prev, day: Number(value) }))
+                    setBirthDay((prev) =>
+                      prev ? { ...prev, day: Number(value) } : null
+                    )
                   }
                 >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={birth.getDate().toString()}
+                      placeholder={birth ? birth.getDate().toString() : ""}
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>
@@ -220,14 +230,18 @@ const adminInfoEdit = ({
                 </Select>
 
                 <Select
-                  value={birthDay.month.toString()}
+                  value={birthDay ? birthDay.month.toString() : ""}
                   onValueChange={(value) =>
-                    setBirthDay((prev) => ({ ...prev, month: Number(value) }))
+                    setBirthDay((prev) =>
+                      prev ? { ...prev, month: Number(value) } : null
+                    )
                   }
                 >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={(birth.getMonth() + 1).toString()}
+                      placeholder={
+                        birth ? (birth.getMonth() + 1).toString() : ""
+                      }
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>
@@ -245,14 +259,16 @@ const adminInfoEdit = ({
                 </Select>
 
                 <Select
-                  value={birthDay.year.toString()}
+                  value={birthDay ? birthDay.year.toString() : ""}
                   onValueChange={(value) =>
-                    setBirthDay((prev) => ({ ...prev, year: Number(value) }))
+                    setBirthDay((prev) =>
+                      prev ? { ...prev, year: Number(value) } : null
+                    )
                   }
                 >
                   <SelectTrigger className="w-[100px]">
                     <SelectValue
-                      placeholder={birth.getFullYear().toString()}
+                      placeholder={birth ? birth.getFullYear().toString() : ""}
                       className="body-regular text-dark100_light900"
                     />
                   </SelectTrigger>

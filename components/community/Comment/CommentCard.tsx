@@ -5,9 +5,9 @@ import { formatTimeMessageBox } from "@/lib/utils";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import OtherPost from "../Other/OtherPost";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
-import { handleDislike, handleLike } from "@/utils/commentUtils";
+import { handleDislikeComment, handleLikeComment } from "@/utils/commentUtils";
+import OtherButton from "../Other/OtherButton";
 
 const CommentCard = ({
   item,
@@ -32,9 +32,9 @@ const CommentCard = ({
   };
   const handleReactComment = async () => {
     if (liked) {
-      await handleDislike(item._id, setLiked, setLikeCount);
+      await handleDislikeComment(item._id, setLiked, setLikeCount);
     } else {
-      await handleLike(item._id, setLiked, setLikeCount);
+      await handleLikeComment(item._id, setLiked, setLikeCount);
     }
   };
   useEffect(() => {
@@ -122,7 +122,7 @@ const CommentCard = ({
                   </Button>
                   {/* ReportPost xuất hiện bên cạnh Reply */}
                   <div className="absolute left-full top-0 mt-[-2px] hidden group-hover:block ml-2">
-                    <OtherPost
+                    <OtherButton
                       comment={item}
                       setComments={setComments}
                       setEditingCommentId={setEditingCommentId}

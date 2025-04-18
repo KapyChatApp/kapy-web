@@ -4,9 +4,15 @@ import { formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
-import OtherPost from "../Other/OtherPost";
+import OtherButton from "../Other/OtherButton";
 
-const Information = ({ post }: { post: PostResponseDTO }) => {
+const Information = ({
+  post,
+  setArrayPost
+}: {
+  post: PostResponseDTO;
+  setArrayPost?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
@@ -42,7 +48,7 @@ const Information = ({ post }: { post: PostResponseDTO }) => {
       </div>
       <div className="w-fit h-fit">
         <div className="ml-2">
-          <OtherPost post={post} />
+          <OtherButton post={post} setPostList={setArrayPost} />
         </div>
       </div>
     </div>

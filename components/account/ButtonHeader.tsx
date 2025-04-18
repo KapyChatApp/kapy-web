@@ -23,6 +23,8 @@ import { useChatContext } from "@/context/ChatContext";
 import { useFriendContext } from "@/context/FriendContext";
 import { useUserContext } from "@/context/UserContext";
 import PersonalEdit from "../settings/Profile/PersonalEdit";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import OtherButton from "../community/Other/OtherButton";
 
 const ButtonHeader = ({ account }: { account: AccountData }) => {
   const { adminInfo } = useUserContext();
@@ -55,6 +57,13 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
     } else {
       router.push(`/${response}`);
     }
+  };
+  const user: ShortUserResponseDTO = {
+    _id: account.data._id,
+    firstName: account.data.firstName,
+    lastName: account.data.lastName,
+    avatar: account.data.avatar,
+    nickName: account.data.nickName
   };
 
   useEffect(() => {
@@ -283,15 +292,15 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
   return (
     <>
       <section className="row-start-1 col-start-2 flex items-center gap-5 mb-5">
-        <span className="h3-bold text-dark100_light900">
-          {"mutualFriends" in account.data
-            ? account.data.firstName
-            : adminInfo.firstName}{" "}
-          {"mutualFriends" in account.data
-            ? account.data.lastName
-            : adminInfo.lastName}
+        <span className="h3-medium text-dark100_light900">
+          {account.data.firstName} {account.data.lastName}
         </span>
         {renderActionButton()}
+        {account.type === "friend" && (
+          <div className="flex h-full items-center justify-center">
+            <OtherButton user={user} />
+          </div>
+        )}
       </section>
 
       {isConfirm && <ConfirmModal confirm={confirm} />}

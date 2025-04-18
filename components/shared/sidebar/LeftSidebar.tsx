@@ -21,7 +21,6 @@ import {
   MenubarSeparator,
   MenubarTrigger
 } from "@radix-ui/react-menubar";
-import { PersonalAccount } from "@/components/settings/Profile/PersonalAccount";
 import SettingLayout from "@/components/settings/YourSetting/SettingLayout";
 import { useUserContext } from "@/context/UserContext";
 import { getMyProfile } from "@/lib/data/mine/dataAdmin";
@@ -51,8 +50,8 @@ const Leftsidebar = () => {
   };
 
   const pathname = usePathname();
+  const router = useRouter();
 
-  const [isAccount, setAccount] = useState(false);
   const [isSetting, setSetting] = useState(false);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const { adminInfo, newAva, setAdminInfo } = useUserContext();
@@ -64,14 +63,14 @@ const Leftsidebar = () => {
     }
   };
   const handleAccount = () => {
-    setAccount(!isAccount);
+    router.push(`/account/${adminInfo._id}`);
     setDropdownOpen(false);
   };
   const handleSetting = () => {
     setSetting(!isSetting);
     setDropdownOpen(false);
   };
-  const router = useRouter();
+
   const handleLogout = async () => {
     try {
       const deviceId = localStorage.getItem("deviceId");
@@ -480,8 +479,6 @@ const Leftsidebar = () => {
           </div>
         </div>
       </section>
-
-      {isAccount && <PersonalAccount setPersonal={setAccount} />}
       {isSetting && <SettingLayout setSetting={setSetting} />}
     </>
   );

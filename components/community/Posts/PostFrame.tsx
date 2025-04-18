@@ -4,10 +4,16 @@ import Content from "./Content";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import Actions from "./Actions";
 
-const PostFrame = ({ post }: { post: PostResponseDTO }) => {
+const PostFrame = ({
+  post,
+  setArrayPost
+}: {
+  post: PostResponseDTO;
+  setArrayPost?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
+}) => {
   return (
     <div className="flex flex-col mb-5 w-[470px] h-fit items-center justify-start">
-      <Information post={post} />
+      <Information post={post} setArrayPost={setArrayPost} />
       <Content post={post} />
       <Actions post={post} />
     </div>

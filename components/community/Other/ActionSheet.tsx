@@ -10,23 +10,33 @@ import { FriendRequestDTO } from "@/lib/DTO/friend";
 import { unFriend } from "@/lib/services/friend/unfriend";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
-import { handleDelete } from "@/utils/commentUtils";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { handleDeleteComment } from "@/utils/commentUtils";
+import { handleDeletePost } from "@/utils/postUtils";
+import { useRouter } from "next/navigation";
 
 const ActionSheet = ({
   post,
   comment,
+  user,
   setIsBack,
   setEditingCommentId,
-  setComments
+  setComments,
+  setPostList
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
+  user?: ShortUserResponseDTO;
   setIsBack: React.Dispatch<React.SetStateAction<boolean>>;
   setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
+  setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
 }) => {
+  const router = useRouter();
   const [isReport, setReport] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
+  const [isDeletePost, setIsDeletePost] = useState(false);
+  const [isDeleteComment, setIsDeleteComment] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
     handleAction: () => {},
@@ -69,44 +79,121 @@ const ActionSheet = ({
     });
   };
 
-  const handleDeleteComment = async (commentId: string) => {
+  // Comments
+  const handleDeleteMyComment = async (commentId: string) => {
     if (setComments) {
-      await handleDelete(commentId, setComments);
+      await handleDeleteComment(commentId, setComments);
       setIsBack(false);
     }
   };
-
+  const handleConfirmDeleteMyComment = (commentId: string) => {
+    if (!comment) return;
+    setIsDeleteComment(true);
+    setConfirm({
+      setConfirm: setIsDeleteComment,
+      handleAction: () => handleDeleteMyComment(commentId),
+      name: "your comment",
+      action: "delete"
+    });
+  };
   const handleGetEditingCommentId = () => {
     if (comment && setEditingCommentId) {
       setEditingCommentId(comment._id);
       setIsBack(false);
-      console.log("check");
     }
   };
-  const adminId = localStorage.getItem("adminId");
-  const checkAdminComment = !!(
-    comment &&
-    adminId &&
-    comment.userId === adminId
-  ); // ✅ Ép kiểu về boolean
 
-  const actions = checkAdminComment
-    ? actionSheet(
+  // Posts
+  const handleDeleteMyPost = async () => {
+    if (setPostList && post) {
+      await handleDeletePost(post._id, setPostList);
+      setIsBack(false);
+    }
+  };
+  const handleConfirmDeleteMyPost = () => {
+    if (!post) return;
+    setIsDeletePost(true);
+    setConfirm({
+      setConfirm: setIsDeletePost,
+      handleAction: handleDeleteMyPost,
+      name: "this post",
+      action: "delete"
+    });
+  };
+  const handleEditRoute = () => {
+    post && router.push(`/community/edit/${post._id}`);
+  };
+  // const checkAdminComment = !!(
+  //   comment &&
+  //   adminId &&
+  //   comment.userId === adminId
+  // ); // ✅ Ép kiểu về boolean
+
+  //   const actions = checkAdminComment
+  //     ? actionSheet(
+  //         setReport,
+  //         handleConfirmUnfriend,
+  //         setIsBack,
+  //         !!comment,
+  //         checkAdminComment,
+  //         () => handleDeleteMyComment(comment._id || ""),
+  //         handleGetEditingCommentId
+  //       )
+  //     : actionSheet(
+  //         setReport,
+  //         handleConfirmUnfriend,
+  //         setIsBack,
+  //         !!comment,
+  //         checkAdminComment // ✅ Đã đảm bảo kiểu boolean
+  //       );
+  const adminId = localStorage.getItem("adminId");
+  const checkAdminPost = post && adminId === post.userId;
+  const checkAdminComment = comment && adminId === comment.userId;
+
+  let actions: any[] = [];
+
+  if (user) {
+    // 👉 User: chỉ Report + Cancel
+    actions = actionSheet(setReport, handleUnfriend, setIsBack, false, false);
+  } else if (post) {
+    if (checkAdminPost) {
+      // 👉 Post do Admin tạo: Delete, Edit, Cancel
+      actions = actionSheet(
         setReport,
-        handleConfirmUnfriend,
+        undefined,
         setIsBack,
-        !!comment,
-        checkAdminComment,
-        () => handleDeleteComment(comment._id || ""),
-        handleGetEditingCommentId
-      )
-    : actionSheet(
-        setReport,
-        handleConfirmUnfriend,
-        setIsBack,
-        !!comment,
-        checkAdminComment // ✅ Đã đảm bảo kiểu boolean
+        false,
+        true,
+        handleConfirmDeleteMyPost,
+        handleEditRoute
       );
+    } else {
+      // 👉 Post của người khác: Report, Unfriend, Cancel
+      actions = actionSheet(
+        setReport,
+        handleConfirmUnfriend,
+        setIsBack,
+        false,
+        false
+      );
+    }
+  } else if (comment) {
+    if (checkAdminComment) {
+      // 👉 Comment do Admin tạo: Delete, Edit, Cancel
+      actions = actionSheet(
+        setReport,
+        undefined,
+        setIsBack,
+        true,
+        true,
+        () => handleConfirmDeleteMyComment(comment._id),
+        handleGetEditingCommentId
+      );
+    } else {
+      // 👉 Comment của người khác: Report, Cancel
+      actions = actionSheet(setReport, undefined, setIsBack, true, false);
+    }
+  }
 
   return (
     <>
@@ -156,11 +243,13 @@ const ActionSheet = ({
       {isReport && (
         <ReportCard
           onClose={() => setReport(false)}
-          type="Post"
-          reportedId={comment?._id || post?._id || ""}
+          type={post ? "Post" : comment ? "Comment" : user ? "User" : "Unknown"}
+          reportedId={comment?._id || post?._id || user?._id || ""}
         />
       )}
-      {isUnfr && <ConfirmModal confirm={confirm} />}
+      {(isUnfr || isDeleteComment || isDeletePost) && (
+        <ConfirmModal confirm={confirm} />
+      )}
     </>
   );
 };

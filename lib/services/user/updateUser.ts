@@ -1,17 +1,5 @@
 import { UserUpdateRequest } from "@/lib/DTO/user";
 
-const defaultRequest: UserUpdateRequest = {
-  firstName: "",
-  lastName: "",
-  nickName: "",
-  phoneNumber: "",
-  email: "",
-  password: "",
-  rePassword: "",
-  gender: true,
-  address: "",
-  birthDay: ""
-};
 export async function updateUserProfile(params: UserUpdateRequest) {
   try {
     const storedToken = localStorage.getItem("token");

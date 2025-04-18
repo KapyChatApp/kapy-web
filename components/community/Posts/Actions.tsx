@@ -3,12 +3,12 @@ import { PostResponseDTO } from "@/lib/DTO/post";
 import Image from "next/image";
 import React, { useMemo, useState } from "react";
 import Interaction from "./Interaction";
-import DetailLike from "../Other/DetailLike";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import CommentArea from "../Comment/CommentArea";
-import { handleCreate } from "@/utils/commentUtils";
+import DetailListUser from "../../shared/modal/DetailListUser";
+import { handleCreateComment } from "@/utils/commentUtils";
 
 const Actions = ({ post }: { post: PostResponseDTO }) => {
   const { adminInfo } = useUserContext();
@@ -32,7 +32,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
   };
 
   const handleCommentPost = async () => {
-    await handleCreate(
+    await handleCreateComment(
       post._id,
       "post",
       commentContent,
@@ -70,8 +70,13 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
             </div>
 
             <div className="flex w-full h-fit justify-start items-center">
-              <span className="flex w-full text-dark100_light900 body-regular gap-1">
-                Liked by
+              <span className="flex text-dark100_light900 body-regular gap-1 items-center justify-center">
+                <span
+                  className="cursor-pointer"
+                  onClick={() => setIsLike(true)}
+                >
+                  Liked by
+                </span>
                 <a
                   className="text-dark100_light900 body-semibold"
                   href={`/account/${likedUsers[0]._id}`}
@@ -183,7 +188,9 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
         </section>
       </div>
 
-      {isLike && <DetailLike likedUsers={likedUsers} setIsBack={setIsLike} />}
+      {isLike && (
+        <DetailListUser list={likedUsers} setIsBack={setIsLike} label="Likes" />
+      )}
     </>
   );
 };
