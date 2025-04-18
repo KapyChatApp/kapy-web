@@ -292,13 +292,8 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
   return (
     <>
       <section className="row-start-1 col-start-2 flex items-center gap-5 mb-5">
-        <span className="h3-bold text-dark100_light900">
-          {"mutualFriends" in account.data
-            ? account.data.firstName
-            : adminInfo.firstName}{" "}
-          {"mutualFriends" in account.data
-            ? account.data.lastName
-            : adminInfo.lastName}
+        <span className="h3-medium text-dark100_light900">
+          {account.data.firstName} {account.data.lastName}
         </span>
         {renderActionButton()}
         {account.type === "friend" && (

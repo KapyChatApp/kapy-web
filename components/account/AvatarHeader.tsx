@@ -20,14 +20,10 @@ const AvatarHeader = ({ account }: { account: AccountData }) => {
           <Image
             alt="ava"
             src={
-              "mutualFriends" in account.data
-                ? account.data.avatar
-                  ? account.data.avatar
-                  : "/assets/ava/default.png"
-                : newAva
+              newAva
                 ? newAva
-                : adminInfo.avatar
-                ? adminInfo.avatar
+                : account.data.avatar
+                ? account.data.avatar
                 : "/assets/ava/default.png"
             }
             fill

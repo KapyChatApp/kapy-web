@@ -5,14 +5,24 @@ import { FileSegment } from "../ui/file-segment";
 import { FileResponseDTO } from "@/lib/DTO/map";
 import { useRouter } from "next/navigation";
 
+const randomImage = [
+  "/assets/post/1.jpg",
+  "/assets/post/2.jpg",
+  "/assets/post/3.jpg"
+];
+
 const PostGrid = ({ postData }: { postData: PostResponseDTO[] }) => {
   const renderFirstContent = (content: FileResponseDTO[]) => {
     if (content.length === 0) {
-      <img
-        src="/assets/images/icon.png"
-        alt=""
-        className="w-full h-full aspect-square object-cover rounded-md"
-      />;
+      // const randomImg =
+      //   randomImage[Math.floor(Math.random() * randomImage.length)];
+      return (
+        <img
+          src="/assets/post/3.jpg"
+          alt="Random fallback"
+          className="w-full h-full aspect-square object-cover rounded-md"
+        />
+      );
     } else {
       switch (content[0].type) {
         case "Image":
