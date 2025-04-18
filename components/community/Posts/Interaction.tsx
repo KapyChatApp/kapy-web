@@ -2,8 +2,7 @@
 import { iconInteraction } from "@/constants/post";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
-import { dislikePost } from "@/lib/services/post/dislike";
-import { likePost } from "@/lib/services/post/like";
+import { handleReactPost } from "@/utils/postUtils";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -21,18 +20,7 @@ const Interaction = ({
   const [shared, setShared] = useState(false);
 
   const handleLikeClick = async () => {
-    let updatedLikes;
-
-    if (liked) {
-      setLiked(false);
-      updatedLikes = post.likedIds.filter((item) => item._id !== userId);
-      await dislikePost(post._id);
-    } else {
-      setLiked(true);
-      updatedLikes = post.likedIds; // Thêm userLike vào danh sách
-      await likePost(post._id);
-    }
-    if (updateLikes) updateLikes(updatedLikes); // Gọi callback để cập nhật Actions
+    await handleReactPost(liked, post, userId, setLiked, updateLikes);
   };
 
   const handleCommentClick = () => {

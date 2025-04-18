@@ -16,7 +16,7 @@ import CommentArea from "@/components/community/Comment/CommentArea";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
-import { handleCreate, handleUpdate } from "@/utils/commentUtils";
+import { handleCreateComment, handleEditComment } from "@/utils/commentUtils";
 import { set } from "date-fns";
 import { editComment } from "@/lib/services/post/comment/edit";
 
@@ -73,7 +73,7 @@ const page = () => {
   };
   const handleUpdateComment = async () => {
     if (!editingCommentId) return;
-    await handleUpdate(
+    await handleEditComment(
       setCommentList,
       editingCommentId,
       commentContent,
@@ -85,7 +85,7 @@ const page = () => {
   };
 
   const handleCommentPost = async () => {
-    await handleCreate(
+    await handleCreateComment(
       detailPost._id,
       "post",
       commentContent,
@@ -97,7 +97,7 @@ const page = () => {
     );
   };
   const handleCommentReply = async () => {
-    await handleCreate(
+    await handleCreateComment(
       replyId,
       "reply",
       commentContent,

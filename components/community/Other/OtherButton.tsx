@@ -7,25 +7,27 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 
-const OtherPost = ({
+const OtherButton = ({
   post,
   comment,
   user,
   setComments,
-  setEditingCommentId
+  setEditingCommentId,
+  setPostList
 }: {
   post?: PostResponseDTO;
   comment?: CommentResponseDTO;
   user?: ShortUserResponseDTO;
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   setEditingCommentId?: React.Dispatch<React.SetStateAction<string>>;
+  setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
 }) => {
-  const [isBack, setIsBack] = useState(false);
+  const [isSheet, setIsSheet] = useState(false);
   return (
     <>
       <Button
         className="p-0 shadow-none border-none h-fit"
-        onClick={() => setIsBack(!isBack)}
+        onClick={() => setIsSheet(!isSheet)}
       >
         <Icon
           icon="basil:other-1-outline"
@@ -34,18 +36,19 @@ const OtherPost = ({
           className="text-dark100_light900"
         />
       </Button>
-      {isBack && (
+      {isSheet && (
         <ActionSheet
           post={post}
-          setIsBack={setIsBack}
+          setIsBack={setIsSheet}
           comment={comment}
           user={user}
           setComments={setComments}
           setEditingCommentId={setEditingCommentId}
+          setPostList={setPostList}
         />
       )}
     </>
   );
 };
 
-export default OtherPost;
+export default OtherButton;

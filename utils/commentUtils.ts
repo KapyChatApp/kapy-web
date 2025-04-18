@@ -7,7 +7,7 @@ import { editComment } from "@/lib/services/post/comment/edit";
 import { likeComment } from "@/lib/services/post/comment/like";
 import { getFileFormat } from "@/lib/utils";
 
-export const handleCreate = async (
+export const handleCreateComment = async (
   replyId: string,
   targetType: string,
   commentContent: string,
@@ -61,7 +61,7 @@ export const handleCreate = async (
   await createComment(commentContent, files, replyId, targetType);
 };
 
-export const handleDelete = async (
+export const handleDeleteComment = async (
   commentId: string,
   setListComment: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>
 ) => {
@@ -73,7 +73,7 @@ export const handleDelete = async (
   }
 };
 
-export const handleLike = async (
+export const handleLikeComment = async (
   commentId: string,
   setLiked: React.Dispatch<React.SetStateAction<boolean>>,
   setLikeCount: React.Dispatch<React.SetStateAction<number>>
@@ -89,7 +89,7 @@ export const handleLike = async (
   }
 };
 
-export const handleDislike = async (
+export const handleDislikeComment = async (
   commentId: string,
   setLiked: React.Dispatch<React.SetStateAction<boolean>>,
   setLikeCount: React.Dispatch<React.SetStateAction<number>>
@@ -106,7 +106,7 @@ export const handleDislike = async (
   }
 };
 
-export const handleUpdate = async (
+export const handleEditComment = async (
   setCommentList: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>,
   editingCommentId: string,
   commentContent: string,

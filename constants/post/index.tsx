@@ -1,43 +1,66 @@
+import { ActionItem } from "@/types/post";
+
 export const actionSheet = (
-  setReport: (value: boolean) => void,
-  handleConfirmUnfriend: () => void,
-  setIsBack: (value: boolean) => void,
-  isComment: boolean,
-  checkAdminComment: boolean,
-  handleDeleteComment?: () => void,
-  handleGetEditingCommentId?: () => void
-) => {
-  const actions = [
+  setReport: (val: boolean) => void,
+  handleUnfriend?: () => void,
+  setIsBack?: (val: boolean) => void,
+  isComment = false,
+  isAdmin = false,
+  handleDelete?: () => void,
+  handleEdit?: () => void
+): ActionItem[] => {
+  if (isAdmin) {
+    return [
+      {
+        label: "Delete",
+        value: true,
+        onClick: handleDelete
+      },
+      ...(isComment
+        ? [
+            {
+              label: "Edit",
+              onClick: handleEdit
+            }
+          ]
+        : handleEdit
+        ? [
+            {
+              label: "Edit",
+              onClick: handleEdit
+            }
+          ]
+        : []),
+      {
+        label: "Cancel",
+        onClick: () => setIsBack?.(false)
+      }
+    ];
+  }
+
+  const defaultActions = [
     {
-      label: checkAdminComment ? "Delete" : "Report",
+      label: "Report",
       value: true,
-      onClick: checkAdminComment ? handleDeleteComment : () => setReport(true)
+      onClick: () => setReport(true)
     }
   ];
 
-  if (isComment && checkAdminComment && handleGetEditingCommentId) {
-    actions.push({
-      label: "Edit",
-      value: true,
-      onClick: handleGetEditingCommentId
-    });
-  }
-
-  if (!isComment) {
-    actions.push({
+  if (!isComment && handleUnfriend) {
+    defaultActions.push({
       label: "Unfriend",
       value: true,
-      onClick: handleConfirmUnfriend
+      onClick: handleUnfriend
     });
   }
 
-  actions.push({
+  defaultActions.push({
     label: "Cancel",
     value: false,
-    onClick: () => setIsBack(false)
+    onClick: () => setIsBack?.(false)
   });
 
-  return actions;
+  return defaultActions;
 };
 
 export const iconInteraction = (

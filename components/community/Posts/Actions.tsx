@@ -7,8 +7,8 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
 import { CommentResponseDTO } from "@/lib/DTO/comment";
 import CommentArea from "../Comment/CommentArea";
-import { handleCreate } from "@/utils/commentUtils";
 import DetailListUser from "../../shared/modal/DetailListUser";
+import { handleCreateComment } from "@/utils/commentUtils";
 
 const Actions = ({ post }: { post: PostResponseDTO }) => {
   const { adminInfo } = useUserContext();
@@ -32,7 +32,7 @@ const Actions = ({ post }: { post: PostResponseDTO }) => {
   };
 
   const handleCommentPost = async () => {
-    await handleCreate(
+    await handleCreateComment(
       post._id,
       "post",
       commentContent,

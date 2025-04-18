@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { PostResponseDTO } from "@/lib/DTO/post";
-import OtherPost from "../../Other/OtherPost";
+import OtherButton from "../../Other/OtherButton";
 
 const Header = ({ post }: { post: PostResponseDTO }) => {
   const [isBack, setIsBack] = useState(false);
@@ -43,7 +43,7 @@ const Header = ({ post }: { post: PostResponseDTO }) => {
 
       <div className="w-10 h-10 mr-2">
         <div className="flex p-2">
-          <OtherPost post={post} />
+          <OtherButton post={post} />
         </div>
       </div>
     </div>

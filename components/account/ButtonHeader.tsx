@@ -23,8 +23,8 @@ import { useChatContext } from "@/context/ChatContext";
 import { useFriendContext } from "@/context/FriendContext";
 import { useUserContext } from "@/context/UserContext";
 import PersonalEdit from "../settings/Profile/PersonalEdit";
-import OtherPost from "../community/Other/OtherPost";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import OtherButton from "../community/Other/OtherButton";
 
 const ButtonHeader = ({ account }: { account: AccountData }) => {
   const { adminInfo } = useUserContext();
@@ -298,7 +298,7 @@ const ButtonHeader = ({ account }: { account: AccountData }) => {
         {renderActionButton()}
         {account.type === "friend" && (
           <div className="flex h-full items-center justify-center">
-            <OtherPost user={user} />
+            <OtherButton user={user} />
           </div>
         )}
       </section>
