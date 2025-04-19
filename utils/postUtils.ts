@@ -84,7 +84,7 @@ export const handleEditPost = async (
   postId: string,
   caption: string,
   files: File[] | null,
-  remainContentIds: string[],
+  remainContents: FileResponseDTO[],
   tags: ShortUserResponseDTO[],
   onBack: () => void
 ) => {
@@ -94,7 +94,7 @@ export const handleEditPost = async (
     caption,
     files,
     tagIds,
-    remainContentIds
+    remainContents
   );
   if (!response) {
     toast({

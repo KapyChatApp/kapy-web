@@ -44,7 +44,7 @@ const page = () => {
   const router = useRouter();
   const handleBack = () => {
     const scrollPosition = sessionStorage.getItem("scrollPosition");
-    router.back();
+    router.push(`/community`);
 
     if (scrollPosition) {
       setTimeout(() => {

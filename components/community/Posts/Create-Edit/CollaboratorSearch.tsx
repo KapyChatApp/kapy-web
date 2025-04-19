@@ -6,8 +6,10 @@ import { getMyListBestFriend } from "@/lib/data/mine/dataBestFriend";
 import { FriendResponseDTO } from "@/lib/DTO/friend";
 
 const CollaboratorSearch = ({
+  taggedUser,
   setTaggedUser
 }: {
+  taggedUser?: ShortUserResponseDTO[];
   setTaggedUser: React.Dispatch<React.SetStateAction<ShortUserResponseDTO[]>>;
 }) => {
   const [filteredUsers, setFilteredUsers] = useState<ShortUserResponseDTO[]>(
@@ -42,10 +44,13 @@ const CollaboratorSearch = ({
   };
 
   const handleSelectUser = (user: ShortUserResponseDTO) => {
-    const name = user.firstName + user.lastName;
-    setSearchCollaborator(name);
+    const alreadyTagged = taggedUser?.some((u) => u._id === user._id);
+    if (alreadyTagged) return;
+    const name = "@" + user.firstName + " " + user.lastName;
+
     setTaggedUser((prev) => [...prev, user]);
-    setIsSelected(true); // Đánh dấu là đã chọn
+    setSearchCollaborator(name);
+    setIsSelected(true);
     setShowDropdown(false);
   };
 
@@ -79,6 +84,29 @@ const CollaboratorSearch = ({
           className="text-dark100_light900 w-4 h-4"
         />
       </div>
+      {taggedUser && taggedUser.length > 0 && (
+        <div className="flex flex-wrap gap-2 mt-2">
+          {taggedUser.map((user) => (
+            <div
+              key={user._id}
+              className="flex items-center gap-2 px-2 py-1 rounded-full bg-blue-100 text-accent-blue text-sm"
+            >
+              <span>
+                {user.firstName} {user.lastName}
+              </span>
+              <button
+                onClick={() => {
+                  setTaggedUser((prev) =>
+                    prev.filter((u) => u._id !== user._id)
+                  );
+                }}
+              >
+                <Icon icon="iconoir:cancel" width={14} height={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Danh sách kết quả tìm kiếm */}
       {showDropdown && (

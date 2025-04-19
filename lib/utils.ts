@@ -28,6 +28,7 @@ import { useUserContext } from "@/context/UserContext";
 import { UserResponseDTO } from "./DTO/user";
 import { useRouter } from "next/navigation";
 import { createGroup } from "./services/message/createGroup";
+import { FileResponseDTO } from "./DTO/map";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -622,3 +623,26 @@ export const getDeviceInfo = () => {
 
   return deviceInfo;
 };
+
+export const mapFilesToDTO = (files: File[]): FileResponseDTO[] => {
+  return files.map((file) => ({
+    _id: crypto.randomUUID(), // tạm thời để render, server sẽ generate cái thật
+    fileName: file.name,
+    url: URL.createObjectURL(file),
+    bytes: file.size,
+    width: 0,
+    height: 0,
+    format: file.name.split(".").pop() || "",
+    type: file.type.split("/")[0] === "image" ? "Image" : "Video"
+  }));
+};
+
+export async function urlToFile(
+  url: string,
+  fileName: string,
+  mimeType: string
+): Promise<File> {
+  const response = await fetch(url);
+  const blob = await response.blob();
+  return new File([blob], fileName, { type: mimeType });
+}

@@ -1,55 +1,79 @@
-"use client";
+import { FileResponseDTO } from "@/lib/DTO/map";
+import PreCreate from "./PreCreate";
+import UploadFiles from "./UploadFiles";
+import { useEffect, useState } from "react";
+import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { handleCreatePost, handleEditPost } from "@/utils/postUtils";
+import { Icon } from "@iconify/react/dist/iconify.js";
+import { Button } from "@/components/ui/button";
 import ConfirmModal, {
   ConfirmModalProps
 } from "@/components/friends/ConfirmModal";
-import { Button } from "@/components/ui/button";
-import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useEffect, useState } from "react";
-import UploadFiles from "./UploadFiles";
-import { FileResponseDTO } from "@/lib/DTO/map";
-import PreCreate from "./PreCreate";
-import { ShortUserResponseDTO } from "@/lib/DTO/user";
-import { handleCreate } from "@/utils/postUtils";
+import { PostResponseDTO } from "@/lib/DTO/post";
+import { useRouter } from "next/navigation";
 
-const CreatePost = ({
-  setIsCreate
+const PostForm = ({
+  post,
+  isEdit = false,
+  onFinish
 }: {
-  setIsCreate: React.Dispatch<React.SetStateAction<boolean>>;
+  post?: PostResponseDTO;
+  isEdit?: boolean;
+  onFinish: () => void;
 }) => {
-  const [step, setStep] = useState(0); // 0: UploadFiles, 1: PreCreate
-  const [isMounted, setIsMounted] = useState(false);
-  const [isConfirm, setIsConfirm] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  const [step, setStep] = useState(0);
+  const [files, setFiles] = useState<File[]>([]); //New Files
+  const [remainContents, setRemainContents] = useState<FileResponseDTO[]>([]);
   const [captionContent, setCaptionContent] = useState("");
   const [taggedUser, setTaggedUser] = useState<ShortUserResponseDTO[]>([]);
+  const [isConfirm, setIsConfirm] = useState(false);
   const [confirm, setConfirm] = useState<ConfirmModalProps>({
     setConfirm: () => {},
     handleAction: () => {},
     name: "",
     action: ""
   });
-  const handleBack = () => {
-    setIsCreate(false);
+  useEffect(() => {
+    if (!post) return;
+    setRemainContents(post.contents);
+    setTaggedUser(post.tags);
+    setCaptionContent(post.caption);
+  }, [post]);
+  const handleSubmit = async () => {
+    if (post && isEdit && post._id) {
+      await handleEditPost(
+        post._id,
+        captionContent,
+        files,
+        remainContents,
+        taggedUser,
+        onFinish
+      );
+    } else {
+      await handleCreatePost(captionContent, files, taggedUser, onFinish);
+    }
+    onFinish();
   };
 
+  const router = useRouter();
+  const handleBack = () => {
+    if (isEdit) {
+      router.push(`/community`);
+    } else {
+      onFinish();
+    }
+  };
   const handleConfirmBack = () => {
     setIsConfirm(true);
     setConfirm({
       setConfirm: setIsConfirm,
       handleAction: handleBack,
-      name: "post",
+      name: "your changes",
       action: "discard"
     });
   };
 
-  const handleShare = async () => {
-    await handleCreate(captionContent, files, taggedUser, handleBack);
-  };
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
-  return isMounted ? (
+  return (
     <>
       <div className="modal-overlay-post">
         {/* Close Button */}
@@ -66,7 +90,6 @@ const CreatePost = ({
             />
           </Button>
         </div>
-
         <div
           className={`w-full h-[555px] rounded-lg background-light900_dark200 flex flex-col items-center justify-between ${
             step === 0 ? "max-w-[512px]" : "max-w-[852px]"
@@ -76,7 +99,7 @@ const CreatePost = ({
           <div
             className={`flex w-full h-[43px] items-center ${
               step === 0
-                ? files.length === 0
+                ? files.length === 0 && remainContents.length === 0
                   ? "justify-center"
                   : "justify-between"
                 : "justify-between "
@@ -98,14 +121,17 @@ const CreatePost = ({
             ) : (
               <div></div>
             )}
-
             <h2 className="paragraph-bold text-dark100_light900">
-              {step === 1 ? "Create new post" : "Upload files"}
+              {step === 1
+                ? isEdit
+                  ? "Update post"
+                  : "Create new post"
+                : "Upload files"}
             </h2>
 
             {step === 0 ? (
               // Nút Next khi ở bước UploadFiles
-              files.length > 0 && (
+              (files.length > 0 || remainContents.length > 0) && (
                 <button
                   onClick={() => setStep(1)}
                   className="flex items-center justify-center bg-transparent text-primary-500 rounded-full body-semibold"
@@ -117,30 +143,39 @@ const CreatePost = ({
               // Nút Share khi ở bước PreCreate
               <button
                 className="flex items-center justify-center bg-transparent text-primary-500 rounded-full body-semibold"
-                onClick={handleShare}
+                onClick={handleSubmit}
               >
-                Share
+                {isEdit ? "Done" : "Share"}
               </button>
             )}
           </div>
 
           {/* Nội dung */}
           {step === 0 ? (
-            <UploadFiles files={files} setFiles={setFiles} />
+            isEdit ? (
+              <UploadFiles
+                files={files}
+                setFiles={setFiles}
+                remainContents={remainContents}
+                setRemainContents={setRemainContents}
+              />
+            ) : (
+              <UploadFiles files={files} setFiles={setFiles} />
+            )
           ) : (
             <PreCreate
               files={files}
               captionContent={captionContent}
+              taggedUser={taggedUser}
+              remainContents={remainContents}
               setCaptionContent={setCaptionContent}
               setTaggedUser={setTaggedUser}
             />
           )}
         </div>
       </div>
-
       {isConfirm && <ConfirmModal confirm={confirm} />}
     </>
-  ) : null;
+  );
 };
-
-export default CreatePost;
+export default PostForm;

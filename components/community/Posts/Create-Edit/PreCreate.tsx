@@ -6,15 +6,20 @@ import React, { useMemo, useState } from "react";
 import CaptionInput from "./CaptionInput";
 import CollaboratorSearch from "./CollaboratorSearch";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
+import { mapFilesToDTO } from "@/lib/utils";
 
 const PreCreate = ({
   files,
+  remainContents = [],
   captionContent,
+  taggedUser,
   setCaptionContent,
   setTaggedUser
 }: {
   files: File[];
+  remainContents?: FileResponseDTO[];
   captionContent: string;
+  taggedUser?: ShortUserResponseDTO[];
   setCaptionContent: React.Dispatch<React.SetStateAction<string>>;
   setTaggedUser: React.Dispatch<React.SetStateAction<ShortUserResponseDTO[]>>;
 }) => {
@@ -23,26 +28,16 @@ const PreCreate = ({
   const handleInputChange = (value: string) => {
     setCaptionContent(value);
   };
-
-  const parsedFiles = useMemo(() => {
-    return files.map((file) => ({
-      _id: crypto.randomUUID(), // Mỗi file sẽ chỉ tạo ID một lần
-      fileName: file.name,
-      url: URL.createObjectURL(file),
-      bytes: file.size,
-      width: 0,
-      height: 0,
-      format: file.name.split(".").pop() || "",
-      type: file.type.split("/")[0] === "image" ? "Image" : "Video"
-    }));
-  }, [files]); // Chỉ tính toán lại khi `files` thay đổi
-
+  const mergedFiles = useMemo(() => {
+    const mappedNewFiles = mapFilesToDTO(files);
+    return [...remainContents, ...mappedNewFiles];
+  }, [files, remainContents]);
   return (
     <div className="w-full flex flex-grow items-center justify-center">
       {/* Ảnh hoặc video */}
       <div className="w-full h-full overflow-auto flex justify-center">
         <div className="grid gap-2 overflow-x-auto scrollbar-hide">
-          <SwiperDetailPost contents={parsedFiles} />
+          <SwiperDetailPost contents={mergedFiles} />
         </div>
       </div>
 
@@ -71,7 +66,10 @@ const PreCreate = ({
 
         {/* Add Collaborators */}
         <div className="flex flex-grow items-center justify-between mt-4 border-t pt-3 border-light500_dark400 w-full">
-          <CollaboratorSearch setTaggedUser={setTaggedUser} />
+          <CollaboratorSearch
+            taggedUser={taggedUser}
+            setTaggedUser={setTaggedUser}
+          />
         </div>
       </div>
     </div>
