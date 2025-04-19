@@ -41,7 +41,13 @@ export const getPostsOfUser = async (
 ) => {
   try {
     const data: PostResponseDTO[] = await fetchUserPost(id, isMine, setError);
-    if (data) setPostData(data);
+    if (data) {
+      const sortedData = data.sort(
+        (a, b) =>
+          new Date(b.createAt).getTime() - new Date(a.createAt).getTime()
+      );
+      setPostData(sortedData);
+    }
   } catch (err) {
     console.error("Error fetching posts:", err);
   }
