@@ -14,25 +14,28 @@ const page = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchProfile = async () => {
       const adminId = localStorage.getItem("adminId");
       if (!adminId) return;
 
       if (id.toString() === adminId) {
         await getMyProfile(setAdminInfo);
       }
-
-      handleGetAllDetail(
-        id.toString(),
-        adminInfo,
-        setAccount,
-        setPostData,
-        setError
-      );
     };
 
-    fetchData();
-  }, [id, adminInfo]);
+    fetchProfile();
+  }, [id]);
+
+  useEffect(() => {
+    if (!adminInfo) return;
+    handleGetAllDetail(
+      id.toString(),
+      adminInfo,
+      setAccount,
+      setPostData,
+      setError
+    );
+  }, [adminInfo, id]);
 
   return (
     <section className="h-screen w-full py-[16px] pr-[16px]">
