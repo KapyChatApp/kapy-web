@@ -4,13 +4,13 @@ import { Button } from "../ui/button";
 import PostFrame from "./Posts/PostFrame";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import CreatePost from "./Posts/Create/CreatePost";
+import CreatePost from "./Posts/Create-Edit/CreatePost";
 import { fetchPosts } from "@/lib/data/post/dataPost";
 import { useUserContext } from "@/context/UserContext";
 
 const Feeds = () => {
   const [arrayPost, setArrayPost] = useState<PostResponseDTO[]>([]);
-  const { adminId } = useUserContext();
+  const { adminInfo } = useUserContext();
   useEffect(() => {
     const fetchData = async () => {
       const adminId = localStorage.getItem("adminId");
@@ -60,17 +60,23 @@ const Feeds = () => {
           </div>
         </div>
 
-        <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
-          {arrayPost.map((item) => (
-            <PostFrame
-              key={item._id}
-              post={item}
-              {...(item.userId === adminId
-                ? { setArrayPost: setArrayPost }
-                : {})}
-            />
-          ))}
-        </div>
+        {arrayPost.length > 0 ? (
+          <div className="flex flex-col w-full h-full items-center justify-start overflow-scroll custom-scrollbar">
+            {arrayPost.map((item) => (
+              <PostFrame
+                key={item._id}
+                post={item}
+                {...(item.userId === adminInfo._id
+                  ? { setArrayPost: setArrayPost }
+                  : {})}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center background-light900_dark400">
+            <div className="loader"></div>
+          </div>
+        )}
       </div>
 
       {isCreate && <CreatePost setIsCreate={setIsCreate} />}

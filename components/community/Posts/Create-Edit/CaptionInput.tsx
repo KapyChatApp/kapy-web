@@ -60,7 +60,7 @@ const CaptionInput = ({
           onInput={handleInput}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          placeholder="Add a caption..."
+          placeholder={captionContent ? captionContent : "Add a caption..."}
         />
       </div>
 

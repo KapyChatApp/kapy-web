@@ -9,7 +9,9 @@ const Content = ({ post }: { post: PostResponseDTO }) => {
         <p className="text-dark100_light900 body-regular">{post.caption}</p>
       </div>
       <div
-        className={`w-full h-fit flex ${post.tags.length > 0 ? "mb-2" : ""}`}
+        className={`w-full h-fit flex ${
+          post.tags.length > 0 || post.contents.length > 0 ? "mb-2" : ""
+        }`}
       >
         {post.tags.map((item, index) => (
           <div className="w-fit break-words whitespace-pre-wrap">

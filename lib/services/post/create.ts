@@ -1,3 +1,4 @@
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
 export async function createPost(
   caption: string,
   files: File[] | null,
@@ -21,13 +22,17 @@ export async function createPost(
     formData.append("tagIds", JSON.stringify(tagIds)); // Chuyển thành JSON string
 
     if (files) {
-      files.forEach((file) => {
+      const validFiles = files.filter((file) => {
+        if (file.size > MAX_FILE_SIZE) {
+          alert(`❌ File "${file.name}" vượt quá 10MB (size: ${file.size})`);
+          return false;
+        }
+        return true;
+      });
+      validFiles.forEach((file) => {
         formData.append("file", file);
       });
     }
-    Array.from(formData.entries()).forEach(([key, value]) => {
-      console.log(`${key}:`, value);
-    });
 
     const response = await fetch(`${process.env.BASE_URL}post/create`, {
       method: "POST",
