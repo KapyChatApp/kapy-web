@@ -134,7 +134,6 @@ export const GroupCallContextProvider: React.FC<{
       ongoingGroupCall?: OngoingGroupCall | null;
       isEmitHangup?: boolean;
     }) => {
-      // Nếu là host thì phát tín hiệu kết thúc cuộc gọi cho cả nhóm
       if (socket && adminInfo && data?.ongoingGroupCall && data.isEmitHangup) {
         socket.emit("groupHangup", {
           ongoingGroupCall: data.ongoingGroupCall,
@@ -143,7 +142,12 @@ export const GroupCallContextProvider: React.FC<{
       }
       // Ngắt kết nối local
       setPeers(null);
-      setOngoingGroupCall(null);
+      if (data?.ongoingGroupCall) {
+        setOngoingGroupCall(data.ongoingGroupCall); // cập nhật cái mới
+      } else {
+        setOngoingGroupCall(null); // kết thúc hẳn
+      }
+
       setIsCallEnded(true);
 
       if (localStream) {
@@ -156,18 +160,37 @@ export const GroupCallContextProvider: React.FC<{
   );
 
   const handleLeaveGroup = useCallback(
-    (leaverUserId: string) => {
-      console.log("User left the group call:", leaverUserId);
-      if (peers && peers.length > 0) {
+    (data: {
+      leaverUserId?: string | null;
+      participantsGroup?: ParticipantsGroup | null;
+    }) => {
+      console.log("📤 User leaving:", data.leaverUserId);
+
+      if (peers && peers.length > 0 && data.participantsGroup) {
         setPeers((prev) => {
           if (!prev) return null;
           return prev.filter(
-            (p) => !p.participantUser.some((u) => u.userId === leaverUserId)
+            (p) =>
+              !p.participantUser.some((u) => u.userId === data.leaverUserId)
           );
         });
       }
+
+      setOngoingGroupCall((prev) => {
+        if (!prev) return null;
+
+        if (data.participantsGroup) {
+          const updated: OngoingGroupCall = {
+            participantsGroup: data.participantsGroup,
+            isRinging: false
+          };
+          console.log("✅ Updating ongoingGroupCall to:", updated);
+          return updated;
+        }
+        return prev;
+      });
     },
-    [socket, peers, ongoingGroupCall, adminInfo]
+    [peers]
   );
 
   const createPeer = useCallback(
@@ -239,7 +262,7 @@ export const GroupCallContextProvider: React.FC<{
 
       if (peers && peers.length > 0) {
         peers.forEach((p) => {
-          p.peerConnection.signal(connectionData.sdp);
+          connectionData.sdp && p.peerConnection.signal(connectionData.sdp);
         });
         return;
       }
@@ -273,7 +296,9 @@ export const GroupCallContextProvider: React.FC<{
     async (ongoingGroupCall: OngoingGroupCall) => {
       setIsCallEnded(false);
       setOngoingGroupCall((prev) => {
-        if (!prev) return null;
+        if (!prev) {
+          return null;
+        }
         return {
           ...prev,
           isRinging: false
@@ -372,14 +397,14 @@ export const GroupCallContextProvider: React.FC<{
     socket.on("groupHangup", handleGroupHangup);
     console.log("🔔 Event group hangup is listening...");
 
-    socket.on("groupPeerLeave", handleLeaveGroup);
+    socket.on("leavingRoom", handleLeaveGroup);
     console.log("🔔 Event leaving group is listening...");
 
     return () => {
       socket.off("incomingGroupCall", onIncomingGroupCall);
       socket.off("groupWebrtcSignal", completeGroupPeerConnection);
       socket.off("groupHangup", handleGroupHangup);
-      socket.off("groupPeerLeave", handleLeaveGroup);
+      socket.off("leavingRoom", handleLeaveGroup);
     };
   }, [
     socket,

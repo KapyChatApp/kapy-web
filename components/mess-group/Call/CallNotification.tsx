@@ -52,15 +52,17 @@ const CallNotification = () => {
         "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
     });
     router.back();
-    isGroupCall
-      ? handleGroupHangup({
-          ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
-          isEmitHangup: true
-        })
-      : handleHangup({
-          ongoingCall: ongoingCall ? ongoingCall : undefined,
-          isEmitHangup: true
-        });
+    if (isGroupCall) {
+      handleGroupHangup({
+        ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
+        isEmitHangup: false
+      });
+    } else {
+      handleHangup({
+        ongoingCall: ongoingCall ? ongoingCall : undefined,
+        isEmitHangup: true
+      });
+    }
   };
 
   return (
