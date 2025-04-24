@@ -24,6 +24,9 @@ interface iGroupCallContext {
   localStream: MediaStream | null;
   peers: PeerDataGroup[] | null;
   isCallEnded: boolean;
+  setOngoingGroupCall: React.Dispatch<
+    React.SetStateAction<OngoingGroupCall | null>
+  >;
   handleGroupCall: (
     membersOnline: SocketUser[],
     groupInfo: SocketGroup
@@ -184,6 +187,20 @@ export const GroupCallContextProvider: React.FC<{
               )
             }));
         });
+
+        setOngoingGroupCall((prev) => {
+          if (!prev) return null;
+
+          if (data.participantsGroup) {
+            const updated: OngoingGroupCall = {
+              participantsGroup: data.participantsGroup,
+              isRinging: false
+            };
+            console.log("✅ Updating ongoingGroupCall to:", updated);
+            return updated;
+          }
+          return prev;
+        });
       }
 
       setOngoingGroupCall((prev) => {
@@ -192,15 +209,17 @@ export const GroupCallContextProvider: React.FC<{
         if (data.participantsGroup) {
           const updated: OngoingGroupCall = {
             participantsGroup: data.participantsGroup,
-            isRinging: false
+            isRinging: localStream ? false : true
           };
+
           console.log("✅ Updating ongoingGroupCall to:", updated);
           return updated;
         }
+
         return prev;
       });
     },
-    [peers]
+    [peers, localStream]
   );
 
   const createPeer = useCallback(
@@ -446,6 +465,7 @@ export const GroupCallContextProvider: React.FC<{
         localStream,
         peers,
         isCallEnded,
+        setOngoingGroupCall,
         handleGroupCall,
         handleJoinGroupCall,
         handleGroupHangup

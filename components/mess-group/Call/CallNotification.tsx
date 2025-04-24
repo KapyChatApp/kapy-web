@@ -9,11 +9,17 @@ import { toast } from "@/hooks/use-toast";
 import { OngoingCall } from "@/types/socket";
 import { useGroupSocketContext } from "@/context/GroupCallContext";
 import { OngoingGroupCall } from "@/types/group-call";
+import { useUserContext } from "@/context/UserContext";
 
 const CallNotification = () => {
   const { ongoingCall, handleJoinCall, handleHangup } = useSocketContext();
-  const { ongoingGroupCall, handleJoinGroupCall, handleGroupHangup } =
-    useGroupSocketContext();
+  const {
+    ongoingGroupCall,
+    handleJoinGroupCall,
+    handleGroupHangup,
+    setOngoingGroupCall
+  } = useGroupSocketContext();
+  const { adminInfo } = useUserContext();
 
   // Kiểm tra xem có cuộc gọi nhóm đang đổ chuông không
   const isGroupCall = ongoingGroupCall?.isRinging ?? false;
@@ -46,18 +52,43 @@ const CallNotification = () => {
     handleJoinGroupCall(ongoingGroupCall);
   };
   const handleEndCall = async () => {
-    toast({
-      title: isGroupCall ? "Meeting Ended" : "Call Ended",
-      className:
-        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
-    });
-    router.back();
     if (isGroupCall) {
+      const callerId = ongoingGroupCall?.participantsGroup.caller?.userId;
+      const receivers = ongoingGroupCall?.participantsGroup.receivers || [];
+      const totalParticipants = receivers.length + (callerId ? 1 : 0);
+
+      const isCaller = callerId === adminInfo._id;
+
+      // 👉 Logic xác định loại hành động
+      const shouldEmitHangup = isCaller || totalParticipants <= 2;
+
       handleGroupHangup({
-        ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
-        isEmitHangup: false
+        ongoingGroupCall: ongoingGroupCall || undefined,
+        isEmitHangup: shouldEmitHangup
       });
+
+      toast({
+        title: "Meeting Ended",
+        className:
+          "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+      });
+
+      // 👉 Điều hướng
+      if (shouldEmitHangup) {
+        router.push("/group-chat/");
+      } else {
+        router.push(
+          "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
+        );
+        setOngoingGroupCall(null);
+      }
     } else {
+      router.back();
+      toast({
+        title: "Call Ended",
+        className:
+          "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+      });
       handleHangup({
         ongoingCall: ongoingCall ? ongoingCall : undefined,
         isEmitHangup: true
