@@ -45,11 +45,12 @@ const PersonalRoom = () => {
 
   const router = useRouter();
   const handleEndCall = () => {
-    router.back();
+    //router.push(`/${ongoingCall?.participants.caller.userId}`);
     handleHangup({
       ongoingCall: ongoingCall ? ongoingCall : undefined,
       isEmitHangup: true
     });
+    router.push(`/`);
     toast({
       title: "Call Ended",
       className:
@@ -58,7 +59,7 @@ const PersonalRoom = () => {
   };
 
   if (!localStream && !peer && !ongoingCall && isCallEnded) {
-    router.back();
+    router.push(`/`);
     toast({
       title: "Call Ended",
       className:

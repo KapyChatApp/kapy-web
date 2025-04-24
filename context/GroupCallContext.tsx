@@ -134,10 +134,11 @@ export const GroupCallContextProvider: React.FC<{
       ongoingGroupCall?: OngoingGroupCall | null;
       isEmitHangup?: boolean;
     }) => {
-      if (socket && adminInfo && data?.ongoingGroupCall && data.isEmitHangup) {
+      if (socket && adminInfo && data?.ongoingGroupCall) {
         socket.emit("groupHangup", {
           ongoingGroupCall: data.ongoingGroupCall,
-          userHangingupId: adminInfo._id
+          userHangingupId: adminInfo._id,
+          isEmitHangup: data.isEmitHangup
         });
       }
       // Ngắt kết nối local
@@ -168,11 +169,20 @@ export const GroupCallContextProvider: React.FC<{
 
       if (peers && peers.length > 0 && data.participantsGroup) {
         setPeers((prev) => {
-          if (!prev) return null;
-          return prev.filter(
-            (p) =>
-              !p.participantUser.some((u) => u.userId === data.leaverUserId)
-          );
+          if (!prev) return [];
+
+          return prev
+            .filter((peer) =>
+              peer.participantUser.some(
+                (user) => user.userId === data.leaverUserId
+              )
+            ) // giữ lại peer nào có chứa leaverUserId
+            .map((peer) => ({
+              ...peer,
+              participantUser: peer.participantUser.filter(
+                (user) => user.userId !== data.leaverUserId
+              )
+            }));
         });
       }
 
