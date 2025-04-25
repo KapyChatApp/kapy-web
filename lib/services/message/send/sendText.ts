@@ -6,16 +6,18 @@ export async function handleSendTextMessage(
   messageContent: string,
   boxId: string,
   recipientIds: string[] | undefined,
-  setMessageContent: React.Dispatch<React.SetStateAction<string>>,
-  setError: React.Dispatch<React.SetStateAction<string>>
+  caller?: string,
+  setMessageContent?: React.Dispatch<React.SetStateAction<string>>,
+  setError?: React.Dispatch<React.SetStateAction<string>>
 ) {
   const recipientId = recipientIds ? recipientIds : [];
   const messageData = {
     boxId: boxId,
-    content: messageContent
+    content: messageContent,
+    caller: caller
   };
   if (!messageData.boxId || recipientId.length === 0) {
-    setError("Missing required fields in message data");
+    setError && setError("Missing required fields in message data");
     console.error("Missing required fields in message data");
     return;
   }
@@ -23,12 +25,13 @@ export async function handleSendTextMessage(
     const formData = new FormData();
     formData.append("boxId", messageData.boxId);
     formData.append("content", JSON.stringify(messageData.content));
+    messageData.caller && formData.append("caller", messageData.caller);
 
     // Gửi API
     try {
       const storedToken = localStorage.getItem("token");
       if (!storedToken) {
-        setError("No token found");
+        setError && setError("No token found");
         return;
       }
 
@@ -41,13 +44,13 @@ export async function handleSendTextMessage(
           }
         }
       );
-      setMessageContent("");
+      setMessageContent && setMessageContent("");
     } catch (error: any) {
-      setError(error.message);
+      setError && setError(error.message);
       console.error("Error sending message: ", error);
     }
   } else {
-    setError("No text in input bar");
+    setError && setError("No text in input bar");
     console.log("No text in input bar");
   }
 }

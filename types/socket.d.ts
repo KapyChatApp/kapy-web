@@ -10,6 +10,7 @@ export type SocketUser = {
 export type Participants = {
   caller: SocketUser;
   receiver: SocketUser;
+  boxId: string;
 };
 
 export type OngoingCall = {

@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 import { formatTimeMessageBox } from "@/lib/utils";
 import { useLayoutContext } from "@/context/LayoutContext";
@@ -121,16 +121,17 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
 
   // Call
   const router = useRouter();
+  const { id } = useParams();
   const handleVideoCall = async (client: SocketUser) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
-    handleCall(client, true);
+    handleCall(client, id.toString(), true);
   };
 
   const handleAudioCall = async (client: SocketUser) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
-    handleCall(client, false);
+    handleCall(client, id.toString(), false);
   };
 
   const handleMeeting = async (

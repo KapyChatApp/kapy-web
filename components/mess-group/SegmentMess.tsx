@@ -7,6 +7,7 @@ import AudioSegment from "./RightMessage/Segment/AudioSegment";
 import OtherSegment from "./RightMessage/Segment/OtherSegment";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import {
+  DetailCalling,
   ResponseMessageDTO,
   ResponseReactMessageDTO,
   UserInfoBox
@@ -17,6 +18,9 @@ import { useChatContext } from "@/context/ChatContext";
 import { reactMessage } from "@/lib/services/message/react";
 import { getPusherClient } from "@/lib/pusher";
 import { useParams } from "next/navigation";
+import CallingSegment from "./RightMessage/Segment/CalliingSegment";
+import { useSocketContext } from "@/context/SocketContext";
+import { useGroupSocketContext } from "@/context/GroupCallContext";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -39,12 +43,13 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   const adminId = adminInfo._id;
 
   // Render Content
-  const textSegment = text;
+  const textSegment = text && !text.startsWith("__CALL__:");
   const contentSegment = contentId && !text;
   const imageSegment = contentSegment && contentId.type === "Image";
   const audioSegment = contentSegment && contentId.type === "Audio";
   const videoSegment = contentSegment && contentId.type === "Video";
   const otherSegment = contentSegment && contentId.type === "Other";
+  const callingSegment = text && text.startsWith("__CALL__:");
 
   const [isHovered, setIsHovered] = useState(false);
   const [showQuantity, setShowQuantity] = useState(false);
@@ -117,7 +122,9 @@ const SegmentMess: React.FC<SegmentMessage> = ({
   };
 
   const showHeart =
-    segments.flag && (isHovered || isReactedByMessage[segments.id]);
+    segments.flag &&
+    (isHovered || isReactedByMessage[segments.id]) &&
+    !callingSegment;
   const params = {
     setShowQuantity,
     recieverInfo,
@@ -163,6 +170,33 @@ const SegmentMess: React.FC<SegmentMessage> = ({
       setIsCount(segments.isReact.length);
     }
   }, []);
+
+  //Calling Event
+  const { handleCall, onlineUsers } = useSocketContext();
+  const { handleGroupCall, onlineGroupUsers } = useGroupSocketContext();
+  const { dataChat } = useChatContext();
+  const chatItem = dataChat.find((chat) => chat.id === id);
+  const receiverId = recieverInfo.find(
+    (item) => item._id !== adminInfo._id
+  )?._id;
+  const client =
+    onlineUsers && onlineUsers.find((user) => user.profile._id === receiverId);
+  const membersGroupId =
+    Array.isArray(recieverInfo) &&
+    recieverInfo
+      .map((member) => member._id)
+      .filter((item) => item !== adminInfo?._id);
+  const clientGroup =
+    onlineGroupUsers &&
+    onlineGroupUsers.filter(
+      (user) => membersGroupId && membersGroupId.includes(user.userId)
+    );
+  const groupInfo = {
+    _id: id,
+    name: chatItem ? chatItem.groupName : "",
+    avatar: chatItem ? chatItem.groupAva : "",
+    members: recieverInfo
+  };
   return (
     <>
       <div
@@ -187,6 +221,20 @@ const SegmentMess: React.FC<SegmentMessage> = ({
         {otherSegment && (
           <OtherSegment segments={segments} index={index} length={length} />
         )}
+        {callingSegment &&
+          (() => {
+            const call: DetailCalling = JSON.parse(
+              text.replace("__CALL__:", "")
+            );
+            return (
+              <CallingSegment
+                detail={call}
+                client={client}
+                clientGroup={clientGroup}
+                groupInfo={groupInfo}
+              />
+            );
+          })()}
 
         {/* Div hiển thị khi đã react */}
         {segments.flag && isReactedByMessage[segments.id] && (

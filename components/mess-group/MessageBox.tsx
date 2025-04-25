@@ -2,7 +2,11 @@
 import { useChatContext } from "@/context/ChatContext";
 import { useLayoutContext } from "@/context/LayoutContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo, ResponseMessageDTO } from "@/lib/DTO/message";
+import {
+  DetailCalling,
+  MessageBoxInfo,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
 import { markMessageAsRead } from "@/lib/services/message/read-mark";
 import { contentBox, formatTimeMessageBox } from "@/lib/utils";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -55,6 +59,23 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
     return { content, senderName, createAt };
   };
   const { content, senderName, createAt } = contentWithSendername();
+  const renderContent = () => {
+    if (content.startsWith("__CALL__:")) {
+      const call: DetailCalling = JSON.parse(content.replace("__CALL__:", ""));
+
+      const userCount = call.participants.length;
+
+      if (call.isGroup) {
+        return `Meeting ${
+          call.status === "completed" ? `${call.duration}s` : "missed"
+        }`;
+      } else {
+        return `Call ${call.type} - ${call.status}`;
+      }
+    } else {
+      return content;
+    }
+  };
   const { openMore, setOpenMore } = useLayoutContext();
 
   const router = useRouter();
@@ -157,9 +178,13 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
                 )}
                 <div className="flex min-w-0 ">
                   {readStatusByBox[box.id] ? (
-                    <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
+                    <p className="small-custom ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
+                      {renderContent()}
+                    </p>
                   ) : (
-                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">{`${content}`}</p>
+                    <p className="small-bold-custom justify-start ml-1 overflow-hidden text-ellipsis whitespace-nowrap text-dark100_light900">
+                      {renderContent()}
+                    </p>
                   )}
                 </div>
               </div>

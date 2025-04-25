@@ -10,6 +10,8 @@ import { OngoingCall } from "@/types/socket";
 import { useGroupSocketContext } from "@/context/GroupCallContext";
 import { OngoingGroupCall } from "@/types/group-call";
 import { useUserContext } from "@/context/UserContext";
+import { DetailCalling } from "@/lib/DTO/message";
+import { sendCallSummaryMessage } from "@/utils/callingUtils";
 
 const CallNotification = () => {
   const { ongoingCall, handleJoinCall, handleHangup } = useSocketContext();
@@ -83,7 +85,23 @@ const CallNotification = () => {
         setOngoingGroupCall(null);
       }
     } else {
-      router.back();
+      const participants = [
+        ongoingCall?.participants.caller.userId,
+        ongoingCall?.participants.receiver.userId
+      ].filter((id): id is string => id !== undefined);
+      const detailCalling: DetailCalling = {
+        type: ongoingCall?.isVideoCall ? "video" : "audio",
+        status: "rejected",
+        duration: "00:00:00",
+        isGroup: false,
+        participants: participants
+      };
+      await sendCallSummaryMessage({
+        ongoingCall,
+        participants,
+        detailCalling
+      });
+      router.push("/");
       toast({
         title: "Call Ended",
         className:

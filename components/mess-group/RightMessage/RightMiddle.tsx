@@ -263,7 +263,9 @@ const RightMiddle = ({
                             className={`relative group h-full flex flex-row  items-center justify-start`} // Thêm lớp để nhóm hover
                           >
                             {item.createBy === adminId &&
-                              item.flag === true && (
+                              item.flag === true &&
+                              item.text &&
+                              !item.text.startsWith("__CALL__:") && (
                                 <MenubarSegment
                                   createAt={new Date(
                                     item.createAt
@@ -284,7 +286,9 @@ const RightMiddle = ({
                               recieverInfo={receiverInfo}
                             />
                             {item.createBy !== adminId &&
-                              item.flag === true && (
+                              item.flag === true &&
+                              item.text &&
+                              !item.text.startsWith("__CALL__:") && (
                                 <MenubarSegment
                                   createAt={new Date(
                                     item.createAt
