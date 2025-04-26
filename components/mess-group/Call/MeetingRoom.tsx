@@ -8,6 +8,8 @@ import VideoContainer from "./VideoContainer";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { useUserContext } from "@/context/UserContext";
+import { DetailCalling } from "@/lib/DTO/message";
+import { editCallSummaryMessage } from "@/utils/callingUtils";
 
 const MeetingRoom = () => {
   const {
@@ -39,7 +41,7 @@ const MeetingRoom = () => {
   console.log("peer in Group >>>", peers);
 
   const router = useRouter();
-  const handleEndCall = () => {
+  const handleEndCall = async () => {
     const callerId = ongoingGroupCall?.participantsGroup.caller?.userId;
     const receivers = ongoingGroupCall?.participantsGroup.receivers || [];
     const totalParticipants = receivers.length + (callerId ? 1 : 0);
@@ -48,6 +50,30 @@ const MeetingRoom = () => {
 
     // 👉 Logic xác định loại hành động
     const shouldEmitHangup = isCaller || totalParticipants <= 2;
+
+    // 👉 Điều hướng
+    if (shouldEmitHangup) {
+      const participants = [
+        ongoingGroupCall?.participantsGroup.caller.userId,
+        ...(ongoingGroupCall?.participantsGroup.receivers ?? []).map(
+          (item) => item.userId
+        )
+      ].filter((id): id is string => id !== undefined);
+
+      const detailCalling: DetailCalling = {
+        type: "video",
+        status: "completed",
+        duration: formatTime(callDuration),
+        isGroup: true,
+        participants: participants
+      };
+      await editCallSummaryMessage(detailCalling, adminInfo._id);
+      router.push("/group-chat/");
+    } else {
+      router.push(
+        "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
+      );
+    }
 
     handleGroupHangup({
       ongoingGroupCall: ongoingGroupCall || undefined,
@@ -59,15 +85,6 @@ const MeetingRoom = () => {
       className:
         "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
     });
-
-    // 👉 Điều hướng
-    if (shouldEmitHangup) {
-      router.push("/group-chat/");
-    } else {
-      router.push(
-        "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
-      );
-    }
   };
 
   if (!localStream && !peers && !ongoingGroupCall && isCallEnded) {

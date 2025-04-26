@@ -42,7 +42,9 @@ export async function handleSendTextMessage(
           }
         }
       );
-
+      if (response.status === 200 && response.data.success !== false) {
+        localStorage.setItem("editedMessageId", response.data.sendMessage.id);
+      }
       setMessageContent && setMessageContent("");
     } catch (error: any) {
       setError && setError(error.message);
