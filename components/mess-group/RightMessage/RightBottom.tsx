@@ -13,7 +13,7 @@ import MessageRecorder from "../MessageRecorder";
 import { useUserContext } from "@/context/UserContext";
 import { isTexting } from "@/lib/services/message/isTexting";
 import { disableTexting } from "@/lib/services/message/disableTexting";
-import { ResponseMessageDTO } from "@/lib/DTO/message";
+import { DetailCalling, ResponseMessageDTO } from "@/lib/DTO/message";
 import { handleSendRecorder } from "@/lib/services/message/send/sendRecord";
 import { handleSendTextMessage } from "@/lib/services/message/send/sendText";
 import { handleSendMultipleFiles } from "@/lib/services/message/send/sendMultipleFiles";
@@ -124,6 +124,7 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
           messageContent,
           boxId,
           recipientIds,
+          undefined,
           setMessageContent,
           setError
         );
@@ -200,6 +201,35 @@ const RightBottom = ({ recipientIds }: BottomProps) => {
         }
         return prev; // Không thay đổi nếu tin nhắn đã tồn tại
       });
+      if (data.text && data.text.startsWith("__CALL__:")) {
+        console.log("data message pusher: ", data.id);
+        const call: DetailCalling = JSON.parse(
+          data.text.replace("__CALL__:", "")
+        );
+        if (call.status === "ongoing") {
+          localStorage.setItem("editedMessageId", data.id);
+          setMessagesByBox((prev) => {
+            const currentMessages = prev[data.boxId] || [];
+            const messageExists = currentMessages.some(
+              (msg) => msg.id === data.id
+            );
+
+            let updatedMessages;
+            if (messageExists) {
+              updatedMessages = currentMessages.map((msg) =>
+                msg.id === data.id ? data : msg
+              );
+            } else {
+              updatedMessages = [...currentMessages, data];
+            }
+
+            return {
+              ...prev,
+              [data.boxId]: updatedMessages
+            };
+          });
+        }
+      }
       if (isCurrentPageBoxId(data.boxId)) {
         handleReadMark(data.boxId);
       } else {

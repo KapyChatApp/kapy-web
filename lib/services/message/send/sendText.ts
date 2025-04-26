@@ -1,5 +1,3 @@
-import { FileContent } from "@/lib/DTO/message";
-import { getFileFormat } from "@/lib/utils";
 import axios from "axios";
 
 export async function handleSendTextMessage(
@@ -44,6 +42,7 @@ export async function handleSendTextMessage(
           }
         }
       );
+
       setMessageContent && setMessageContent("");
     } catch (error: any) {
       setError && setError(error.message);

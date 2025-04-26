@@ -62,9 +62,6 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
   const renderContent = () => {
     if (content.startsWith("__CALL__:")) {
       const call: DetailCalling = JSON.parse(content.replace("__CALL__:", ""));
-
-      const userCount = call.participants.length;
-
       if (call.isGroup) {
         return `Meeting ${
           call.status === "completed" ? `${call.duration}s` : "missed"

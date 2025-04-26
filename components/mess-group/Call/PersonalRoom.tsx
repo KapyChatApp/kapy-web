@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useMediaControls } from "@/hooks/use-media";
-import { handleSendTextMessage } from "@/lib/services/message/send/sendText";
 import { DetailCalling } from "@/lib/DTO/message";
 import { sendCallSummaryMessage } from "@/utils/callingUtils";
 

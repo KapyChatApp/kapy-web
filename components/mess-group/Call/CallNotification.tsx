@@ -11,7 +11,10 @@ import { useGroupSocketContext } from "@/context/GroupCallContext";
 import { OngoingGroupCall } from "@/types/group-call";
 import { useUserContext } from "@/context/UserContext";
 import { DetailCalling } from "@/lib/DTO/message";
-import { sendCallSummaryMessage } from "@/utils/callingUtils";
+import {
+  editCallSummaryMessage,
+  sendCallSummaryMessage
+} from "@/utils/callingUtils";
 
 const CallNotification = () => {
   const { ongoingCall, handleJoinCall, handleHangup } = useSocketContext();
@@ -77,6 +80,21 @@ const CallNotification = () => {
 
       // 👉 Điều hướng
       if (shouldEmitHangup) {
+        const participants = [
+          ongoingGroupCall?.participantsGroup.caller.userId,
+          ...(ongoingGroupCall?.participantsGroup.receivers ?? []).map(
+            (item) => item.userId
+          )
+        ].filter((id): id is string => id !== undefined);
+
+        const detailCalling: DetailCalling = {
+          type: "video",
+          status: "rejected",
+          duration: "00:00:00",
+          isGroup: true,
+          participants: participants
+        };
+        await editCallSummaryMessage(detailCalling, adminInfo._id);
         router.push("/group-chat/");
       } else {
         router.push(

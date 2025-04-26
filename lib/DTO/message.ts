@@ -109,7 +109,7 @@ export interface ReadedStatusPusher {
 
 export interface DetailCalling {
   type: string; // "video", "audio"
-  status: string; // "missed", "rejected", "completed"
+  status: string; // "missed", "rejected", "completed", "ongoing"
   duration: string;
   isGroup: boolean;
   participants: string[];
