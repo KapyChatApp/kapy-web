@@ -30,11 +30,6 @@ const CallNotification = () => {
   const isGroupCall = ongoingGroupCall?.isRinging ?? false;
   if (!ongoingCall?.isRinging && !ongoingGroupCall?.isRinging) return;
 
-  console.log("calling...");
-  console.log("Online users: ", ongoingCall?.participants);
-  console.log("Ongoing call: ", ongoingCall);
-  console.log("Ongoing group call: ", ongoingGroupCall);
-
   const imgSrc = isGroupCall
     ? ongoingGroupCall?.participantsGroup.groupDetails.avatar
     : ongoingCall?.participants.caller.profile.avatar;

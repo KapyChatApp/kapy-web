@@ -19,7 +19,8 @@ const CallingSegment = ({
   groupInfo?: SocketGroup | null;
 }) => {
   const { handleCall } = useSocketContext();
-  const { handleGroupCall } = useGroupSocketContext();
+  const { handleGroupCall, ongoingGroupCall, handleRejoinGroupCall } =
+    useGroupSocketContext();
   const { type, status, duration, isGroup } = detail;
   const iconDone =
     type === "video"
@@ -60,7 +61,11 @@ const CallingSegment = ({
         if (type === "video") {
           if (isGroup) {
             if (clientGroup && groupInfo) {
-              handleMeeting(clientGroup, groupInfo);
+              if (status !== "ongoing") {
+                handleMeeting(clientGroup, groupInfo); //create new meeting
+              } else {
+                //handleRejoinGroupCall(); //Join again after leaving
+              }
             }
           } else {
             if (client) {

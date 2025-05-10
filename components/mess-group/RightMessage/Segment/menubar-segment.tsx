@@ -111,8 +111,9 @@ const MenubarSegment = ({ createAt, admin, messageId, boxId }: MenuProps) => {
           );
           return; // Không thực hiện tiếp nếu boxId không hợp lệ
         }
-        const fileDelete =
-          messagesByBox[data.boxId] || [].find((item) => item.id === data.id);
+        const fileDelete = messagesByBox[data.boxId]?.find(
+          (item) => item.id === data.id
+        );
 
         if (fileDelete && fileDelete.contentId) {
           console.log("Updated fileList: ", fileDelete);

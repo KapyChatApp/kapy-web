@@ -36,6 +36,7 @@ interface iGroupCallContext {
     ongoingGroupCall?: OngoingGroupCall | null;
     isEmitHangup?: boolean;
   }) => void;
+  handleRejoinGroupCall: () => void;
 }
 
 export const GroupCallContext = createContext<iGroupCallContext | null>(null);
@@ -221,6 +222,23 @@ export const GroupCallContextProvider: React.FC<{
     },
     [peers, localStream]
   );
+
+  const handleRejoinGroupCall = useCallback(async () => {
+    if (!socket || !ongoingGroupCall) return;
+    const stream = await getMediaStream();
+    if (!stream) {
+      console.log("Error: No stream available.");
+      return;
+    }
+
+    socket.emit("rejoinGroupCall", {
+      ongoingGroupCall,
+      userId: adminInfo._id, // hoặc user hiện tại
+      socketId: socket.id // socket mới
+    });
+
+    console.log("📞 Sent rejoinGroupCall event to server");
+  }, [socket, ongoingGroupCall]);
 
   const createPeer = useCallback(
     (stream: MediaStream, initiator: boolean) => {
@@ -468,7 +486,8 @@ export const GroupCallContextProvider: React.FC<{
         setOngoingGroupCall,
         handleGroupCall,
         handleJoinGroupCall,
-        handleGroupHangup
+        handleGroupHangup,
+        handleRejoinGroupCall
       }}
     >
       {children}
