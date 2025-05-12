@@ -16,6 +16,7 @@ import {
   SocketGroup
 } from "@/types/group-call";
 import { useSocketContext } from "./SocketContext";
+import { useRouter } from "next/navigation";
 
 interface iGroupCallContext {
   isSocketConnected: boolean;
@@ -36,7 +37,7 @@ interface iGroupCallContext {
     ongoingGroupCall?: OngoingGroupCall | null;
     isEmitHangup?: boolean;
   }) => void;
-  handleRejoinGroupCall: () => void;
+  requestJoinGroupCall: (groupInfo: SocketGroup) => void;
 }
 
 export const GroupCallContext = createContext<iGroupCallContext | null>(null);
@@ -46,6 +47,7 @@ export const GroupCallContextProvider: React.FC<{
 }> = ({ children }) => {
   const { adminInfo } = useUserContext();
   const { socket } = useSocketContext();
+  const router = useRouter();
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const [onlineGroupUsers, setOnlineGroupUsers] = useState<SocketUser[] | null>(
@@ -223,6 +225,19 @@ export const GroupCallContextProvider: React.FC<{
     [peers, localStream]
   );
 
+  const requestJoinGroupCall = useCallback(
+    (groupInfo: SocketGroup) => {
+      if (!socket || !adminInfo) return;
+
+      socket.emit("requestGroupCallData", {
+        groupInfo: groupInfo,
+        userId: adminInfo._id,
+        socketId: socket.id
+      });
+    },
+    [socket, adminInfo]
+  );
+
   const handleRejoinGroupCall = useCallback(async () => {
     if (!socket || !ongoingGroupCall) return;
     const stream = await getMediaStream();
@@ -239,6 +254,39 @@ export const GroupCallContextProvider: React.FC<{
 
     console.log("📞 Sent rejoinGroupCall event to server");
   }, [socket, ongoingGroupCall]);
+
+  const handleReceiveGroupCallData = useCallback(
+    async (groupCall: OngoingGroupCall) => {
+      if (!socket || !adminInfo) return;
+
+      console.log("🧩 Received group call data");
+      setOngoingGroupCall(groupCall);
+      if (ongoingGroupCall) {
+        await handleRejoinGroupCall();
+      }
+
+      const groupId = groupCall.participantsGroup.groupDetails._id;
+      router.push(`/socket/${groupId}`);
+    },
+    [socket, adminInfo, ongoingGroupCall]
+  );
+
+  const handleNeedGroupCallData = useCallback(
+    (data: { groupId: string; toSocketId: string }) => {
+      if (!socket || !adminInfo) return;
+
+      console.log("🧩 Need group call data");
+      if (
+        ongoingGroupCall?.participantsGroup.groupDetails._id === data.groupId
+      ) {
+        socket.emit("provideGroupCallData", {
+          toSocketId: data.toSocketId,
+          ongoingGroupCall: ongoingGroupCall
+        });
+      }
+    },
+    [socket, adminInfo, ongoingGroupCall, router]
+  );
 
   const createPeer = useCallback(
     (stream: MediaStream, initiator: boolean) => {
@@ -447,11 +495,19 @@ export const GroupCallContextProvider: React.FC<{
     socket.on("leavingRoom", handleLeaveGroup);
     console.log("🔔 Event leaving group is listening...");
 
+    socket.on("receiveGroupCallData", handleReceiveGroupCallData);
+    console.log("🔔 Event receiving groupp call data is listening...");
+
+    socket.on("needGroupCallData", handleNeedGroupCallData);
+    console.log("🔔 Event needing groupp call data is listening...");
+
     return () => {
       socket.off("incomingGroupCall", onIncomingGroupCall);
       socket.off("groupWebrtcSignal", completeGroupPeerConnection);
       socket.off("groupHangup", handleGroupHangup);
       socket.off("leavingRoom", handleLeaveGroup);
+      socket.off("receiveGroupCallData", handleReceiveGroupCallData);
+      socket.off("needGroupCallData", handleNeedGroupCallData);
     };
   }, [
     socket,
@@ -487,7 +543,7 @@ export const GroupCallContextProvider: React.FC<{
         handleGroupCall,
         handleJoinGroupCall,
         handleGroupHangup,
-        handleRejoinGroupCall
+        requestJoinGroupCall
       }}
     >
       {children}

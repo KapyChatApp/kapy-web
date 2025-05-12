@@ -19,7 +19,7 @@ const CallingSegment = ({
   groupInfo?: SocketGroup | null;
 }) => {
   const { handleCall } = useSocketContext();
-  const { handleGroupCall, ongoingGroupCall, handleRejoinGroupCall } =
+  const { handleGroupCall, ongoingGroupCall, requestJoinGroupCall } =
     useGroupSocketContext();
   const { type, status, duration, isGroup } = detail;
   const iconDone =
@@ -65,6 +65,7 @@ const CallingSegment = ({
                 handleMeeting(clientGroup, groupInfo); //create new meeting
               } else {
                 //handleRejoinGroupCall(); //Join again after leaving
+                requestJoinGroupCall(groupInfo);
               }
             }
           } else {

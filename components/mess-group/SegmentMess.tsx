@@ -18,9 +18,10 @@ import { useChatContext } from "@/context/ChatContext";
 import { reactMessage } from "@/lib/services/message/react";
 import { getPusherClient } from "@/lib/pusher";
 import { useParams } from "next/navigation";
-import CallingSegment from "./RightMessage/Segment/CalliingSegment";
+import CallingSegment from "./RightMessage/Segment/CallingSegment";
 import { useSocketContext } from "@/context/SocketContext";
 import { useGroupSocketContext } from "@/context/GroupCallContext";
+import { SocketGroup } from "@/types/group-call";
 
 interface SegmentMessage {
   segments: ResponseMessageDTO;
@@ -191,7 +192,7 @@ const SegmentMess: React.FC<SegmentMessage> = ({
     onlineGroupUsers.filter(
       (user) => membersGroupId && membersGroupId.includes(user.userId)
     );
-  const groupInfo = {
+  const groupInfo: SocketGroup = {
     _id: id,
     name: chatItem ? chatItem.groupName : "",
     avatar: chatItem ? chatItem.groupAva : "",
