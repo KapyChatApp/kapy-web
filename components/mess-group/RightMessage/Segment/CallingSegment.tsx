@@ -19,8 +19,12 @@ const CallingSegment = ({
   groupInfo?: SocketGroup | null;
 }) => {
   const { handleCall } = useSocketContext();
-  const { handleGroupCall, ongoingGroupCall, requestJoinGroupCall } =
-    useGroupSocketContext();
+  const {
+    handleGroupCall,
+    handleRequestOngoingGroupCall,
+    ongoingGroupCall,
+    handleJoinGroupCall
+  } = useGroupSocketContext();
   const { type, status, duration, isGroup } = detail;
   const iconDone =
     type === "video"
@@ -54,6 +58,11 @@ const CallingSegment = ({
     router.push(`/socket/${groupInfo._id}`);
     handleGroupCall(clientGroup, groupInfo);
   };
+
+  const handleLateJoining = async (groupInfo: SocketGroup) => {
+    handleRequestOngoingGroupCall(groupInfo);
+    router.push(`/socket/${groupInfo._id}`);
+  };
   return (
     <div
       className={`background-light700_dark200 bg-opacity-50 p-3 rounded-[18px] flex flex-wrap w-fit h-full items-center justify-center cursor-pointer`}
@@ -64,8 +73,7 @@ const CallingSegment = ({
               if (status !== "ongoing") {
                 handleMeeting(clientGroup, groupInfo); //create new meeting
               } else {
-                //handleRejoinGroupCall(); //Join again after leaving
-                requestJoinGroupCall(groupInfo);
+                handleLateJoining(groupInfo);
               }
             }
           } else {

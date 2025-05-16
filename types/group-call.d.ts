@@ -24,5 +24,5 @@ export type OngoingGroupCall = {
 export type PeerDataGroup = {
   peerConnection: Peer.Instance;
   stream: MediaStream | undefined;
-  participantUser: SocketUser[];
+  participantUser: SocketUser;
 };
