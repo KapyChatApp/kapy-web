@@ -12,7 +12,8 @@ export type SocketGroup = {
 
 export type ParticipantsGroup = {
   groupDetails: SocketGroup;
-  receivers: SocketUser[];
+  receivers: SocketUser[]; //online users
+  callees: SocketUser[];
   caller: SocketUser;
 };
 
