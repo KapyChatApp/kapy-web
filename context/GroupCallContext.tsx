@@ -312,8 +312,8 @@ export const GroupCallContextProvider: React.FC<{
 
       const participantsGroup: ParticipantsGroup = {
         groupDetails: groupInfo,
-        receivers: membersOnline,
-        callees: [],
+        currentJoiners: [currentSocketUser!],
+        callees: membersOnline,
         caller: currentSocketUser!
       };
 
@@ -341,11 +341,7 @@ export const GroupCallContextProvider: React.FC<{
   );
 
   const completeGroupPeerConnection = useCallback(
-    async ({
-      sdp,
-      fromUserId,
-      ongoingGroupCall
-    }: {
+    async (data: {
       sdp: SignalData;
       fromUserId: string;
       ongoingGroupCall: OngoingGroupCall;
@@ -354,35 +350,43 @@ export const GroupCallContextProvider: React.FC<{
         console.warn("⚠️ No peers are created.");
         return;
       }
+      const newJoiners = data.ongoingGroupCall.participantsGroup.currentJoiners;
+      const newCallees = data.ongoingGroupCall.participantsGroup.callees;
+
+      const myJoiners =
+        ongoingGroupCall?.participantsGroup.currentJoiners || [];
+      const myCallees = ongoingGroupCall?.participantsGroup.callees || [];
+
+      const mergedJoiners = Array.from(
+        new Map(
+          [...myJoiners, ...newJoiners].map((u) => [u.userId, u])
+        ).values()
+      );
+      const mergedCallees = Array.from(
+        new Map(
+          [...myCallees, ...newCallees].map((u) => [u.userId, u])
+        ).values()
+      );
+
+      const updatedOngoing: OngoingGroupCall = {
+        ...ongoingGroupCall,
+        participantsGroup: {
+          ...data.ongoingGroupCall.participantsGroup,
+          callees: mergedCallees,
+          currentJoiners: mergedJoiners
+        },
+        isRinging: false
+      };
+      setOngoingGroupCall(updatedOngoing);
+
       const existingPeer = peers.find(
-        (p) => p.participantUser.userId === fromUserId
+        (p) => p.participantUser.userId === data.fromUserId
       );
 
       if (existingPeer && existingPeer.peerConnection) {
-        const newCallees = ongoingGroupCall.participantsGroup.callees;
-        setOngoingGroupCall((prev) => {
-          const myCallees = prev?.participantsGroup.callees || [];
-          const mergedCallees = Array.from(
-            new Map(
-              [...myCallees, ...newCallees].map((callee) => [
-                callee.userId,
-                callee
-              ])
-            ).values()
-          );
-          return prev
-            ? {
-                ...prev,
-                participantsGroup: {
-                  ...prev.participantsGroup,
-                  callees: mergedCallees
-                }
-              }
-            : prev;
-        });
         try {
-          existingPeer.peerConnection.signal(sdp);
-          console.log(`✅ Sent signal SDP to user ${fromUserId}`);
+          existingPeer.peerConnection.signal(data.sdp);
+          console.log(`✅ Sent signal SDP to user ${data.fromUserId}`);
         } catch (error) {
           console.error("❌ Error sending signal SDP to user:", error);
         }
@@ -392,42 +396,53 @@ export const GroupCallContextProvider: React.FC<{
         const peer = createPeer(
           stream,
           false,
-          { userId: fromUserId } as SocketUser,
-          ongoingGroupCall
+          { userId: data.fromUserId } as SocketUser,
+          updatedOngoing
         );
         if (!peer) return;
         setPeers((prev) => [
           ...(prev || []),
           {
             peerConnection: peer,
-            participantUser: { userId: fromUserId } as SocketUser,
+            participantUser: { userId: data.fromUserId } as SocketUser,
             stream: undefined
           }
         ]);
-        peer.signal(sdp);
+        peer.signal(data.sdp);
       }
     },
     [peers]
   );
 
   const handleJoinGroupCall = useCallback(
-    async (ongoingGroupCall: OngoingGroupCall) => {
+    async (ongoingGroupCall: OngoingGroupCall, isNewCallee?: boolean) => {
       setIsCallEnded(false);
       const stream = await getMediaStream();
       if (!stream) return;
       setLocalStream(stream);
 
-      const updatedCallees = [
-        ...ongoingGroupCall.participantsGroup.callees,
+      const updatedJoiners = [
+        ...ongoingGroupCall.participantsGroup.currentJoiners,
         currentSocketUser!
       ];
+
+      const shouldAddCaller =
+        isNewCallee &&
+        currentSocketUser &&
+        !ongoingGroupCall.participantsGroup.callees.some(
+          (u) => u.userId === currentSocketUser.userId
+        );
+      const updatedCallees = shouldAddCaller
+        ? [currentSocketUser, ...ongoingGroupCall.participantsGroup.callees]
+        : ongoingGroupCall.participantsGroup.callees;
 
       const updatedOngoing: OngoingGroupCall = {
         ...ongoingGroupCall,
         isRinging: false,
         participantsGroup: {
           ...ongoingGroupCall.participantsGroup,
-          callees: updatedCallees
+          callees: updatedCallees,
+          currentJoiners: updatedJoiners
         }
       };
 
@@ -435,7 +450,7 @@ export const GroupCallContextProvider: React.FC<{
 
       const allPeers = [
         ongoingGroupCall.participantsGroup.caller,
-        ...ongoingGroupCall.participantsGroup.receivers
+        ...ongoingGroupCall.participantsGroup.callees
       ].filter((u) => u.userId !== currentSocketUser?.userId);
 
       const newPeers = allPeers
@@ -494,7 +509,7 @@ export const GroupCallContextProvider: React.FC<{
     async (ongoingGroupCall: OngoingGroupCall) => {
       if (!socket || !adminInfo || !currentSocketUser) return;
       console.log("Check requesting ongoingGroupCall: ", ongoingGroupCall);
-      handleJoinGroupCall(ongoingGroupCall);
+      handleJoinGroupCall(ongoingGroupCall, true);
     },
     [socket, adminInfo, currentSocketUser, handleJoinGroupCall]
   );
@@ -589,30 +604,30 @@ export const GroupCallContextProvider: React.FC<{
   //   ]
   // );
 
-  const attachTracksToPeers = useCallback(
-    (stream: MediaStream) => {
-      if (!peers || peers.length === 0) return;
+  // const attachTracksToPeers = useCallback(
+  //   (stream: MediaStream) => {
+  //     if (!peers || peers.length === 0) return;
 
-      peers.forEach(({ peerConnection }) => {
-        const senderIds = (peerConnection as any)._pc
-          .getSenders()
-          ?.map((s: RTCRtpSender) => s.track?.id);
+  //     peers.forEach(({ peerConnection }) => {
+  //       const senderIds = (peerConnection as any)._pc
+  //         .getSenders()
+  //         ?.map((s: RTCRtpSender) => s.track?.id);
 
-        stream.getTracks().forEach((track) => {
-          const alreadyAdded = senderIds?.includes(track.id);
-          if (!alreadyAdded) {
-            try {
-              console.log(`🎯 Adding track ${track.kind} to existing peer`);
-              (peerConnection as any)._pc.addTrack(track, stream);
-            } catch (err) {
-              console.warn("⚠️ Failed to add track:", err);
-            }
-          }
-        });
-      });
-    },
-    [peers]
-  );
+  //       stream.getTracks().forEach((track) => {
+  //         const alreadyAdded = senderIds?.includes(track.id);
+  //         if (!alreadyAdded) {
+  //           try {
+  //             console.log(`🎯 Adding track ${track.kind} to existing peer`);
+  //             (peerConnection as any)._pc.addTrack(track, stream);
+  //           } catch (err) {
+  //             console.warn("⚠️ Failed to add track:", err);
+  //           }
+  //         }
+  //       });
+  //     });
+  //   },
+  //   [peers]
+  // );
 
   useEffect(() => {
     if (socket === null) return;
@@ -714,11 +729,11 @@ export const GroupCallContextProvider: React.FC<{
     return () => clearTimeout(timeout);
   }, [isCallEnded]);
 
-  useEffect(() => {
-    if (localStream) {
-      attachTracksToPeers(localStream);
-    }
-  }, [localStream, attachTracksToPeers]);
+  // useEffect(() => {
+  //   if (localStream) {
+  //     attachTracksToPeers(localStream);
+  //   }
+  // }, [localStream, attachTracksToPeers]);
 
   return (
     <GroupCallContext.Provider

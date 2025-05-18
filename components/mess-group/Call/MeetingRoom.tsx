@@ -43,8 +43,9 @@ const MeetingRoom = () => {
   const router = useRouter();
   const handleEndCall = async () => {
     const callerId = ongoingGroupCall?.participantsGroup.caller?.userId;
-    const receivers = ongoingGroupCall?.participantsGroup.receivers || [];
-    const totalParticipants = receivers.length + (callerId ? 1 : 0);
+    const currentJoiners =
+      ongoingGroupCall?.participantsGroup.currentJoiners || [];
+    const totalParticipants = currentJoiners.length;
 
     const isCaller = callerId === adminInfo._id;
 
@@ -54,11 +55,10 @@ const MeetingRoom = () => {
     // 👉 Điều hướng
     if (shouldEmitHangup) {
       const participants = [
-        ongoingGroupCall?.participantsGroup.caller.userId,
-        ...(ongoingGroupCall?.participantsGroup.receivers ?? []).map(
+        ...(ongoingGroupCall?.participantsGroup.currentJoiners ?? []).map(
           (item) => item.userId
         )
-      ].filter((id): id is string => id !== undefined);
+      ];
 
       const detailCalling: DetailCalling = {
         type: "video",
