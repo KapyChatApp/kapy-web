@@ -64,7 +64,7 @@ const MessageBox: React.FC<Box> = ({ box, setClickBox }) => {
       const call: DetailCalling = JSON.parse(content.replace("__CALL__:", ""));
       if (call.isGroup) {
         return `Meeting ${
-          call.status === "completed" ? `${call.duration}s` : "missed"
+          call.status === "completed" ? `${call.duration}s` : "is holding"
         }`;
       } else {
         return `Call ${call.type} - ${call.status}`;
