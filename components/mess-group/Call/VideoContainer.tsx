@@ -18,8 +18,21 @@ const VideoContainer = ({
   useEffect(() => {
     if (videoRef.current && stream) {
       videoRef.current.srcObject = stream;
+
+      videoRef.current
+        .play()
+        .then(() => console.log("🎥 Video playback started"))
+        .catch((err) => console.warn("❌ Cannot autoplay video:", err));
+
+      const tracks = stream.getVideoTracks();
+      if (tracks.length === 0) {
+        console.warn("⚠️ Stream has no video tracks");
+      } else {
+        console.log("✅ Stream has video tracks:", tracks);
+      }
     }
   }, [stream]);
+
   return isMeetingRoom ? (
     <video
       className={cn(
