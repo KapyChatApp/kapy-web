@@ -17,17 +17,17 @@ import { useFriendContext } from "@/context/FriendContext";
 import { handleAddfr, handleUnfr } from "@/lib/utils";
 
 interface VerticalBoxProps {
-  request: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
+  suggest: FriendResponseDTO | RequestedResponseDTO | FindUserDTO;
   setIndex: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const VerticalSuggestBox: React.FC<VerticalBoxProps> = ({
-  request,
+  suggest,
   setIndex
 }) => {
   const { adminInfo } = useUserContext();
   const { setListFriend } = useFriendContext();
-  const list = request as RequestedResponseDTO;
+  const list = suggest as RequestedResponseDTO;
   const friendRequest: FriendRequestDTO = {
     sender: adminInfo._id,
     receiver: list._id

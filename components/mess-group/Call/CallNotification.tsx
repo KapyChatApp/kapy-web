@@ -9,20 +9,26 @@ import { toast } from "@/hooks/use-toast";
 import { OngoingCall } from "@/types/socket";
 import { useGroupSocketContext } from "@/context/GroupCallContext";
 import { OngoingGroupCall } from "@/types/group-call";
+import { useUserContext } from "@/context/UserContext";
+import { DetailCalling } from "@/lib/DTO/message";
+import {
+  editCallSummaryMessage,
+  sendCallSummaryMessage
+} from "@/utils/callingUtils";
 
 const CallNotification = () => {
   const { ongoingCall, handleJoinCall, handleHangup } = useSocketContext();
-  const { ongoingGroupCall, handleJoinGroupCall, handleGroupHangup } =
-    useGroupSocketContext();
+  const {
+    ongoingGroupCall,
+    handleJoinGroupCall,
+    handleGroupHangup,
+    setOngoingGroupCall
+  } = useGroupSocketContext();
+  const { adminInfo } = useUserContext();
 
   // Kiểm tra xem có cuộc gọi nhóm đang đổ chuông không
   const isGroupCall = ongoingGroupCall?.isRinging ?? false;
   if (!ongoingCall?.isRinging && !ongoingGroupCall?.isRinging) return;
-
-  console.log("calling...");
-  console.log("Online users: ", ongoingCall?.participants);
-  console.log("Ongoing call: ", ongoingCall);
-  console.log("Ongoing group call: ", ongoingGroupCall);
 
   const imgSrc = isGroupCall
     ? ongoingGroupCall?.participantsGroup.groupDetails.avatar
@@ -46,21 +52,79 @@ const CallNotification = () => {
     handleJoinGroupCall(ongoingGroupCall);
   };
   const handleEndCall = async () => {
-    toast({
-      title: isGroupCall ? "Meeting Ended" : "Call Ended",
-      className:
-        "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
-    });
-    router.back();
-    isGroupCall
-      ? handleGroupHangup({
-          ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
-          isEmitHangup: true
-        })
-      : handleHangup({
-          ongoingCall: ongoingCall ? ongoingCall : undefined,
-          isEmitHangup: true
-        });
+    if (isGroupCall) {
+      const callerId = ongoingGroupCall?.participantsGroup.caller?.userId;
+      const currentJoiners =
+        ongoingGroupCall?.participantsGroup.currentJoiners || [];
+      const totalParticipants = currentJoiners.length;
+
+      const isCaller = callerId === adminInfo._id;
+
+      // 👉 Logic xác định loại hành động
+      const shouldEmitHangup = isCaller || totalParticipants <= 2;
+
+      handleGroupHangup({
+        ongoingGroupCall: ongoingGroupCall || undefined,
+        isEmitHangup: shouldEmitHangup
+      });
+
+      toast({
+        title: "Meeting Ended",
+        className:
+          "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+      });
+
+      // 👉 Điều hướng
+      if (shouldEmitHangup) {
+        const participants = [
+          ...(ongoingGroupCall?.participantsGroup.currentJoiners ?? []).map(
+            (item) => item.userId
+          )
+        ].filter((id): id is string => id !== undefined);
+
+        const detailCalling: DetailCalling = {
+          type: "video",
+          status: "rejected",
+          duration: "00:00:00",
+          isGroup: true,
+          participants: participants
+        };
+        await editCallSummaryMessage(detailCalling, adminInfo._id);
+        router.push("/group-chat/");
+      } else {
+        router.push(
+          "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
+        );
+        setOngoingGroupCall(null);
+      }
+    } else {
+      const participants = [
+        ongoingCall?.participants.caller.userId,
+        ongoingCall?.participants.receiver.userId
+      ].filter((id): id is string => id !== undefined);
+      const detailCalling: DetailCalling = {
+        type: ongoingCall?.isVideoCall ? "video" : "audio",
+        status: "rejected",
+        duration: "00:00:00",
+        isGroup: false,
+        participants: participants
+      };
+      await sendCallSummaryMessage({
+        ongoingCall,
+        participants,
+        detailCalling
+      });
+      router.push("/");
+      toast({
+        title: "Call Ended",
+        className:
+          "border-none rounded-lg bg-accent-blue text-white paragraph-regular items-center justify-center "
+      });
+      handleHangup({
+        ongoingCall: ongoingCall ? ongoingCall : undefined,
+        isEmitHangup: true
+      });
+    }
   };
 
   return (

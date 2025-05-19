@@ -3,7 +3,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import { Button } from "../../ui/button";
-import { usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname, useRouter } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 import { formatTimeMessageBox } from "@/lib/utils";
 import { useLayoutContext } from "@/context/LayoutContext";
@@ -12,7 +12,9 @@ import { SocketUser } from "@/types/socket";
 import { useGroupSocketContext } from "@/context/GroupCallContext";
 import { ParticipantsGroup, SocketGroup } from "@/types/group-call";
 import { group } from "console";
-import { UserInfoBox } from "@/lib/DTO/message";
+import { DetailCalling, UserInfoBox } from "@/lib/DTO/message";
+import { sendCallSummaryMessage } from "@/utils/callingUtils";
+import { useChatContext } from "@/context/ChatContext";
 
 interface RightTopProps {
   _id: string;
@@ -34,7 +36,6 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
 
   const pathname = usePathname();
   const isActiveGroup = /^\/group-chat\/[a-zA-Z0-9_-]+$/.test(pathname);
-  const { timeOfflineChat } = useUserContext();
   const { handleCall, onlineUsers } = useSocketContext();
   const { handleGroupCall, onlineGroupUsers } = useGroupSocketContext();
   const { openMore, setOpenMore } = useLayoutContext();
@@ -42,7 +43,7 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   const handleOpenMore = () => {
     setOpenMore(!openMore);
   };
-  const { adminInfo, isOnlineChat } = useUserContext();
+  const { adminInfo, isOnlineChat, timeOfflineChat } = useUserContext();
 
   const client =
     onlineUsers && onlineUsers.find((user) => user.profile._id === _id);
@@ -121,16 +122,17 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
 
   // Call
   const router = useRouter();
+  const { id } = useParams();
   const handleVideoCall = async (client: SocketUser) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
-    handleCall(client, true);
+    handleCall(client, id.toString(), true);
   };
 
   const handleAudioCall = async (client: SocketUser) => {
     if (!client) return;
     router.push(`/socket/${client.socketId}`);
-    handleCall(client, false);
+    handleCall(client, id.toString(), false);
   };
 
   const handleMeeting = async (
@@ -139,6 +141,23 @@ const RightTop: React.FC<rightTop> = ({ top }) => {
   ) => {
     router.push(`/socket/${_id}`);
     handleGroupCall(clientGroup, groupInfo);
+    const participants = clientGroup
+      .map((item) => item.userId)
+      .filter((id): id is string => id !== undefined);
+
+    const detailCalling: DetailCalling = {
+      type: "video",
+      status: "ongoing",
+      duration: "Is holding",
+      isGroup: true,
+      participants: participants
+    };
+    await sendCallSummaryMessage({
+      participants,
+      detailCalling,
+      groupBoxId: _id,
+      groupCaller: adminInfo._id
+    });
   };
 
   //Online Status

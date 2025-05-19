@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface UseGroupCallControlsProps {
   localStream: MediaStream | null;
@@ -15,14 +15,16 @@ export const useMediaControls = ({
   const [isVidOn, setIsVidOn] = useState(true);
   const [isScreenOn, setIsScreenOn] = useState(false);
   const [currentStream, setCurrentStream] = useState<MediaStream | null>(null);
+  const callDurationRef = useRef(0);
   const [callDuration, setCallDuration] = useState(0);
 
   const isOnCall = !!(localStream && peer && ongoingCall);
 
   const formatTime = (seconds: number) => {
-    const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
+    const hrs = String(Math.floor(seconds / 3600)).padStart(2, "0");
+    const mins = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
     const secs = String(seconds % 60).padStart(2, "0");
-    return `${mins}:${secs}`;
+    return `${hrs}:${mins}:${secs}`;
   };
 
   const toggleCamera = useCallback(() => {
@@ -100,8 +102,10 @@ export const useMediaControls = ({
 
   useEffect(() => {
     if (!peer || !localStream) return;
+
     const interval = setInterval(() => {
-      setCallDuration((prev) => prev + 1);
+      callDurationRef.current += 1;
+      setCallDuration(callDurationRef.current);
     }, 1000);
 
     return () => clearInterval(interval);

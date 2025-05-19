@@ -7,6 +7,9 @@ import React, { useCallback, useEffect, useState } from "react";
 import VideoContainer from "./VideoContainer";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { useUserContext } from "@/context/UserContext";
+import { DetailCalling } from "@/lib/DTO/message";
+import { editCallSummaryMessage } from "@/utils/callingUtils";
 
 const MeetingRoom = () => {
   const {
@@ -32,17 +35,51 @@ const MeetingRoom = () => {
     peer: peers,
     ongoingCall: ongoingGroupCall
   });
+  const { adminInfo } = useUserContext();
 
   console.log("ongoingCall in Group >>>", ongoingGroupCall);
   console.log("peer in Group >>>", peers);
 
   const router = useRouter();
-  const handleEndCall = () => {
-    router.back();
+  const handleEndCall = async () => {
+    const callerId = ongoingGroupCall?.participantsGroup.caller?.userId;
+    const currentJoiners =
+      ongoingGroupCall?.participantsGroup.currentJoiners || [];
+    const totalParticipants = currentJoiners.length;
+
+    const isCaller = callerId === adminInfo._id;
+
+    // 👉 Logic xác định loại hành động
+    const shouldEmitHangup = isCaller || totalParticipants <= 2;
+
+    // 👉 Điều hướng
+    if (shouldEmitHangup) {
+      const participants = [
+        ...(ongoingGroupCall?.participantsGroup.currentJoiners ?? []).map(
+          (item) => item.userId
+        )
+      ];
+
+      const detailCalling: DetailCalling = {
+        type: "video",
+        status: "completed",
+        duration: formatTime(callDuration),
+        isGroup: true,
+        participants: participants
+      };
+      await editCallSummaryMessage(detailCalling, adminInfo._id);
+      router.push("/group-chat/");
+    } else {
+      router.push(
+        "/group-chat/" + ongoingGroupCall?.participantsGroup.groupDetails._id
+      );
+    }
+
     handleGroupHangup({
-      ongoingGroupCall: ongoingGroupCall ? ongoingGroupCall : undefined,
-      isEmitHangup: true
+      ongoingGroupCall: ongoingGroupCall || undefined,
+      isEmitHangup: shouldEmitHangup
     });
+
     toast({
       title: "Meeting Ended",
       className:
@@ -98,15 +135,20 @@ const MeetingRoom = () => {
               />
             )}
             {peers &&
-              peers.map((peerItem, index) => (
-                <VideoContainer
-                  key={index}
-                  stream={peerItem.stream || null}
-                  isLocalStream={false}
-                  isOnCall={isOnCall}
-                  isMeetingRoom={true}
-                />
-              ))}
+              peers.map((peerItem, index) => {
+                if (peerItem.stream) {
+                  return (
+                    <VideoContainer
+                      key={index}
+                      stream={peerItem.stream}
+                      isLocalStream={false}
+                      isOnCall={isOnCall}
+                      isMeetingRoom={true}
+                    />
+                  );
+                }
+                return null;
+              })}
           </div>
         )}
 

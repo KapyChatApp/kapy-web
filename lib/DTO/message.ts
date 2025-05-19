@@ -106,3 +106,11 @@ export interface ReadedStatusPusher {
   readedId: string[];
   boxId: string;
 }
+
+export interface DetailCalling {
+  type: string; // "video", "audio"
+  status: string; // "missed", "rejected", "completed", "ongoing"
+  duration: string;
+  isGroup: boolean;
+  participants: string[];
+}

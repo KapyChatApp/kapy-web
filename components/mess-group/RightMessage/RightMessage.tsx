@@ -7,7 +7,11 @@ import RightMiddle from "./RightMiddle";
 import OpenMoreDisplay from "./OpenMoreDisplay";
 import { useChatContext } from "@/context/ChatContext";
 import { useUserContext } from "@/context/UserContext";
-import { MessageBoxInfo, ReadedStatusPusher } from "@/lib/DTO/message";
+import {
+  MessageBoxInfo,
+  ReadedStatusPusher,
+  ResponseMessageDTO
+} from "@/lib/DTO/message";
 import { FriendRequestDTO } from "@/lib/DTO/friend";
 import { unBlockFr } from "@/lib/services/friend/unblock";
 import { useFriendContext } from "@/context/FriendContext";
@@ -17,6 +21,8 @@ import { getRealTimeOfUser } from "@/lib/services/user/getRealTime";
 import { getPusherClient } from "@/lib/pusher";
 import { useLayoutContext } from "@/context/LayoutContext";
 import { getMyListFriend } from "@/lib/data/mine/dataAllFriends";
+import { fetchMessages } from "@/lib/data/message/dataMessages";
+import { useGroupSocketContext } from "@/context/GroupCallContext";
 
 interface RightMessageProps {
   chatItem: MessageBoxInfo | undefined;
@@ -31,10 +37,18 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //FetchMessage Backend
   const { id } = useParams();
   const [relation, setRelation] = useState("");
+  const [filteredSegmentAdmin, setFilteredSegmentAdmin] = useState<
+    ResponseMessageDTO[]
+  >([]);
+  const [filteredSegmentOther, setFilteredSegmentOther] = useState<
+    ResponseMessageDTO[]
+  >([]);
   const { adminInfo, isOnlineChat } = useUserContext();
   const { setListBlockedFriend, setListFriend } = useFriendContext();
-  const { messagesByBox, setMemberList, setCreateBy } = useChatContext();
+  const { messagesByBox, setMemberList, setCreateBy, setMessagesByBox } =
+    useChatContext();
   const { openMore, isParagraphVisible } = useLayoutContext();
+  const { ongoingGroupCall } = useGroupSocketContext();
   const adminId = adminInfo._id;
 
   const onclose = () => {
@@ -111,13 +125,28 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           isOnline: false
         };
   }
+  useEffect(() => {
+    const fetchMessage = async () => {
+      if (!id) return;
+      const boxMessages = await fetchMessages(id.toString());
+      if (boxMessages) {
+        const segmentAdmin = boxMessages
+          ? boxMessages.filter((item) => item.createBy === adminId)
+          : [];
+        setFilteredSegmentAdmin(segmentAdmin);
+        const segmentOther = boxMessages
+          ? boxMessages.filter((item) => item.createBy !== adminId)
+          : [];
+        setFilteredSegmentOther(segmentOther);
+        setMessagesByBox((prev) => ({
+          ...prev,
+          [id.toString()]: boxMessages
+        }));
+      }
+    };
+    fetchMessage();
+  }, [ongoingGroupCall, id]);
   //filterSegment
-  const filteredSegmentAdmin = messagesByBox[boxId]
-    ? messagesByBox[boxId].filter((item) => item.createBy === adminId)
-    : [];
-  const filteredSegmentOther = messagesByBox[boxId]
-    ? messagesByBox[boxId].filter((item) => item.createBy !== adminId)
-    : [];
 
   //OpenMoreDisplay
   const display = {

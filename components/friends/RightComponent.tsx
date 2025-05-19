@@ -165,7 +165,7 @@ const RightComponent = () => {
                   )
                   .map((item) => (
                     <div className="flex flex-row w-fit h-fit" key={item._id}>
-                      <VerticalSuggestBox request={item} setIndex={setIndex} />
+                      <VerticalSuggestBox suggest={item} setIndex={setIndex} />
                     </div>
                   ))}
               </div>
@@ -200,7 +200,7 @@ const RightComponent = () => {
                       key={item._id}
                     >
                       <VerticalSuggestBox
-                        request={item as FindUserDTO}
+                        suggest={item as FindUserDTO}
                         setIndex={setIndex}
                       />
                     </div>

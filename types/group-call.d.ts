@@ -12,7 +12,8 @@ export type SocketGroup = {
 
 export type ParticipantsGroup = {
   groupDetails: SocketGroup;
-  receivers: SocketUser[];
+  callees: SocketUser[]; //online users
+  currentJoiners: SocketUser[]; //caller & current callees
   caller: SocketUser;
 };
 
@@ -24,5 +25,5 @@ export type OngoingGroupCall = {
 export type PeerDataGroup = {
   peerConnection: Peer.Instance;
   stream: MediaStream | undefined;
-  participantUser: SocketUser[];
+  participantUser: SocketUser;
 };

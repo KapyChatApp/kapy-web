@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 import { toast } from "@/hooks/use-toast";
 import Image from "next/image";
 import { useMediaControls } from "@/hooks/use-media";
+import { DetailCalling } from "@/lib/DTO/message";
+import { sendCallSummaryMessage } from "@/utils/callingUtils";
 
 const PersonalRoom = () => {
   const { localStream, peer, ongoingCall, handleHangup, isCallEnded } =
@@ -44,12 +46,25 @@ const PersonalRoom = () => {
   console.log("isCallEnded", isCallEnded);
 
   const router = useRouter();
-  const handleEndCall = () => {
-    router.back();
+  const handleEndCall = async () => {
+    //router.push(`/${ongoingCall?.participants.caller.userId}`);
+    const participants = [
+      ongoingCall?.participants.caller.userId,
+      ongoingCall?.participants.receiver.userId
+    ].filter((id): id is string => id !== undefined);
+    const detailCalling: DetailCalling = {
+      type: ongoingCall?.isVideoCall ? "video" : "audio",
+      status: "completed",
+      duration: formatTime(callDuration),
+      isGroup: false,
+      participants: participants
+    };
+    await sendCallSummaryMessage({ ongoingCall, participants, detailCalling });
     handleHangup({
       ongoingCall: ongoingCall ? ongoingCall : undefined,
       isEmitHangup: true
     });
+    router.push(`/`);
     toast({
       title: "Call Ended",
       className:
@@ -58,7 +73,7 @@ const PersonalRoom = () => {
   };
 
   if (!localStream && !peer && !ongoingCall && isCallEnded) {
-    router.back();
+    router.push(`/`);
     toast({
       title: "Call Ended",
       className:
