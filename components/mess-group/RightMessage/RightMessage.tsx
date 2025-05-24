@@ -37,12 +37,6 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
   //FetchMessage Backend
   const { id } = useParams();
   const [relation, setRelation] = useState("");
-  const [filteredSegmentAdmin, setFilteredSegmentAdmin] = useState<
-    ResponseMessageDTO[]
-  >([]);
-  const [filteredSegmentOther, setFilteredSegmentOther] = useState<
-    ResponseMessageDTO[]
-  >([]);
   const { adminInfo, isOnlineChat } = useUserContext();
   const { setListBlockedFriend, setListFriend } = useFriendContext();
   const { messagesByBox, setMemberList, setCreateBy, setMessagesByBox } =
@@ -125,29 +119,35 @@ const RightMessage = ({ chatItem }: RightMessageProps) => {
           isOnline: false
         };
   }
-  useEffect(() => {
-    const fetchMessage = async () => {
-      if (!id) return;
-      const boxMessages = await fetchMessages(id.toString());
-      if (boxMessages) {
-        const segmentAdmin = boxMessages
-          ? boxMessages.filter((item) => item.createBy === adminId)
-          : [];
-        setFilteredSegmentAdmin(segmentAdmin);
-        const segmentOther = boxMessages
-          ? boxMessages.filter((item) => item.createBy !== adminId)
-          : [];
-        setFilteredSegmentOther(segmentOther);
-        setMessagesByBox((prev) => ({
-          ...prev,
-          [id.toString()]: boxMessages
-        }));
-      }
-    };
-    fetchMessage();
-  }, [ongoingGroupCall, id]);
-  //filterSegment
 
+  // useEffect(() => {
+  //   const fetchMessage = async () => {
+  //     if (!id) return;
+  //     const boxMessages = await fetchMessages(id.toString());
+  //     if (boxMessages) {
+  //       const segmentAdmin = boxMessages
+  //         ? boxMessages.filter((item) => item.createBy === adminId)
+  //         : [];
+  //       setFilteredSegmentAdmin(segmentAdmin);
+  //       const segmentOther = boxMessages
+  //         ? boxMessages.filter((item) => item.createBy !== adminId)
+  //         : [];
+  //       setFilteredSegmentOther(segmentOther);
+  //       setMessagesByBox((prev) => ({
+  //         ...prev,
+  //         [id.toString()]: boxMessages
+  //       }));
+  //     }
+  //   };
+  //   fetchMessage();
+  // }, [ongoingGroupCall, id]);
+
+  const filteredSegmentAdmin = messagesByBox[boxId]
+    ? messagesByBox[boxId].filter((item) => item.createBy === adminId)
+    : [];
+  const filteredSegmentOther = messagesByBox[boxId]
+    ? messagesByBox[boxId].filter((item) => item.createBy !== adminId)
+    : [];
   //OpenMoreDisplay
   const display = {
     detailByBox: chatItem,
