@@ -36,7 +36,7 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
           // Tạo File với loại dynamic
           const file = new File([blob], "avatar", { type: fileType });
 
-          const result = await uploadAvatarClient(file);
+          const result = await uploadAvatarClient(file, isPost);
 
           if (result.status) {
             const temporaryUrl = URL.createObjectURL(blob);
