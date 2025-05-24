@@ -1,6 +1,5 @@
 import React from "react";
 import "./globals.css";
-import { Lexend } from "next/font/google";
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
@@ -12,12 +11,6 @@ import { LayoutProvider } from "@/context/LayoutContext";
 import SocketProvider from "@/providers/SocketProvider";
 import { cn } from "@/lib/utils";
 import { GroupCallContextProvider } from "@/context/GroupCallContext";
-
-const lexend = Lexend({
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-  variable: "--font-lexend"
-});
 
 export const metadata: Metadata = {
   title: "Kapy ChatApp",
@@ -41,20 +34,15 @@ export default function RootLayout({
       </head>
       <body
         cz-shortcut-listen="true"
-        className={cn(
-          lexend.className,
-          "relative font-helvetica custom-scrollbar "
-        )}
+        className={cn("relative font-helvetica custom-scrollbar ")}
       >
         <LayoutProvider>
           <ThemeProvider>
             <UserProvider>
               {" "}
-              {/* Bọc ngoài để SocketProvider có thể truy cập useUserContext */}
               <ChatProvider>
                 <FriendProvider>
                   <SocketProvider>
-                    {/* SocketProvider bây giờ có thể dùng useUserContext */}
                     <GroupCallContextProvider>
                       {" "}
                       {children}
