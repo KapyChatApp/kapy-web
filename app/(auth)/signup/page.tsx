@@ -76,6 +76,7 @@ const Signup = () => {
               "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
           });
         });
+        return;
       }
 
       // Kiểm tra mật khẩu xác nhận
@@ -86,10 +87,9 @@ const Signup = () => {
           className:
             "border-none rounded-lg bg-accent-red text-light-900 paragraph-regular items-center justify-center "
         });
-        setError("Confirmed password is not valid.");
-        throw new Error("Confirmed password does not match the password.");
+        setError("Confirmed password does not match the password.");
+        return;
       }
-
       // Nếu không có lỗi, thực hiện logic tiếp theo
       const params: UserRegisterDTO = {
         firstName,
