@@ -60,24 +60,23 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
   console.log("ongoingCall in SocketContext", ongoingCall);
 
   const getMediaStream = useCallback(
-    async (faceMode?: string) => {
+    async (
+      faceMode?: string,
+      isVideoCall = true
+    ): Promise<MediaStream | null> => {
       if (localStream) return localStream;
 
       try {
-        const devices = await navigator.mediaDevices.enumerateDevices();
-
-        const videoDevices = devices.filter(
-          (device) => device.kind === "videoinput"
-        );
-
         const constraints: MediaStreamConstraints = {
           audio: true,
-          video: {
-            width: { min: 640, ideal: 1280, max: 1920 },
-            height: { min: 360, ideal: 720, max: 1080 },
-            frameRate: { min: 15, ideal: 30, max: 60 },
-            facingMode: videoDevices.length > 0 ? faceMode : undefined
-          }
+          video: isVideoCall
+            ? {
+                width: { min: 640, ideal: 1280, max: 1920 },
+                height: { min: 360, ideal: 720, max: 1080 },
+                frameRate: { min: 15, ideal: 30, max: 60 },
+                facingMode: faceMode || "user"
+              }
+            : false // ❗ Quan trọng: chỉ lấy audio khi là audio call
         };
 
         const stream = await navigator.mediaDevices.getUserMedia(constraints);
@@ -85,7 +84,6 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
         return stream;
       } catch (error) {
         console.error("Error accessing media devices:", error);
-        setLocalStream(null);
         return null;
       }
     },
@@ -97,7 +95,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
       setIsCallEnded(false);
       if (!currentSocketUser) return;
 
-      const stream = await getMediaStream();
+      const stream = await getMediaStream(undefined, isVideoCall);
       if (!stream) {
         console.log("Error: No stream available.");
         return;
@@ -260,7 +258,8 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
         };
       });
 
-      const stream = await getMediaStream();
+      const stream = await getMediaStream(undefined, ongoingCall.isVideoCall);
+
       if (!stream) {
         console.log("Could not get a stream in handleJoinCall");
         return;
