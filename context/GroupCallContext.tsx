@@ -289,7 +289,10 @@ export const GroupCallContextProvider: React.FC<{
           `🎥 Track received: ${track.kind} from ${partnerUser.userId}`
         );
 
-        if (remoteStream.getVideoTracks().length > 0) {
+        if (
+          remoteStream.getVideoTracks().length > 0 ||
+          remoteStream.getAudioTracks().length > 0
+        ) {
           setPeers(
             (prev) =>
               prev?.map((p) =>
