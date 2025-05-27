@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useMediaControls } from "@/hooks/use-media";
 import { DetailCalling } from "@/lib/DTO/message";
 import { sendCallSummaryMessage } from "@/utils/callingUtils";
+import AudioContainer from "./AudioContainer";
 
 const PersonalRoom = () => {
   const { localStream, peer, ongoingCall, handleHangup, isCallEnded } =
@@ -139,6 +140,10 @@ const PersonalRoom = () => {
                 </div>
                 <h3 className="text-dark100_light900">{namePaticipant}</h3>
               </div>
+
+              {peer && peer.stream && (
+                <AudioContainer stream={peer.stream} isLocalStream={false} />
+              )}
             </div>
           ))}
 
