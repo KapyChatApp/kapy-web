@@ -129,7 +129,7 @@ const CommentArea = ({
             onInput={handleInput}
             onBlur={handleBlur}
             onKeyDown={handleKeyDown}
-            placeholder="Add a comment..."
+            placeholder={commentContent ? commentContent : "Add a comment..."}
           />
 
           {/* Hiển thị nút gửi khi có nội dung */}

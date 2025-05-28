@@ -17,21 +17,23 @@ export const handleCreateComment = async (
   setCommentContent: (content: string) => void,
   setFiles: (file: File | null) => void
 ) => {
+  const tempId = `temp-${Date.now()}`;
+
   const parsedFile: FileResponseDTO | undefined = files
     ? {
         _id: "",
-        fileName: files?.name || "",
-        url: files ? URL.createObjectURL(files) : "",
-        bytes: files?.size || 0,
+        fileName: files.name,
+        url: URL.createObjectURL(files),
+        bytes: files.size,
         width: 0,
         height: 0,
-        format: getFileFormat(files?.type || "", files?.name || ""),
-        type: files?.type.split("/")[0] || ""
+        format: getFileFormat(files.type, files.name),
+        type: files.type.split("/")[0]
       }
     : undefined;
 
-  const newCmt: CommentResponseDTO = {
-    _id: "",
+  const tempComment: CommentResponseDTO = {
+    _id: tempId,
     firstName: adminInfo.firstName,
     lastName: adminInfo.lastName,
     nickName: adminInfo.nickName,
@@ -44,21 +46,52 @@ export const handleCreateComment = async (
     createBy: adminInfo._id,
     content: parsedFile
   };
-  if (targetType === "post") {
-    setNewComment((prev: CommentResponseDTO[]) => [...prev, newCmt]);
-  } else {
-    // Thêm reply vào comment cha
-    setNewComment((prev) =>
-      prev.map((comment) =>
-        comment._id === replyId
-          ? { ...comment, replieds: [...comment.replieds, newCmt] }
-          : comment
-      )
+
+  // B1: Hiển thị ngay comment tạm
+  setNewComment((prev) => {
+    if (targetType === "post") return [...prev, tempComment];
+    return prev.map((comment) =>
+      comment._id === replyId
+        ? { ...comment, replieds: [...comment.replieds, tempComment] }
+        : comment
     );
-  }
+  });
+
+  // B2: Reset input
   setCommentContent("");
   setFiles(null);
-  await createComment(commentContent, files, replyId, targetType);
+
+  try {
+    const created = await createComment(
+      commentContent,
+      files,
+      replyId,
+      targetType
+    );
+
+    // B3: Cập nhật lại _id cho comment tạm
+    setNewComment((prev) => {
+      if (targetType === "post") {
+        return prev.map((cmt) =>
+          cmt._id === tempId ? { ...cmt, _id: created._id } : cmt
+        );
+      } else {
+        return prev.map((cmt) =>
+          cmt._id === replyId
+            ? {
+                ...cmt,
+                replieds: cmt.replieds.map((rep) =>
+                  rep._id === tempId ? { ...rep, _id: created._id } : rep
+                )
+              }
+            : cmt
+        );
+      }
+    });
+  } catch (err) {
+    console.error("❌ Lỗi tạo comment:", err);
+    // Option: hiển thị lỗi hoặc xoá comment tạm khỏi UI nếu muốn
+  }
 };
 
 export const handleDeleteComment = async (
@@ -115,24 +148,26 @@ export const handleEditComment = async (
   setFiles: React.Dispatch<React.SetStateAction<File | null>>,
   files?: File | null
 ) => {
+  // 1. Cập nhật giao diện tạm thời
+  const tempContent = files
+    ? {
+        _id: "",
+        fileName: files.name,
+        url: URL.createObjectURL(files),
+        bytes: files.size,
+        width: 0,
+        height: 0,
+        format: getFileFormat(files.type, files.name),
+        type: files.type.split("/")[0] === "image" ? "Image" : "Video"
+      }
+    : undefined;
   setCommentList((prev) =>
     prev.map((c) =>
       c._id === editingCommentId
         ? {
             ...c,
             caption: commentContent,
-            content: files
-              ? {
-                  _id: "",
-                  fileName: files.name,
-                  url: URL.createObjectURL(files),
-                  bytes: files.size,
-                  width: 0,
-                  height: 0,
-                  format: getFileFormat(files.type, files.name),
-                  type: files.type.includes("/") ? files.type.split("/")[0] : ""
-                }
-              : c.content // Giữ nguyên content nếu không có file mới
+            content: files ? tempContent : c.content
           }
         : c
     )
@@ -142,5 +177,27 @@ export const handleEditComment = async (
   setCommentContent("");
   setFiles(null);
 
-  await editComment(editingCommentId, commentContent, files);
+  try {
+    // 2. Gọi API sửa comment
+    const updatedComment = await editComment(
+      editingCommentId,
+      commentContent,
+      files
+    );
+
+    // 3. Cập nhật lại comment bằng dữ liệu thật từ backend (có url thật, width, height,...)
+    setCommentList((prev) =>
+      prev.map((c) =>
+        c._id === editingCommentId
+          ? {
+              ...c,
+              caption: updatedComment.caption,
+              content: updatedComment.content
+            }
+          : c
+      )
+    );
+  } catch (err) {
+    console.error("❌ Failed to edit comment:", err);
+  }
 };

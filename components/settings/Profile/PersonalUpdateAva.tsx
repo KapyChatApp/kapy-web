@@ -191,6 +191,7 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
             <Button
               className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
               onClick={handleUpdate}
+              disabled={file ? false : true}
             >
               Update
             </Button>

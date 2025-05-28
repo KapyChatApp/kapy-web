@@ -8,7 +8,7 @@ import { useParams, useRouter } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
-import { formatTimeMessageBox, getFileFormat } from "@/lib/utils";
+import { formatTimeMessageBox, getFileFormat, urlToFile } from "@/lib/utils";
 import Interaction from "@/components/community/Posts/Interaction";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 import { FileResponseDTO } from "@/lib/DTO/map";
@@ -17,8 +17,6 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { useUserContext } from "@/context/UserContext";
 import { handleCreateComment, handleEditComment } from "@/utils/commentUtils";
-import { set } from "date-fns";
-import { editComment } from "@/lib/services/post/comment/edit";
 
 const defaultDetail: PostResponseDTO = {
   _id: "",
@@ -126,6 +124,34 @@ const page = () => {
     };
     fetchDetail();
   }, []);
+  useEffect(() => {
+    const handleEditComment = async () => {
+      if (editingCommentId !== "" && commentList.length > 0) {
+        const comment = commentList.find(
+          (item) => item._id === editingCommentId
+        );
+        if (comment) {
+          console.log("Comment edited: ", comment);
+          const convertedFile = comment.content
+            ? await urlToFile(
+                comment.content.url,
+                `old-${comment.content._id}.${
+                  comment.content.type === "Image" ? "jpg" : "mp4"
+                }`,
+                comment.content.type === "Image" ? "image/jpeg" : "video/mp4"
+              )
+            : null;
+          setFiles(convertedFile);
+          setCommentContent(comment.caption);
+        }
+      } else {
+        setFiles(null);
+        setCommentContent("");
+      }
+    };
+
+    handleEditComment();
+  }, [editingCommentId]);
   useEffect(() => {
     setIsMounted(true);
   }, []);
