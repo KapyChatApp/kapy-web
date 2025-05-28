@@ -8,6 +8,7 @@ import AvatarEditor from "react-avatar-editor";
 import { uploadAvatarClient } from "@/lib/services/user/updateAva";
 import { toast } from "@/hooks/use-toast";
 import { UserUpdateRequest } from "@/lib/DTO/user";
+import { Switch } from "@/components/ui/switch";
 
 interface Props {
   setUpdateAva: React.Dispatch<React.SetStateAction<boolean>>;
@@ -18,6 +19,7 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPost, setIsPost] = useState(false);
   const { setNewAva } = useUserContext();
   const handleBack = () => {
     setUpdateAva(false);
@@ -34,7 +36,7 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
           // Tạo File với loại dynamic
           const file = new File([blob], "avatar", { type: fileType });
 
-          const result = await uploadAvatarClient(file);
+          const result = await uploadAvatarClient(file, isPost);
 
           if (result.status) {
             const temporaryUrl = URL.createObjectURL(blob);
@@ -162,25 +164,40 @@ const PersonalUpdateAva = ({ setUpdateAva, editorRef }: Props) => {
 
         <span className="flex w-full h-[0.5px] background-light500_dark400"></span>
 
-        {
-          <div className="flex justify-end w-full items-center pr-4 py-2">
-            <div className="flex flex-row w-full h-fit gap-6 justify-end">
-              <Button
-                onClick={handleBack}
-                className="paragraph-regular text-dark100_light900 py-2 px-3 rounded-lg background-light700_dark400 w-fit"
-              >
-                Cancel
-              </Button>
-              <Button
-                className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
-                onClick={handleUpdate}
-                disabled={file ? false : true}
-              >
-                Update
-              </Button>
-            </div>
+        <div className="flex justify-between w-full items-center p-2">
+          <div className="flex w-fit">
+            <Switch
+              id="post-avatar-mode"
+              checked={isPost}
+              onCheckedChange={(checked) => {
+                if (checked) {
+                  setIsPost(true);
+                } else {
+                  setIsPost(false);
+                }
+              }}
+            />
+            <span className="text-dark100_light900 small-light ml-1 italic">
+              Wanna post new avatar ?
+            </span>
           </div>
-        }
+          <div className="flex flex-row w-fit h-fit gap-4 justify-end">
+            <Button
+              onClick={handleBack}
+              className="paragraph-regular text-dark100_light900 py-2 px-3 rounded-lg background-light700_dark400 w-fit"
+            >
+              Cancel
+            </Button>
+            <Button
+              className="bg-primary-500 hover:bg-primary-500 hover:bg-opacity-20 bg-opacity-20 text-primary-500 paragraph-regular py-2 px-3 rounded-lg w-fit"
+              onClick={handleUpdate}
+              disabled={file ? false : true}
+            >
+              Update
+            </Button>
+          </div>
+        </div>
+
         {/* Input file ẩn */}
         <input
           type="file"
