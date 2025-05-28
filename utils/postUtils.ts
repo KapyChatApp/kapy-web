@@ -49,13 +49,20 @@ export const handleCreatePost = async (
 
 export const handleDeletePost = async (
   postId: string,
-  setPostList: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>
+  setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>,
+  setPostData?: React.Dispatch<React.SetStateAction<PostResponseDTO[] | null>>
 ) => {
   const result = await deletePost(postId);
   if (result) {
-    setPostList((items) =>
-      items.filter((post: PostResponseDTO) => post._id !== postId)
-    );
+    setPostList &&
+      setPostList((items) =>
+        items.filter((post: PostResponseDTO) => post._id !== postId)
+      );
+    setPostData &&
+      setPostData(
+        (items) =>
+          items && items.filter((post: PostResponseDTO) => post._id !== postId)
+      );
   }
 };
 

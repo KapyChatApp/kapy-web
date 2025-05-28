@@ -13,7 +13,8 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { handleDeleteComment } from "@/utils/commentUtils";
 import { handleDeletePost } from "@/utils/postUtils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUserContext } from "@/context/UserContext";
 
 const ActionSheet = ({
   post,
@@ -32,6 +33,7 @@ const ActionSheet = ({
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
 }) => {
+  const { setPostData } = useUserContext();
   const router = useRouter();
   const [isReport, setReport] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
@@ -104,12 +106,26 @@ const ActionSheet = ({
   };
 
   // Posts
+  const searchParams = useSearchParams();
+  const encoded = searchParams.get("r");
   const handleDeleteMyPost = async () => {
-    if (setPostList && post) {
-      await handleDeletePost(post._id, setPostList);
+    if (post) {
+      setPostList
+        ? await handleDeletePost(post._id, setPostList)
+        : await handleDeletePost(post._id, undefined, setPostData);
       setIsBack(false);
     }
+    let returnTo = "/community";
+    if (encoded) {
+      try {
+        returnTo = atob(encoded);
+      } catch (err) {
+        console.warn("Invalid return path");
+      }
+    }
+    router.push(returnTo);
   };
+
   const handleConfirmDeleteMyPost = () => {
     if (!post) return;
     setIsDeletePost(true);
