@@ -14,6 +14,7 @@ import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { handleDeleteComment } from "@/utils/commentUtils";
 import { handleDeletePost } from "@/utils/postUtils";
 import { useRouter } from "next/navigation";
+import { useUserContext } from "@/context/UserContext";
 
 const ActionSheet = ({
   post,
@@ -32,6 +33,7 @@ const ActionSheet = ({
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
 }) => {
+  const { setPostData } = useUserContext();
   const router = useRouter();
   const [isReport, setReport] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
@@ -106,10 +108,11 @@ const ActionSheet = ({
   // Posts
   const handleDeleteMyPost = async () => {
     if (setPostList && post) {
-      await handleDeletePost(post._id, setPostList);
+      await handleDeletePost(post._id, setPostList, setPostData);
       setIsBack(false);
     }
   };
+
   const handleConfirmDeleteMyPost = () => {
     if (!post) return;
     setIsDeletePost(true);
