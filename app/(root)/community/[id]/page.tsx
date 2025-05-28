@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Header from "@/components/community/Posts/DetailPost/Header";
 import CaptionCard from "@/components/community/Posts/DetailPost/Caption";
 import Comments from "@/components/community/Posts/DetailPost/Comments";
@@ -40,9 +40,20 @@ const page = () => {
   const [detailPost, setDetailPost] = useState<PostResponseDTO>(defaultDetail);
   const [isMounted, setIsMounted] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const encoded = searchParams.get("r");
+
+  let returnTo = "/community";
+  if (encoded) {
+    try {
+      returnTo = atob(encoded);
+    } catch (err) {
+      console.warn("Invalid return path");
+    }
+  }
   const handleBack = () => {
     const scrollPosition = sessionStorage.getItem("scrollPosition");
-    router.push(`/community`);
+    router.push(returnTo);
 
     if (scrollPosition) {
       setTimeout(() => {

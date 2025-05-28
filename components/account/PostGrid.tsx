@@ -3,13 +3,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React from "react";
 import { FileSegment } from "../ui/file-segment";
 import { FileResponseDTO } from "@/lib/DTO/map";
-import { useRouter } from "next/navigation";
-
-const randomImage = [
-  "/assets/post/1.jpg",
-  "/assets/post/2.jpg",
-  "/assets/post/3.jpg"
-];
+import { useParams, useRouter } from "next/navigation";
 
 const PostGrid = ({ postData }: { postData: PostResponseDTO[] }) => {
   const renderFirstContent = (content: FileResponseDTO[]) => {
@@ -59,7 +53,10 @@ const PostGrid = ({ postData }: { postData: PostResponseDTO[] }) => {
       }
     }
   };
+  const { id } = useParams();
   const router = useRouter();
+  const returnTo = `/account/${String(id)}`;
+  const encoded = btoa(returnTo);
   return postData.length > 0 ? (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-1">
       {postData.map((post) => {
@@ -67,7 +64,7 @@ const PostGrid = ({ postData }: { postData: PostResponseDTO[] }) => {
         return (
           <div
             className="relative w-full h-96 cursor-pointer"
-            onClick={() => router.push(`/community/${post._id}`)}
+            onClick={() => router.push(`/community/${post._id}?r=${encoded}`)}
           >
             {renderFirstContent(post.contents)}
 

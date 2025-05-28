@@ -3,9 +3,10 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { PostResponseDTO } from "@/lib/DTO/post";
 import OtherButton from "../../Other/OtherButton";
+import { useUserContext } from "@/context/UserContext";
 
 const Header = ({ post }: { post: PostResponseDTO }) => {
-  const [isBack, setIsBack] = useState(false);
+  const { setPostData } = useUserContext();
   const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
     setIsMounted(true);
