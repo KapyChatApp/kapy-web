@@ -13,7 +13,7 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { handleDeleteComment } from "@/utils/commentUtils";
 import { handleDeletePost } from "@/utils/postUtils";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 
 const ActionSheet = ({
@@ -106,11 +106,24 @@ const ActionSheet = ({
   };
 
   // Posts
+  const searchParams = useSearchParams();
+  const encoded = searchParams.get("r");
   const handleDeleteMyPost = async () => {
-    if (setPostList && post) {
-      await handleDeletePost(post._id, setPostList, setPostData);
+    if (post) {
+      setPostList
+        ? await handleDeletePost(post._id, setPostList)
+        : await handleDeletePost(post._id, undefined, setPostData);
       setIsBack(false);
     }
+    let returnTo = "/community";
+    if (encoded) {
+      try {
+        returnTo = atob(encoded);
+      } catch (err) {
+        console.warn("Invalid return path");
+      }
+    }
+    router.push(returnTo);
   };
 
   const handleConfirmDeleteMyPost = () => {
