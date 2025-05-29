@@ -1,23 +1,25 @@
 "use client";
 import RightComponent from "@/components/friends/RightComponent";
 import { useFriendContext } from "@/context/FriendContext";
-import { getMyListRequestedFriend } from "@/lib/data/mine/dataRequestFriend";
+import { getMyListFriend } from "@/lib/data/mine/dataAllFriends";
 import React, { useEffect, useState } from "react";
 
-const Page = () => {
-  const { listRequestedFriend, setListRequestedFriend } = useFriendContext();
+const FriendAllPage = () => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const { listFriend, setListFriend } = useFriendContext();
 
   useEffect(() => {
-    const fetchRequestedFriends = async () => {
+    const fetchData = async () => {
       try {
-        await getMyListRequestedFriend(setListRequestedFriend, console.error);
+        await getMyListFriend(setListFriend, setError);
+      } catch {
+        setError("Failed to load all friends.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchRequestedFriends();
+    fetchData();
   }, []);
 
   if (loading) {
@@ -31,4 +33,4 @@ const Page = () => {
   return <RightComponent />;
 };
 
-export default Page;
+export default FriendAllPage;
