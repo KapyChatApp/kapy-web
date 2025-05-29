@@ -5,8 +5,10 @@ import React, { useRef, useState } from "react";
 import PersonalUpdateAva from "../settings/Profile/PersonalUpdateAva";
 import AvatarEditor from "react-avatar-editor";
 import { useUserContext } from "@/context/UserContext";
+import { useParams } from "next/navigation";
 
 const AvatarHeader = ({ account }: { account: AccountData }) => {
+  const { id } = useParams();
   const { newAva, adminInfo } = useUserContext();
   const [updateAva, setUpdateAva] = useState(false);
   const editorRef = useRef<AvatarEditor | null>(null);
@@ -14,8 +16,10 @@ const AvatarHeader = ({ account }: { account: AccountData }) => {
     <>
       <section className="flex row-span-4 mr-7 items-center justify-center">
         <div
-          className="rounded-full w-40 h-40 max-w-[160px] relative overflow-hidden cursor-pointer"
-          onClick={() => setUpdateAva(true)}
+          className={`rounded-full w-40 h-40 max-w-[160px] relative overflow-hidden ${
+            adminInfo._id === id.toString() && "cursor-pointer"
+          }`}
+          onClick={() => id.toString() === adminInfo._id && setUpdateAva(true)}
         >
           <Image
             alt="ava"
