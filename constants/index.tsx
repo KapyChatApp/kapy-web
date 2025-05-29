@@ -20,7 +20,7 @@ export const sidebarLinks: SidebarLink[] = [
   },
   {
     icon: "ri:shake-hands-fill",
-    route: "/friends",
+    route: "/friends/all-friend",
     label: "Your friends"
   },
   {

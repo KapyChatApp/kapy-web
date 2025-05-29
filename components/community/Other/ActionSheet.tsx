@@ -13,7 +13,7 @@ import { CommentResponseDTO } from "@/lib/DTO/comment";
 import { ShortUserResponseDTO } from "@/lib/DTO/user";
 import { handleDeleteComment } from "@/utils/commentUtils";
 import { handleDeletePost } from "@/utils/postUtils";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useUserContext } from "@/context/UserContext";
 
 const ActionSheet = ({
@@ -33,7 +33,7 @@ const ActionSheet = ({
   setComments?: React.Dispatch<React.SetStateAction<CommentResponseDTO[]>>;
   setPostList?: React.Dispatch<React.SetStateAction<PostResponseDTO[]>>;
 }) => {
-  const { setPostData } = useUserContext();
+  const { setPostData, adminInfo } = useUserContext();
   const router = useRouter();
   const [isReport, setReport] = useState(false);
   const [isUnfr, setIsUnfr] = useState(false);
@@ -136,8 +136,16 @@ const ActionSheet = ({
       action: "delete"
     });
   };
+
   const handleEditRoute = () => {
-    post && router.push(`/community/edit/${post._id}`);
+    if (!post) return;
+
+    const baseRoute = `/community/edit/${post._id}`;
+    const r = searchParams.get("r");
+
+    const finalRoute = r ? `${baseRoute}?r=${r}` : baseRoute;
+
+    router.push(finalRoute);
   };
   // const checkAdminComment = !!(
   //   comment &&

@@ -2,11 +2,13 @@
 import PostForm from "@/components/community/Posts/Create-Edit/PostForm";
 import { fetchDetailPost } from "@/lib/data/post/detail";
 import { PostResponseDTO } from "@/lib/DTO/post";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const page = () => {
   const { id } = useParams();
+  const searchParams = useSearchParams();
+  const encoded = searchParams.get("r");
   const [post, setPost] = useState<PostResponseDTO | undefined>(undefined);
   const router = useRouter();
 
@@ -33,7 +35,17 @@ const page = () => {
     <PostForm
       post={post}
       isEdit={true}
-      onFinish={() => router.push(`/community/${post?._id}`)}
+      onFinish={() => {
+        let returnTo = "/community";
+        if (encoded) {
+          try {
+            returnTo = atob(encoded);
+          } catch (err) {
+            console.warn("Invalid return path");
+          }
+        }
+        router.push(returnTo);
+      }}
     />
   );
 };
