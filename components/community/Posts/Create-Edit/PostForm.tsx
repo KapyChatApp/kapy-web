@@ -54,20 +54,11 @@ const PostForm = ({
     }
     onFinish();
   };
-
-  const router = useRouter();
-  const handleBack = () => {
-    if (isEdit) {
-      router.push(`/community`);
-    } else {
-      onFinish();
-    }
-  };
   const handleConfirmBack = () => {
     setIsConfirm(true);
     setConfirm({
       setConfirm: setIsConfirm,
-      handleAction: handleBack,
+      handleAction: onFinish,
       name: "your changes",
       action: "discard"
     });

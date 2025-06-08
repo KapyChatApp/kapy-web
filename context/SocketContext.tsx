@@ -288,7 +288,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   //initialize a socket
   useEffect(() => {
-    const newSocket = io("http://localhost:3000", {
+    const newSocket = io("http://localhost:4000", {
       transports: ["websocket", "polling"],
       withCredentials: true
     });
