@@ -16,7 +16,6 @@ import {
   SocketUser
 } from "@/types/socket";
 import Peer, { SignalData } from "simple-peer";
-import { ResponseMessageDTO } from "@/lib/DTO/message";
 import { useChatContext } from "./ChatContext";
 
 interface iSocketContext {
@@ -288,7 +287,7 @@ export const SocketContextProvider: React.FC<{ children: React.ReactNode }> = ({
 
   //initialize a socket
   useEffect(() => {
-    const newSocket = io("http://localhost:4000", {
+    const newSocket = io(process.env.BASE_URL_SOCKET, {
       transports: ["websocket", "polling"],
       withCredentials: true
     });
