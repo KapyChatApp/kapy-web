@@ -127,24 +127,33 @@ const MeetingRoom = () => {
         {ongoingGroupCall && (
           <div className="w-full max-h-[70vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
             {currentStream && (
-              <VideoContainer
-                stream={currentStream}
-                isLocalStream={true}
-                isOnCall={isOnCall}
-                isMeetingRoom={true}
-              />
+              <div className="flex flex-col gap-2">
+                <span className="text-primary-500">You</span>
+                <VideoContainer
+                  stream={currentStream}
+                  isLocalStream={true}
+                  isOnCall={isOnCall}
+                  isMeetingRoom={true}
+                />
+              </div>
             )}
             {peers &&
               peers.map((peerItem, index) => {
                 if (peerItem.stream) {
                   return (
-                    <VideoContainer
-                      key={index}
-                      stream={peerItem.stream}
-                      isLocalStream={false}
-                      isOnCall={isOnCall}
-                      isMeetingRoom={true}
-                    />
+                    <div className="flex flex-col gap-2">
+                      <span className="text-light-500">
+                        {peerItem.participantUser.profile.firstName}{" "}
+                        {peerItem.participantUser.profile.lastName}
+                      </span>
+                      <VideoContainer
+                        key={index}
+                        stream={peerItem.stream}
+                        isLocalStream={false}
+                        isOnCall={isOnCall}
+                        isMeetingRoom={true}
+                      />
+                    </div>
                   );
                 }
                 return null;
